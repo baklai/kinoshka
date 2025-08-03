@@ -4,7 +4,6 @@ import { ApplicationProvider, useApplication } from '@/providers/ApplicationProv
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { type SQLiteDatabase } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -19,27 +18,6 @@ export default function RootLayoutProvider() {
       </SafeAreaProvider>
     </ApplicationProvider>
   );
-}
-
-async function migrateDbIfNeeded(db: SQLiteDatabase) {
-  const DATABASE_VERSION = 1;
-
-  const result = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
-
-  let currentDbVersion = result?.user_version ? Number(result.user_version) : 0;
-
-  if (currentDbVersion >= DATABASE_VERSION) {
-    return;
-  }
-  if (currentDbVersion === 0) {
-    await db.execAsync(
-      `PRAGMA journal_mode = 'wal';
-CREATE TABLE movies (id TEXT PRIMARY KEY NOT NULL, title TEXT NOT NULL, description TEXT);`
-    );
-    currentDbVersion = 1;
-  }
-
-  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
 }
 
 function RootLayout() {
