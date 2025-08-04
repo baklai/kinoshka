@@ -2,10 +2,10 @@ import Sidebar from '@/components/Sidebar';
 import categories from '@/constants/Categories';
 import { ApplicationProvider, useApplication } from '@/providers/ApplicationProvider';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayoutProvider() {
@@ -23,17 +23,10 @@ export default function RootLayoutProvider() {
 function RootLayout() {
   const { selectedCategory, setSelectedCategory } = useApplication();
 
-  const [loaded] = useFonts({
-    SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf')
-  });
-
-  if (!loaded) {
-    return <ActivityIndicator size="large" style={{ flex: 1 }} />;
-  }
-
-  const CustomDarkTheme = {
+  const DefaultTheme = {
     ...DarkTheme,
     dark: true,
+    fontFamily: 'e-Ukraine',
     colors: {
       ...DarkTheme.colors,
       primary: 'rgb(10, 132, 255)',
@@ -46,7 +39,7 @@ function RootLayout() {
   };
 
   return (
-    <ThemeProvider value={CustomDarkTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <View style={styles.container}>
         <Sidebar
           categories={categories}

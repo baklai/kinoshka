@@ -5,6 +5,10 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "typeRoots": [
+        "./node_modules/@types",
+        "./node_modules/react-native-tvos"
       ]
     }
   },

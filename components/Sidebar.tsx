@@ -1,15 +1,13 @@
-import KinoshkaImage from '@/assets/images/kinoshka.png';
 import { CategoryProps } from '@/types/category.type';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BackHandler,
-  Image,
+  Pressable, // Используем Pressable вместо TouchableOpacity
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
 
@@ -24,29 +22,39 @@ export default function Sidebar({
   selectedCategory,
   onSelectedCategory
 }: SidebarProps) {
+  // Состояние для отслеживания сфокусированного элемента
+  const [focusedItem, setFocusedItem] = useState<string | null>(null);
+
   const handleExit = () => {
     BackHandler.exitApp();
   };
 
   return (
     <View style={styles.sidebar}>
-      <View style={styles.topContainer}>
-        <Image source={KinoshkaImage} style={{ width: 280, height: 50, resizeMode: 'stretch' }} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      {/* ScrollView должен быть фокусируемым, чтобы его можно было прокручивать пультом */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        focusable={true}
+        // tvParallaxProperties - это пропс, который добавляет небольшую анимацию при фокусе,
+        // что улучшает UX на Android TV.
+        // @ts-ignore
+        tvParallaxProperties={{ enabled: true }}
+      >
         {categories.map(category => (
-          <TouchableOpacity
+          // Используем Pressable для лучшей обработки фокуса
+          <Pressable
             key={category.name}
             style={[
               styles.item,
-              selectedCategory === category.name && { backgroundColor: '#333333' }
+              selectedCategory === category.name && { backgroundColor: '#333333' },
+              focusedItem === `category-${category.name}` && styles.focusedItem
             ]}
             onPress={() => {
               onSelectedCategory(category.name);
               router.push('/');
             }}
-            activeOpacity={0.6}
+            onFocus={() => setFocusedItem(`category-${category.name}`)}
+            onBlur={() => setFocusedItem(null)}
           >
             <MaterialIcons
               name={category.icon || 'folder'}
@@ -55,59 +63,68 @@ export default function Sidebar({
               style={styles.icon}
             />
             <Text style={styles.itemText}>{category.description}</Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
 
       <View style={styles.bottomContainer}>
         <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.bottomItem}
-            activeOpacity={0.6}
+          <Pressable
+            style={[styles.bottomItem, focusedItem === 'history' && styles.focusedItem]}
             onPress={() => router.push('/history')}
+            onFocus={() => setFocusedItem('history')}
+            onBlur={() => setFocusedItem(null)}
           >
             <MaterialIcons name="history" size={22} color="#c5c5c5" style={styles.icon} />
             <Text style={styles.itemText}>Історія</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={styles.bottomItem}
-            activeOpacity={0.6}
+          <Pressable
+            style={[styles.bottomItem, focusedItem === 'bookmarks' && styles.focusedItem]}
             onPress={() => router.push('/bookmarks')}
+            onFocus={() => setFocusedItem('bookmarks')}
+            onBlur={() => setFocusedItem(null)}
           >
             <MaterialIcons name="bookmark" size={22} color="#c5c5c5" style={styles.icon} />
             <Text style={styles.itemText}>Закладки</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.separator} />
 
         <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.bottomItem}
-            activeOpacity={0.6}
+          <Pressable
+            style={[styles.bottomItem, focusedItem === 'settings' && styles.focusedItem]}
             onPress={() => router.push('/options')}
+            onFocus={() => setFocusedItem('settings')}
+            onBlur={() => setFocusedItem(null)}
           >
             <MaterialIcons name="settings" size={22} color="#c5c5c5" style={styles.icon} />
             <Text style={styles.itemText}>Налаштування</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.bottomItem}
-            activeOpacity={0.6}
+          </Pressable>
+          <Pressable
+            style={[styles.bottomItem, focusedItem === 'about' && styles.focusedItem]}
             onPress={() => router.push('/about')}
+            onFocus={() => setFocusedItem('about')}
+            onBlur={() => setFocusedItem(null)}
           >
             <MaterialIcons name="info" size={22} color="#c5c5c5" style={styles.icon} />
             <Text style={styles.itemText}>Про додаток</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.separator} />
 
         <View style={styles.section}>
-          <TouchableOpacity style={styles.bottomItem} activeOpacity={0.6} onPress={handleExit}>
+          <Pressable
+            style={[styles.bottomItem, focusedItem === 'exit' && styles.focusedItem]}
+            onPress={handleExit}
+            onFocus={() => setFocusedItem('exit')}
+            onBlur={() => setFocusedItem(null)}
+          >
             <MaterialIcons name="exit-to-app" size={22} color="#c5c5c5" style={styles.icon} />
             <Text style={styles.itemText}>Вихід</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -136,15 +153,11 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 600
+    fontSize: 16,
+    fontWeight: '600'
   },
   icon: {
     marginRight: 10
-  },
-  topContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 10
   },
   bottomContainer: {
     paddingVertical: 10,
@@ -164,5 +177,12 @@ const styles = StyleSheet.create({
     height: 1,
     marginVertical: 5,
     backgroundColor: '#333333'
+  },
+  // Новый стиль для элемента в фокусе
+  focusedItem: {
+    borderColor: '#007bff', // Или другой цвет для выделения
+    borderWidth: 2,
+    borderRadius: 6,
+    backgroundColor: '#444444' // Можно изменить фон
   }
 });

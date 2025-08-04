@@ -1,6 +1,6 @@
-import KinoshkaImage from '@/assets/images/kinoshka.png';
+import { Image } from 'expo-image';
 import { Stack } from 'expo-router';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function AboutScreen() {
   return (
@@ -17,7 +17,11 @@ export default function AboutScreen() {
         }}
       />
       <View style={styles.container}>
-        <Image source={KinoshkaImage} style={{ width: 280, height: 50, resizeMode: 'stretch' }} />
+        <Image
+          source={require('@/assets/images/adaptive-icon.png')}
+          style={{ width: 200, height: 200 }}
+          contentFit="cover"
+        />
 
         <Text style={styles.text}>
           Додаток, що поєднує в собі віртуальний online кінотеатр і агрегатор відеокодеків. Дає
@@ -42,6 +46,8 @@ const styles = StyleSheet.create({
     gap: 6
   },
   text: {
+    fontSize: 14,
+    fontWeight: 600,
     color: '#fff',
     maxWidth: 400,
     textAlign: 'center'

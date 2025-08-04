@@ -40,6 +40,44 @@
         {
           "assets": ["assets"]
         }
+      ],
+      [
+        "expo-font",
+        {
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "e-Ukraine",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Thin.otf",
+                    "weight": 100
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-UltraLight.otf",
+                    "weight": 200
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Light.otf",
+                    "weight": 300
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Regular.otf",
+                    "weight": 400
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Medium.otf",
+                    "weight": 500
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Bold.otf",
+                    "weight": 600
+                  }
+                ]
+              }
+            ]
+          }
+        }
       ]
     ],
     "experiments": {

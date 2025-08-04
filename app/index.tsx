@@ -14,13 +14,15 @@ export default function HomeScreen() {
   useEffect(() => {
     async function setup() {
       try {
-        const response = await axios.get<Record<string, any>>('/api/movies', {
-          params: {
-            category: selectedCategory,
-            limit: 40,
-            offset: 0
+        const response = await axios.get<Record<string, any>>(
+          'http://192.19.2.21:3000/api/movies',
+          {
+            params: {
+              limit: 5,
+              offset: 0
+            }
           }
-        });
+        );
 
         const records = response.data.docs;
 
@@ -31,7 +33,7 @@ export default function HomeScreen() {
     }
 
     setup();
-  }, []);
+  }, [selectedCategory]);
 
   return (
     <>
