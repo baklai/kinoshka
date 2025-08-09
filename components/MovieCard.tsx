@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   imageWrapper: {
-    width: scaledPixels(240),
-    height: scaledPixels(360),
+    width: scaledPixels(200),
+    height: scaledPixels(300),
     borderRadius: scaledPixels(3),
     overflow: 'hidden',
     position: 'relative'

@@ -1,157 +1,170 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { useRouter } from 'expo-router';
-import { StyleSheet, TVFocusGuideView } from 'react-native';
+import { MovieProps } from '@/types/movie.type';
+import { Image } from 'expo-image';
+import { useCallback, useState } from 'react';
+import {
+  Alert,
+  Animated,
+  Button,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TVFocusGuideView,
+  useTVEventHandler,
+  View
+} from 'react-native';
 
 export default function IndexScreen() {
-  const router = useRouter();
+  const [focusedItem, setFocusedItem] = useState<MovieProps | null>(null);
 
-  // const renderHeader = useCallback(
-  //   () => (
-  //     <View style={styles.header}>
-  //       <Image
-  //         style={styles.headerImage}
-  //         source={{
-  //           uri: focusedItem.headerImage
-  //         }}
-  //         resizeMode="cover"
-  //       />
-  //       <View style={styles.headerTextContainer}>
-  //         <Text style={styles.headerTitle}>{focusedItem.title}</Text>
-  //         <Text style={styles.headerDescription}>
-  //           {focusedItem.description}
-  //         </Text>
-  //       </View>
-  //     </View>
-  //   ),
-  //   [
-  //     focusedItem.headerImage,
-  //     focusedItem.title,
-  //     focusedItem.description,
-  //     styles.header,
-  //     styles.gradientLeft,
-  //     styles.gradientBottom
-  //   ]
-  // );
+  const upTVEventHandler = useCallback((evt: { eventType: string }) => {
+    if (
+      evt.eventType === 'up' ||
+      evt.eventType === 'down' ||
+      evt.eventType === 'left' ||
+      evt.eventType === 'right'
+    ) {
+      if (focusedItem) {
+        setFocusedItem(null);
+        return true;
+      }
+    }
+
+    return false;
+  }, []);
+
+  if (Platform.isTV) {
+    useTVEventHandler(upTVEventHandler);
+  }
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+  const blurhash =
+    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+
+  const renderHeader = useCallback(
+    () => (
+      <Animated.View>
+        <View style={styles.headerContainer}>
+          <View style={styles.headerImageContainer}>
+            <Image
+              style={styles.headerImage}
+              source={focusedItem?.poster}
+              placeholder={{ blurhash }}
+              contentFit="cover"
+              transition={1000}
+            />
+          </View>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>{focusedItem?.title}</Text>
+            <Text style={styles.headerText}>Якість: 1080p</Text>
+            <Text style={styles.headerText}>Рік виходу: {focusedItem?.year}</Text>
+            <Text style={styles.headerDescription}>{focusedItem?.description}</Text>
+            <View style={styles.fixToText}>
+              <Button title="View video" onPress={() => Alert.alert('Left button pressed')} />
+              <Button title="Favorite" onPress={() => Alert.alert('Right button pressed')} />
+            </View>
+          </View>
+        </View>
+      </Animated.View>
+    ),
+    [focusedItem]
+  );
+
+  const hendleSelectItem = (value: MovieProps) => {
+    setFocusedItem(value);
+  };
 
   return (
-    <TVFocusGuideView trapFocusLeft trapFocusDown>
-      {/* {renderHeader()} */}
-      <MoviesFlatList />
-    </TVFocusGuideView>
+    <>
+      {focusedItem && renderHeader()}
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingVertical: scaledPixels(14) }}
+        showsVerticalScrollIndicator={false}
+      >
+        <TVFocusGuideView trapFocusLeft>
+          <MoviesFlatList
+            api={apiUrl}
+            category="Фільми"
+            filters={{ category: 'filmy' }}
+            onPress={hendleSelectItem}
+          />
+        </TVFocusGuideView>
+
+        <TVFocusGuideView trapFocusLeft>
+          <MoviesFlatList
+            api={apiUrl}
+            category="Серіали"
+            filters={{ category: 'seriesss' }}
+            onPress={hendleSelectItem}
+          />
+        </TVFocusGuideView>
+
+        <TVFocusGuideView trapFocusLeft>
+          <MoviesFlatList
+            api={apiUrl}
+            category="Мультфільми"
+            filters={{ category: 'cartoon' }}
+            onPress={hendleSelectItem}
+          />
+        </TVFocusGuideView>
+      </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
+  fixToText: {
+    gap: scaledPixels(8),
+    flexDirection: 'row',
+    paddingVertical: scaledPixels(8)
   },
-  scrollContent: {
-    flex: 1,
-    marginBottom: scaledPixels(48)
-  },
-  highlightsTitle: {
-    color: '#fff',
-    fontSize: scaledPixels(34),
-    fontWeight: 'bold',
-    marginBottom: scaledPixels(10),
-    marginTop: scaledPixels(15),
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: scaledPixels(10)
+  headerContainer: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    padding: scaledPixels(10),
+    backgroundColor: '#202124'
   },
   headerTitle: {
     color: '#fff',
-    fontSize: scaledPixels(48),
+    fontSize: scaledPixels(28),
     fontWeight: 'bold',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: scaledPixels(10)
   },
+  headerText: {
+    color: '#fff',
+    fontSize: scaledPixels(22)
+  },
   headerDescription: {
     color: '#fff',
-    fontSize: scaledPixels(24),
+    fontSize: scaledPixels(18),
     fontWeight: '500',
     paddingTop: scaledPixels(16),
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: scaledPixels(10)
+    textShadowRadius: scaledPixels(10),
+    lineHeight: 22,
+    marginTop: 8,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    maxWidth: '80%'
   },
-  thumbnailTextContainer: {
-    position: 'absolute',
-    bottom: scaledPixels(10),
-    left: scaledPixels(10),
-    right: scaledPixels(10),
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: scaledPixels(5),
-    borderRadius: scaledPixels(3)
-  },
-  thumbnailText: {
-    color: '#fff',
-    fontSize: scaledPixels(18),
-    fontWeight: 'bold',
-    textAlign: 'center'
-  },
-  highlightThumbnail: {
+  headerImageContainer: {
     width: scaledPixels(400),
-    height: scaledPixels(240),
-    marginRight: scaledPixels(10),
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: scaledPixels(5)
-  },
-  highlightThumbnailFocused: {
-    borderColor: '#fff',
-    borderWidth: scaledPixels(4)
-  },
-  highlightsContainer: {
-    padding: scaledPixels(10),
-    height: scaledPixels(360)
-  },
-  thumbnailPlaceholder: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    width: '100%',
-    height: '100%',
-    borderRadius: scaledPixels(5)
-  },
-  header: {
-    width: '100%',
-    height: scaledPixels(700),
-    position: 'relative'
+    height: scaledPixels(600)
   },
   headerImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover'
+    width: '90%',
+    height: '90%',
+    borderRadius: scaledPixels(8)
   },
-  gradientLeft: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    height: '100%'
-  },
-  gradientBottom: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '15%'
-  },
-  headerTextContainer: {
-    position: 'absolute',
-    left: scaledPixels(40),
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    width: '50%'
-  },
-  highlightsList: {
-    paddingLeft: scaledPixels(20)
-  },
-  cardImage: {
-    width: '100%',
-    height: '70%',
-    borderTopLeftRadius: scaledPixels(10),
-    borderTopRightRadius: scaledPixels(10)
-  }
+  headerTextContainer: {}
 });

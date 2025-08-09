@@ -16,7 +16,6 @@ export default function DrawerLayout() {
           drawerPosition: 'left',
           drawerStyle: {
             backgroundColor: '#202124',
-            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.9), 0 8px 10px -6px rgba(0,0,0,0.9)',
             width: 280
           },
           overlayColor: 'rgba(0,0,0,0.6)',

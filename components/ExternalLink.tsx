@@ -4,7 +4,7 @@ import { Linking, Pressable } from 'react-native';
 
 type Props = Omit<ComponentProps<typeof Link>, 'href'> & { href: string };
 
-export function ExternalLink({ href, ...rest }: Props) {
+export function ExternalLink({ href, ...props }: Props) {
   // On TV, use a Pressable (which handles focus navigation) instead of the Link component
   return (
     <Pressable
@@ -13,7 +13,7 @@ export function ExternalLink({ href, ...rest }: Props) {
         opacity: pressed || focused ? 0.6 : 1.0
       })}
     >
-      {rest.children}
+      {props.children}
     </Pressable>
   );
 }

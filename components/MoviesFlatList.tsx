@@ -2,24 +2,35 @@ import MovieCard from '@/components/MovieCard';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const LIMIT = 10;
+const LIMIT = 6;
 
-const MoviesFlatList = () => {
+const MoviesFlatList = ({
+  api,
+  category,
+  filters,
+  onPress
+}: {
+  api?: string;
+  category: string;
+  filters: Record<string, any>;
+  onPress: (id: MovieProps) => void;
+}) => {
   const [data, setData] = useState<MovieProps[]>([]);
   const [offset, setOffset] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
-
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   const fetchData = useCallback(async () => {
     if (loading || !hasNextPage) return;
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/movies?limit=${LIMIT}&offset=${offset}`);
+      const response = await fetch(
+        `${api}/api/movies?limit=${LIMIT}&offset=${offset}&filters={"category": "${filters.category}"}`
+      );
+
       const result = await response.json();
 
       const newItems = result.docs || [];
@@ -44,11 +55,13 @@ const MoviesFlatList = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: MovieProps }) => (
-      <View style={{ margin: scaledPixels(6) }}>
-        <MovieCard {...item} />
-      </View>
+      <TouchableOpacity onPress={() => onPress(item)}>
+        <View style={{ margin: scaledPixels(6) }}>
+          <MovieCard {...item} />
+        </View>
+      </TouchableOpacity>
     ),
-    []
+    [onPress]
   );
 
   if (!data.length) {
@@ -57,7 +70,7 @@ const MoviesFlatList = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Фільми</Text>
+      <Text style={styles.title}>{category}</Text>
       <FlatList
         data={data}
         horizontal
