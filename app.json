@@ -79,6 +79,7 @@
         }
       ]
     ],
+    "platforms": ["ios", "android"],
     "android": {
       "splash": {
         "image": "./assets/images/splash-icon.png"
@@ -95,11 +96,6 @@
       "splash": {
         "image": "./assets/images/splash-icon.png"
       }
-    },
-    "web": {
-      "bundler": "metro",
-      "favicon": "./assets/images/favicon.png",
-      "output": "static"
     },
     "experiments": {
       "typedRoutes": true

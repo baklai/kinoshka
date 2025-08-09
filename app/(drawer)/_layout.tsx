@@ -3,7 +3,7 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { useCallback } from 'react';
-import { useTVEventHandler } from 'react-native';
+import { Platform, useTVEventHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function DrawerLayout() {
@@ -26,7 +26,9 @@ export default function DrawerLayout() {
     [navigation]
   );
 
-  useTVEventHandler(myTVEventHandler);
+  if (Platform.isTV) {
+    useTVEventHandler(myTVEventHandler);
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'red' }}>

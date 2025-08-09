@@ -1,26 +1,19 @@
-import { Href, Link } from 'expo-router';
-import { openBrowserAsync } from 'expo-web-browser';
+import { Link } from 'expo-router';
 import { type ComponentProps } from 'react';
-import { Platform } from 'react-native';
+import { Linking, Pressable } from 'react-native';
 
-type Props = Omit<ComponentProps<typeof Link>, 'href'> & {
-  href: Href & string;
-};
+type Props = Omit<ComponentProps<typeof Link>, 'href'> & { href: string };
 
-export default function ExternalLink({ href, ...props }: Props) {
+export function ExternalLink({ href, ...rest }: Props) {
+  // On TV, use a Pressable (which handles focus navigation) instead of the Link component
   return (
-    <Link
-      target="_blank"
-      {...props}
-      href={href}
-      onPress={async event => {
-        if (Platform.OS !== 'web') {
-          // Prevent the default behavior of linking to the default browser on native.
-          event.preventDefault();
-          // Open the link in an in-app browser.
-          await openBrowserAsync(href);
-        }
-      }}
-    />
+    <Pressable
+      onPress={() => Linking.openURL(href).catch(reason => alert(`${reason}`))}
+      style={({ pressed, focused }) => ({
+        opacity: pressed || focused ? 0.6 : 1.0
+      })}
+    >
+      {rest.children}
+    </Pressable>
   );
 }
