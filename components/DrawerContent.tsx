@@ -38,7 +38,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
       <View style={styles.headerContainer}>
         <Image
           source={require('@/assets/images/logo.png')}
-          style={{ width: 50, height: 50 }}
+          style={{ width: 30, height: 30 }}
           contentFit="cover"
         />
         <Text style={styles.headerTitle}>KinoshkaTV</Text>
@@ -119,7 +119,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     height: scaledPixels(90),
-    gap: scaledPixels(6),
+    gap: scaledPixels(14),
+    paddingHorizontal: scaledPixels(18),
     backgroundColor: '#1B1C1E',
     borderBottomColor: '#17171A',
     borderBottomWidth: 1
