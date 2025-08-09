@@ -75,21 +75,6 @@
             ]
           }
         }
-      ],
-      [
-        "react-native-video",
-        {
-          "enableNotificationControls": false,
-          "enableBackgroundAudio": false,
-          "enableADSExtension": false,
-          "enableCacheExtension": false,
-          "androidExtensions": {
-            "useExoplayerRtsp": false,
-            "useExoplayerSmoothStreaming": true,
-            "useExoplayerHls": false,
-            "useExoplayerDash": false
-          }
-        }
       ]
     ],
     "android": {

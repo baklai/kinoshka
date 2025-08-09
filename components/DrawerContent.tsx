@@ -37,7 +37,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
     <>
       <View style={styles.headerContainer}>
         <Image
-          source={require('@/assets/images/adaptive-icon.png')}
+          source={require('@/assets/images/logo.png')}
           style={{ width: 50, height: 50 }}
           contentFit="cover"
         />
