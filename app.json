@@ -78,7 +78,6 @@
       ]
     ],
     "android": {
-      "usesCleartextTraffic": true,
       "edgeToEdgeEnabled": true,
       "splash": {
         "image": "./assets/images/splash.png"
