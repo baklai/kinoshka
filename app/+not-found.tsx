@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     fontWeight: 600
   },
   link: {
+    color: '#fff',
     marginTop: 15,
     paddingVertical: 15
   }

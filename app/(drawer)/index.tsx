@@ -1,11 +1,10 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { useNavigation, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
 
   // const renderHeader = useCallback(
   //   () => (

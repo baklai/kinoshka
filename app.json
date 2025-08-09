@@ -6,13 +6,17 @@
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "scheme": "routertv",
     "plugins": [
       [
         "@react-native-tvos/config-tv",
         {
-          "androidTVBanner": "./assets/tv_icons/icon-400x240.png",
+          "isTV": true,
+          "showVerboseWarnings": false,
+          "tvosDeploymentTarget": "15.1",
+          "removeFlipperOnAndroid": true,
+          "androidTVBanner": "assets/tv_icons/tv_banner.png",
+          "androidTVIcon": "assets/tv_icons/tv_icon.png",
           "appleTVImages": {
             "icon": "./assets/tv_icons/icon-1280x768.png",
             "iconSmall": "./assets/tv_icons/icon-400x240.png",
@@ -28,16 +32,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#0E0E0F"
-        }
-      ],
-      [
-        "expo-asset",
-        {
-          "assets": ["assets/images", "assets/tv_icons"]
         }
       ],
       [
@@ -79,27 +77,27 @@
         }
       ]
     ],
-    "platforms": ["ios", "android"],
     "android": {
-      "splash": {
-        "image": "./assets/images/splash-icon.png"
-      },
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#0E0E0F"
-      },
       "edgeToEdgeEnabled": true,
+      "splash": {
+        "image": "./assets/images/splash.png"
+      },
       "package": "com.baklai.KinoshkaTV"
     },
     "ios": {
-      "supportsTablet": true,
       "splash": {
-        "image": "./assets/images/splash-icon.png"
+        "image": "./assets/images/splash.png"
       }
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "output": "static"
     },
     "experiments": {
       "typedRoutes": true
     },
+    "newArchEnabled": true,
     "extra": {
       "router": {}
     },
