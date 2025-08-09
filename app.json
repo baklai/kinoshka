@@ -37,7 +37,7 @@
       [
         "expo-asset",
         {
-          "assets": ["assets"]
+          "assets": ["assets/images", "assets/tv_icons"]
         }
       ],
       [
