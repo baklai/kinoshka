@@ -1,0 +1,112 @@
+{
+  "expo": {
+    "name": "KinoshkaTV",
+    "slug": "KinoshkaTV",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "scheme": "routertv",
+    "plugins": [
+      [
+        "@react-native-tvos/config-tv",
+        {
+          "androidTVBanner": "./assets/tv_icons/icon-400x240.png",
+          "appleTVImages": {
+            "icon": "./assets/tv_icons/icon-1280x768.png",
+            "iconSmall": "./assets/tv_icons/icon-400x240.png",
+            "iconSmall2x": "./assets/tv_icons/icon-800x480.png",
+            "topShelf": "./assets/tv_icons/icon-1920x720.png",
+            "topShelf2x": "./assets/tv_icons/icon-3840x1440.png",
+            "topShelfWide": "./assets/tv_icons/icon-2320x720.png",
+            "topShelfWide2x": "./assets/tv_icons/icon-4640x1440.png"
+          }
+        }
+      ],
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0E0E0F"
+        }
+      ],
+      [
+        "expo-asset",
+        {
+          "assets": ["assets"]
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "e-Ukraine",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Thin.otf",
+                    "weight": 100
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-UltraLight.otf",
+                    "weight": 200
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Light.otf",
+                    "weight": 300
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Regular.otf",
+                    "weight": 400
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Medium.otf",
+                    "weight": 500
+                  },
+                  {
+                    "path": "./assets/fonts/e-ukraine/e-Ukraine-Bold.otf",
+                    "weight": 600
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    ],
+    "android": {
+      "splash": {
+        "image": "./assets/images/splash-icon.png"
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#0E0E0F"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.baklai.KinoshkaTV"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "splash": {
+        "image": "./assets/images/splash-icon.png"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "output": "static"
+    },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {}
+    },
+    "owner": "Dmytro Baklai"
+  }
+}
