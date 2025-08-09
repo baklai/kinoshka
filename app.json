@@ -15,8 +15,8 @@
           "showVerboseWarnings": false,
           "tvosDeploymentTarget": "15.1",
           "removeFlipperOnAndroid": true,
-          "androidTVBanner": "assets/tv_icons/tv_banner.png",
-          "androidTVIcon": "assets/tv_icons/tv_icon.png",
+          "androidTVBanner": "./assets/tv_icons/tv_banner.png",
+          "androidTVIcon": "./assets/tv_icons/tv_icon.png",
           "appleTVImages": {
             "icon": "./assets/tv_icons/icon-1280x768.png",
             "iconSmall": "./assets/tv_icons/icon-400x240.png",
@@ -75,6 +75,21 @@
             ]
           }
         }
+      ],
+      [
+        "react-native-video",
+        {
+          "enableNotificationControls": false,
+          "enableBackgroundAudio": false,
+          "enableADSExtension": false,
+          "enableCacheExtension": false,
+          "androidExtensions": {
+            "useExoplayerRtsp": false,
+            "useExoplayerSmoothStreaming": true,
+            "useExoplayerHls": false,
+            "useExoplayerDash": false
+          }
+        }
       ]
     ],
     "android": {
@@ -83,7 +98,7 @@
       "splash": {
         "image": "./assets/images/splash.png"
       },
-      "package": "com.baklai.KinoshkaTV"
+      "package": "com.anonymous.KinoshkaTV"
     },
     "ios": {
       "splash": {
@@ -101,7 +116,6 @@
     "newArchEnabled": true,
     "extra": {
       "router": {}
-    },
-    "owner": "Dmytro Baklai"
+    }
   }
 }
