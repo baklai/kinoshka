@@ -7,7 +7,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 const LIMIT = 10;
 
 const MoviesFlatList = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<MovieProps[]>([]);
   const [offset, setOffset] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,11 @@ const MoviesFlatList = () => {
 
       const newItems = result.docs || [];
 
-      setData(prev => [...prev, ...newItems]);
+      setData((prev: MovieProps[]) => {
+        const existingIds = new Set(prev.map((item: MovieProps) => item.id));
+        const filteredNewItems = newItems.filter((item: MovieProps) => !existingIds.has(item.id));
+        return [...prev, ...filteredNewItems];
+      });
       setOffset(prev => prev + LIMIT);
       setHasNextPage(result.hasNextPage);
     } catch (error) {
@@ -38,10 +42,13 @@ const MoviesFlatList = () => {
     fetchData();
   }, []);
 
-  const renderItem = ({ item, index }: { item: MovieProps; index: number }) => (
-    <View style={{ margin: 6 }}>
-      <MovieCard {...item} />
-    </View>
+  const renderItem = useCallback(
+    ({ item }: { item: MovieProps }) => (
+      <View style={{ margin: scaledPixels(6) }}>
+        <MovieCard {...item} />
+      </View>
+    ),
+    []
   );
 
   if (!data.length) {
@@ -53,14 +60,13 @@ const MoviesFlatList = () => {
       <Text style={styles.title}>Фільми</Text>
       <FlatList
         data={data}
+        horizontal
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        horizontal
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         onEndReached={fetchData}
         onEndReachedThreshold={0.5}
-        removeClippedSubviews={true}
         ListEmptyComponent={<Text>Нет данных</Text>}
       />
     </View>
@@ -70,7 +76,9 @@ const MoviesFlatList = () => {
 const styles = StyleSheet.create({
   container: {},
   title: {
-    margin: scaledPixels(10)
+    color: '#fff',
+    fontWeight: 'bold',
+    padding: scaledPixels(10)
   }
 });
 
