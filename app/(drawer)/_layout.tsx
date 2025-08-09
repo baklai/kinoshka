@@ -8,6 +8,7 @@ export default function DrawerLayout() {
       <Drawer
         drawerContent={props => <DrawerContent {...props} />}
         screenOptions={{
+          lazy: true,
           headerShown: false,
           swipeEnabled: true,
           swipeEdgeWidth: 50,
@@ -21,8 +22,7 @@ export default function DrawerLayout() {
           overlayColor: 'rgba(0,0,0,0.6)',
           keyboardDismissMode: 'none',
           drawerHideStatusBarOnOpen: true,
-          drawerStatusBarAnimation: 'slide',
-          lazy: true
+          drawerStatusBarAnimation: 'slide'
         }}
       >
         <Drawer.Screen name="index" />

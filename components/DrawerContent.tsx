@@ -8,15 +8,7 @@ import {
 } from '@react-navigation/drawer';
 import { Image } from 'expo-image';
 import { useCallback } from 'react';
-import {
-  BackHandler,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useTVEventHandler,
-  View
-} from 'react-native';
+import { BackHandler, Platform, StyleSheet, Text, useTVEventHandler, View } from 'react-native';
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
   const { navigation } = props;
@@ -36,7 +28,9 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
   }
 
   const handleExit = () => {
-    BackHandler.exitApp();
+    if (Platform.OS === 'android') {
+      BackHandler.exitApp();
+    }
   };
 
   return (
@@ -56,76 +50,63 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
         contentContainerStyle={styles.drawerScrollContainer}
       >
         {categories.map((category, index) => (
-          <TouchableOpacity
+          <DrawerItem
             key={category.name}
-            hasTVPreferredFocus={index === 0}
+            label={category.description}
+            style={styles.drawerItem}
+            labelStyle={styles.drawerItemLabel}
+            icon={({ color, size }) => (
+              <MaterialIcons color={color} size={size} name={category.icon || 'folder'} />
+            )}
             onPress={() => navigation.navigate('index')}
-          >
-            <DrawerItem
-              label={category.description}
-              icon={({ focused, color, size }) => (
-                <MaterialIcons color={color} size={size} name={category.icon || 'folder'} />
-              )}
-              onPress={() => navigation.navigate('index')}
-            />
-          </TouchableOpacity>
+          />
         ))}
       </DrawerContentScrollView>
 
-      <View style={styles.footerContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('history')}>
-          <DrawerItem
-            label="Історія"
-            icon={({ focused, color, size }) => (
-              <MaterialIcons color={color} size={size} name="history" />
-            )}
-            onPress={() => navigation.navigate('history')}
-          />
-        </TouchableOpacity>
+      <View>
+        <DrawerItem
+          label="Історія"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="history" />}
+          onPress={() => navigation.navigate('history')}
+        />
 
-        <TouchableOpacity onPress={() => navigation.navigate('bookmarks')}>
-          <DrawerItem
-            label="Закладки"
-            icon={({ focused, color, size }) => (
-              <MaterialIcons color={color} size={size} name="bookmark" />
-            )}
-            onPress={() => navigation.navigate('bookmarks')}
-          />
-        </TouchableOpacity>
+        <DrawerItem
+          label="Закладки"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="bookmark" />}
+          onPress={() => navigation.navigate('bookmarks')}
+        />
 
         <View style={styles.separator} />
 
-        <TouchableOpacity onPress={() => navigation.navigate('options')}>
-          <DrawerItem
-            label="Налаштування"
-            icon={({ focused, color, size }) => (
-              <MaterialIcons color={color} size={size} name="settings" />
-            )}
-            onPress={() => navigation.navigate('options')}
-          />
-        </TouchableOpacity>
+        <DrawerItem
+          label="Налаштування"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="settings" />}
+          onPress={() => navigation.navigate('options')}
+        />
 
-        <TouchableOpacity onPress={() => navigation.navigate('about')}>
-          <DrawerItem
-            label="Про додаток"
-            icon={({ focused, color, size }) => (
-              <MaterialIcons color={color} size={size} name="info" />
-            )}
-            onPress={() => navigation.navigate('about')}
-          />
-        </TouchableOpacity>
+        <DrawerItem
+          label="Про додаток"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="info" />}
+          onPress={() => navigation.navigate('about')}
+        />
 
         <View style={styles.separator} />
 
-        <TouchableOpacity>
-          <DrawerItem
-            label="Вихід"
-            icon={({ focused, color, size }) => (
-              <MaterialIcons color={color} size={size} name="exit-to-app" />
-            )}
-            onPress={handleExit}
-          />
-        </TouchableOpacity>
+        <DrawerItem
+          label="Вихід"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="exit-to-app" />}
+          onPress={handleExit}
+        />
       </View>
     </>
   );
@@ -138,6 +119,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     height: scaledPixels(90),
+    gap: scaledPixels(6),
     backgroundColor: '#1B1C1E',
     borderBottomColor: '#17171A',
     borderBottomWidth: 1
@@ -157,9 +139,12 @@ const styles = StyleSheet.create({
     paddingEnd: 0
   },
 
-  footerContainer: {
-    width: '100%',
-    paddingVertical: scaledPixels(8)
+  drawerItem: {
+    borderRadius: 0
+  },
+
+  drawerItemLabel: {
+    color: '#fff'
   },
 
   separator: {

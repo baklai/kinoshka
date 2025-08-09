@@ -12,14 +12,14 @@ const MoviesFlatList = () => {
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
   const fetchData = useCallback(async () => {
     if (loading || !hasNextPage) return;
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://192.19.2.21:3000/api/movies?limit=${LIMIT}&offset=${offset}`
-      );
+      const response = await fetch(`${apiUrl}/api/movies?limit=${LIMIT}&offset=${offset}`);
       const result = await response.json();
 
       const newItems = result.docs || [];
