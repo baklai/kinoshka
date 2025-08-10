@@ -1,7 +1,10 @@
+import DropdownButton from '@/components/DropdownButton';
 import MoviesFlatList from '@/components/MoviesFlatList';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/Blurhash';
+import categories from '@/constants/Categories';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -9,10 +12,10 @@ import {
   Alert,
   Animated,
   BackHandler,
-  Button,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useAnimatedValue,
   View
 } from 'react-native';
@@ -20,8 +23,17 @@ import {
 export default function IndexScreen() {
   const [focusedItem, setFocusedItem] = useState<MovieProps | null>(null);
   const fadeAnimated = useAnimatedValue(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+  const handlePlay = (episode?: string) => {
+    Alert.alert('Проигрывание', episode ? `Серия: ${episode}` : 'Фильм');
+  };
+
+  const handleBookmark = () => {
+    setIsBookmarked(prev => !prev);
+  };
 
   const renderHeader = useCallback(
     () => (
@@ -41,25 +53,58 @@ export default function IndexScreen() {
               transition={1000}
             />
           </View>
+
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{focusedItem?.title}</Text>
-            <Text style={styles.headerText}>Якість: 1080p</Text>
-            <Text style={styles.headerText}>Рік виходу: {focusedItem?.year}</Text>
-            <Text style={styles.headerDescription}>{focusedItem?.description}</Text>
+            {focusedItem?.title && <Text style={styles.headerTitle}>{focusedItem.title}</Text>}
+            {focusedItem?.originalTitle && (
+              <Text style={styles.headerText}>Оригінальна назва: {focusedItem.originalTitle}</Text>
+            )}
+            {focusedItem?.quality && (
+              <Text style={styles.headerText}>Якість: {focusedItem.quality}</Text>
+            )}
+            {focusedItem?.rating && (
+              <Text style={styles.headerText}>Рейтинг: {focusedItem.rating}</Text>
+            )}
+            {focusedItem?.year && (
+              <Text style={styles.headerText}>Рік виходу: {focusedItem.year}</Text>
+            )}
+            {focusedItem?.country && (
+              <Text style={styles.headerText}>Країна: {focusedItem.country}</Text>
+            )}
+            {focusedItem?.genres && (
+              <Text style={styles.headerText}>Жанри: {focusedItem.genres}</Text>
+            )}
+            {focusedItem?.directors?.length ? (
+              <Text style={styles.headerText}>Режисер: {focusedItem.directors.join(', ')}</Text>
+            ) : null}
+            {focusedItem?.actors?.length ? (
+              <Text style={styles.headerText}>Актори: {focusedItem.actors.join(', ')}</Text>
+            ) : null}
+            {focusedItem?.description && (
+              <Text style={styles.headerDescription}>{focusedItem.description}</Text>
+            )}
 
             <View style={styles.headerButtonContainer}>
-              {/* <PressableButton text="View video" /> */}
-              <Button title="View video" onPress={() => Alert.alert('Left button pressed')} />
-              <Button title="Favorite" onPress={() => Alert.alert('Right button pressed')} />
+              <DropdownButton episodes={focusedItem?.episode} onPlay={handlePlay} />
+              <TouchableOpacity
+                style={[styles.bookmarkButton, isBookmarked && styles.bookmarkButtonActive]}
+                onPress={handleBookmark}
+              >
+                <Ionicons
+                  name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
+                  size={18}
+                  color={isBookmarked ? '#FFD700' : '#fff'}
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </Animated.View>
     ),
-    [focusedItem]
+    [focusedItem, fadeAnimated, isBookmarked]
   );
 
-  const hendleSelectItem = (value: MovieProps) => {
+  const handleSelectItem = (value: MovieProps) => {
     setFocusedItem(value);
     Animated.timing(fadeAnimated, {
       toValue: 1,
@@ -75,19 +120,14 @@ export default function IndexScreen() {
           toValue: 0,
           duration: 500,
           useNativeDriver: true
-        }).start(() => {
-          setFocusedItem(null);
-        });
+        }).start(() => setFocusedItem(null));
         return true;
       }
       return false;
     };
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-    return () => {
-      subscription.remove();
-    };
+    return () => subscription.remove();
   }, [focusedItem]);
 
   return (
@@ -99,26 +139,15 @@ export default function IndexScreen() {
         contentContainerStyle={{ paddingVertical: scaledPixels(14) }}
         showsVerticalScrollIndicator={false}
       >
-        <MoviesFlatList
-          api={apiUrl}
-          category="Фільми"
-          filters={{ category: 'filmy' }}
-          onPress={hendleSelectItem}
-        />
-
-        <MoviesFlatList
-          api={apiUrl}
-          category="Серіали"
-          filters={{ category: 'seriesss' }}
-          onPress={hendleSelectItem}
-        />
-
-        <MoviesFlatList
-          api={apiUrl}
-          category="Мультфільми"
-          filters={{ category: 'cartoon' }}
-          onPress={hendleSelectItem}
-        />
+        {categories.map(category => (
+          <MoviesFlatList
+            api={apiUrl}
+            key={category.name}
+            category={category.description}
+            filters={{ category: category.name }}
+            onPress={handleSelectItem}
+          />
+        ))}
       </ScrollView>
     </>
   );
@@ -139,7 +168,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: '100%',
     height: '100%',
-    display: 'flex',
     flexDirection: 'row',
     padding: scaledPixels(10)
   },
@@ -149,24 +177,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   headerTextContainer: {
-    display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    flexShrink: 1
   },
   headerText: {
     color: '#fff',
-    fontSize: scaledPixels(22)
+    fontSize: scaledPixels(20)
   },
   headerDescription: {
     color: '#fff',
     fontSize: scaledPixels(18),
     fontWeight: '500',
-    paddingTop: scaledPixels(16),
+    paddingTop: scaledPixels(10),
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: scaledPixels(10),
     lineHeight: 22,
-    marginTop: 8,
-    flexShrink: 1,
+    marginTop: 6,
     flexWrap: 'wrap',
     maxWidth: '80%'
   },
@@ -183,5 +210,13 @@ const styles = StyleSheet.create({
     gap: scaledPixels(8),
     flexDirection: 'row',
     paddingVertical: scaledPixels(8)
+  },
+  bookmarkButton: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    padding: scaledPixels(8),
+    borderRadius: scaledPixels(6)
+  },
+  bookmarkButtonActive: {
+    backgroundColor: 'rgba(255,215,0,0.2)'
   }
 });

@@ -1,6 +1,6 @@
 export interface MovieProps {
   id: string;
-  title: string;
+  title?: string;
   originalTitle?: string;
   link?: string;
   poster?: string;
@@ -14,5 +14,4 @@ export interface MovieProps {
   directors?: string[];
   description?: string;
   episode?: string[];
-  width?: number;
 }
