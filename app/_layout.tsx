@@ -1,5 +1,5 @@
 import { ApplicationProvider } from '@/providers/ApplicationProvider';
-import { DrawerProvider } from '@/providers/SideBarProvider';
+import { DrawerProvider } from '@/providers/DrawerProvider';
 import { DarkTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { SafeAreaView, StyleSheet, View } from 'react-native';

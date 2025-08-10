@@ -89,8 +89,9 @@ const MoviesFlatList = ({
 const styles = StyleSheet.create({
   container: {},
   title: {
-    color: '#fff',
+    color: '#ca563f',
     fontWeight: 'bold',
+    fontSize: scaledPixels(24),
     padding: scaledPixels(10)
   }
 });

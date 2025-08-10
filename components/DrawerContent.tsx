@@ -7,25 +7,11 @@ import {
   DrawerItem
 } from '@react-navigation/drawer';
 import { Image } from 'expo-image';
-import { useCallback } from 'react';
-import { BackHandler, Platform, StyleSheet, Text, useTVEventHandler, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { BackHandler, Platform, StyleSheet, Text, View } from 'react-native';
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
   const { navigation } = props;
-
-  const myTVEventHandler = useCallback(
-    (evt: { eventType: string }) => {
-      if (evt.eventType === 'longLeft') {
-        navigation.openDrawer();
-        return true;
-      }
-    },
-    [navigation]
-  );
-
-  if (Platform.isTV) {
-    useTVEventHandler(myTVEventHandler);
-  }
 
   const handleExit = () => {
     if (Platform.OS === 'android') {
@@ -33,12 +19,23 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
     }
   };
 
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      navigation.toggleDrawer();
+      return true;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <>
-      <View style={styles.headerContainer}>
+      <View style={styles.headerContainer} hasTVPreferredFocus>
         <Image
           source={require('@/assets/images/logo.png')}
-          style={{ width: 30, height: 30 }}
+          style={{ width: 32, height: 32 }}
           contentFit="cover"
         />
         <Text style={styles.headerTitle}>KinoshkaTV</Text>
@@ -63,7 +60,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
         ))}
       </DrawerContentScrollView>
 
-      <View>
+      <View style={styles.footerContainer}>
         <DrawerItem
           label="Історія"
           style={styles.drawerItem}
@@ -121,7 +118,7 @@ const styles = StyleSheet.create({
     height: scaledPixels(90),
     gap: scaledPixels(14),
     paddingHorizontal: scaledPixels(18),
-    backgroundColor: '#1B1C1E',
+    backgroundColor: '#ca563f',
     borderBottomColor: '#17171A',
     borderBottomWidth: 1
   },
@@ -129,8 +126,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: scaledPixels(24),
-    textAlign: 'left'
+    fontSize: scaledPixels(32),
+    textAlign: 'left',
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1
   },
 
   drawerScrollContainer: {
@@ -152,5 +152,10 @@ const styles = StyleSheet.create({
     height: scaledPixels(1),
     marginVertical: scaledPixels(8),
     backgroundColor: '#17171A'
+  },
+
+  footerContainer: {
+    display: 'flex',
+    flexDirection: 'column'
   }
 });

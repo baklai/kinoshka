@@ -1,3 +1,4 @@
+import { BLUR_HASH_MOVIE_CARD } from '@/constants/Blurhash';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -7,16 +8,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function MovieCard({ id, poster, title, rating }: MovieProps) {
   const openLink = (id: string) => {};
 
-  const blurhash =
-    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
-
   return (
     <TouchableOpacity activeOpacity={0.6} onPress={() => openLink(id)} style={styles.container}>
       <View style={styles.imageWrapper}>
         <Image
           style={styles.image}
           source={poster}
-          placeholder={{ blurhash }}
+          placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
           contentFit="cover"
           transition={1000}
         />

@@ -1,12 +1,19 @@
 import DrawerContent from '@/components/DrawerContent';
+import { useDrawerContext } from '@/context/DrawerContext';
+import { useNavigation } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function DrawerLayout() {
+  const { isOpen: isMenuOpen, toggleDrawer } = useDrawerContext();
+
+  const navigation = useNavigation();
+
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'transparent' }}>
       <Drawer
         drawerContent={props => <DrawerContent {...props} />}
+        defaultStatus="open"
         screenOptions={{
           lazy: true,
           headerShown: false,

@@ -1,11 +1,9 @@
+import { BLUR_HASH_MOVIE_CARD } from '@/constants/Blurhash';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function MovieView(movie: MovieProps) {
-  const blurhash =
-    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
-
   return (
     <ScrollView contentContainerStyle={styles.screen}>
       <View style={styles.header}>
@@ -16,7 +14,7 @@ export default function MovieView(movie: MovieProps) {
           <Image
             style={styles.poster}
             source={movie.poster}
-            placeholder={{ blurhash }}
+            placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
             contentFit="cover"
             transition={1000}
           />

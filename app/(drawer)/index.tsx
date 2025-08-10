@@ -1,58 +1,42 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
+import { BLUR_HASH_MOVIE_CARD } from '@/constants/Blurhash';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
-import { useCallback, useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   Animated,
+  BackHandler,
   Button,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TVFocusGuideView,
-  useTVEventHandler,
+  useAnimatedValue,
   View
 } from 'react-native';
 
 export default function IndexScreen() {
   const [focusedItem, setFocusedItem] = useState<MovieProps | null>(null);
-
-  const upTVEventHandler = useCallback((evt: { eventType: string }) => {
-    if (
-      evt.eventType === 'up' ||
-      evt.eventType === 'down' ||
-      evt.eventType === 'left' ||
-      evt.eventType === 'right'
-    ) {
-      if (focusedItem) {
-        setFocusedItem(null);
-        return true;
-      }
-    }
-
-    return false;
-  }, []);
-
-  if (Platform.isTV) {
-    useTVEventHandler(upTVEventHandler);
-  }
+  const fadeAnimated = useAnimatedValue(0);
 
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
-  const blurhash =
-    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
-
   const renderHeader = useCallback(
     () => (
-      <Animated.View>
+      <Animated.View style={[styles.animatedContainer, { opacity: fadeAnimated }]}>
+        <LinearGradient
+          colors={['rgba(0,0,0,0.8)', 'transparent']}
+          style={styles.linearGradientBackground}
+        />
+
         <View style={styles.headerContainer}>
           <View style={styles.headerImageContainer}>
             <Image
               style={styles.headerImage}
               source={focusedItem?.poster}
-              placeholder={{ blurhash }}
+              placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
               contentFit="cover"
               transition={1000}
             />
@@ -62,7 +46,9 @@ export default function IndexScreen() {
             <Text style={styles.headerText}>Якість: 1080p</Text>
             <Text style={styles.headerText}>Рік виходу: {focusedItem?.year}</Text>
             <Text style={styles.headerDescription}>{focusedItem?.description}</Text>
-            <View style={styles.fixToText}>
+
+            <View style={styles.headerButtonContainer}>
+              {/* <PressableButton text="View video" /> */}
               <Button title="View video" onPress={() => Alert.alert('Left button pressed')} />
               <Button title="Favorite" onPress={() => Alert.alert('Right button pressed')} />
             </View>
@@ -75,7 +61,34 @@ export default function IndexScreen() {
 
   const hendleSelectItem = (value: MovieProps) => {
     setFocusedItem(value);
+    Animated.timing(fadeAnimated, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true
+    }).start();
   };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (focusedItem) {
+        Animated.timing(fadeAnimated, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true
+        }).start(() => {
+          setFocusedItem(null);
+        });
+        return true;
+      }
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [focusedItem]);
 
   return (
     <>
@@ -86,58 +99,58 @@ export default function IndexScreen() {
         contentContainerStyle={{ paddingVertical: scaledPixels(14) }}
         showsVerticalScrollIndicator={false}
       >
-        <TVFocusGuideView trapFocusLeft>
-          <MoviesFlatList
-            api={apiUrl}
-            category="Фільми"
-            filters={{ category: 'filmy' }}
-            onPress={hendleSelectItem}
-          />
-        </TVFocusGuideView>
+        <MoviesFlatList
+          api={apiUrl}
+          category="Фільми"
+          filters={{ category: 'filmy' }}
+          onPress={hendleSelectItem}
+        />
 
-        <TVFocusGuideView trapFocusLeft>
-          <MoviesFlatList
-            api={apiUrl}
-            category="Серіали"
-            filters={{ category: 'seriesss' }}
-            onPress={hendleSelectItem}
-          />
-        </TVFocusGuideView>
+        <MoviesFlatList
+          api={apiUrl}
+          category="Серіали"
+          filters={{ category: 'seriesss' }}
+          onPress={hendleSelectItem}
+        />
 
-        <TVFocusGuideView trapFocusLeft>
-          <MoviesFlatList
-            api={apiUrl}
-            category="Мультфільми"
-            filters={{ category: 'cartoon' }}
-            onPress={hendleSelectItem}
-          />
-        </TVFocusGuideView>
+        <MoviesFlatList
+          api={apiUrl}
+          category="Мультфільми"
+          filters={{ category: 'cartoon' }}
+          onPress={hendleSelectItem}
+        />
       </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  fixToText: {
-    gap: scaledPixels(8),
-    flexDirection: 'row',
-    paddingVertical: scaledPixels(8)
+  animatedContainer: {
+    padding: scaledPixels(10),
+    backgroundColor: 'rgb(39, 39, 41)'
+  },
+  linearGradientBackground: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0
   },
   headerContainer: {
     width: '100%',
     height: '100%',
     display: 'flex',
     flexDirection: 'row',
-    padding: scaledPixels(10),
-    backgroundColor: '#202124'
+    padding: scaledPixels(10)
   },
   headerTitle: {
     color: '#fff',
     fontSize: scaledPixels(28),
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: scaledPixels(10)
+    fontWeight: 'bold'
+  },
+  headerTextContainer: {
+    display: 'flex',
+    flexDirection: 'column'
   },
   headerText: {
     color: '#fff',
@@ -166,5 +179,9 @@ const styles = StyleSheet.create({
     height: '90%',
     borderRadius: scaledPixels(8)
   },
-  headerTextContainer: {}
+  headerButtonContainer: {
+    gap: scaledPixels(8),
+    flexDirection: 'row',
+    paddingVertical: scaledPixels(8)
+  }
 });
