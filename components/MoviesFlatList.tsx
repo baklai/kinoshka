@@ -2,7 +2,7 @@ import MovieCard from '@/components/MovieCard';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 
 const LIMIT = 6;
 
@@ -54,13 +54,7 @@ const MoviesFlatList = ({
   }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: MovieProps }) => (
-      <TouchableOpacity onPress={() => onPress(item)}>
-        <View style={{ margin: scaledPixels(6) }}>
-          <MovieCard {...item} />
-        </View>
-      </TouchableOpacity>
-    ),
+    ({ item }: { item: MovieProps }) => <MovieCard {...item} handlePress={item => onPress(item)} />,
     [onPress]
   );
 
@@ -69,7 +63,7 @@ const MoviesFlatList = ({
   }
 
   return (
-    <View style={styles.container}>
+    <>
       <Text style={styles.title}>{category}</Text>
       <FlatList
         data={data}
@@ -80,14 +74,13 @@ const MoviesFlatList = ({
         showsVerticalScrollIndicator={false}
         onEndReached={fetchData}
         onEndReachedThreshold={0.5}
-        ListEmptyComponent={<Text>Нет данных</Text>}
+        ListEmptyComponent={<Text>Немає даних</Text>}
       />
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
   title: {
     color: '#ca563f',
     fontWeight: 'bold',
