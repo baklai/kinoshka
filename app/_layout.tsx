@@ -1,20 +1,18 @@
 import { ApplicationProvider } from '@/providers/ApplicationProvider';
-import { DrawerProvider } from '@/providers/DrawerProvider';
+
 import { DarkTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayoutProvider() {
   return (
     <ApplicationProvider>
-      <DrawerProvider>
-        <SafeAreaProvider>
-          <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0F' }}>
-            <RootLayout />
-          </SafeAreaView>
-        </SafeAreaProvider>
-      </DrawerProvider>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#0E0E0F' }}>
+          <RootLayout />
+        </SafeAreaView>
+      </SafeAreaProvider>
     </ApplicationProvider>
   );
 }
@@ -40,6 +38,8 @@ function RootLayout() {
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
+
+        <StatusBar hidden />
       </View>
     </ThemeProvider>
   );

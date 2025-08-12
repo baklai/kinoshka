@@ -1,18 +1,17 @@
 import DropdownButton from '@/components/DropdownButton';
 import MoviesFlatList from '@/components/MoviesFlatList';
+import StyledIcon from '@/components/StyledIcon';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/Blurhash';
-import categories from '@/constants/Categories';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Drawer } from 'expo-router/drawer';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   Animated,
   BackHandler,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -90,10 +89,9 @@ export default function IndexScreen() {
                 style={[styles.bookmarkButton, isBookmarked && styles.bookmarkButtonActive]}
                 onPress={handleBookmark}
               >
-                <Ionicons
+                <StyledIcon
                   name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
-                  size={18}
-                  color={isBookmarked ? '#FFD700' : '#fff'}
+                  color={isBookmarked ? '#00ff55ff' : '#fff'}
                 />
               </TouchableOpacity>
             </View>
@@ -132,28 +130,37 @@ export default function IndexScreen() {
 
   return (
     <>
+      <Drawer.Screen
+        options={{
+          headerTitle: () => (
+            <View style={styles.header}>
+              <StyledIcon name="movie" />
+              <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>
+                Поточна категорія
+              </Text>
+            </View>
+          )
+        }}
+      />
+
       {focusedItem && renderHeader()}
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingVertical: scaledPixels(14) }}
-        showsVerticalScrollIndicator={false}
-      >
-        {categories.map(category => (
-          <MoviesFlatList
-            api={apiUrl}
-            key={category.name}
-            category={category.description}
-            filters={{ category: category.name }}
-            onPress={handleSelectItem}
-          />
-        ))}
-      </ScrollView>
+      <MoviesFlatList
+        api={apiUrl}
+        category={'filmy'}
+        filters={{ category: 'filmy' }}
+        onPress={handleSelectItem}
+      />
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scaledPixels(6)
+  },
   animatedContainer: {
     padding: scaledPixels(10),
     backgroundColor: 'rgb(39, 39, 41)'

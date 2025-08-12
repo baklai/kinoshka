@@ -54,7 +54,6 @@
     "expo-router": "~5.1.2",
     "expo-secure-store": "^14.2.3",
     "expo-splash-screen": "~0.30.6",
-    "expo-status-bar": "~2.2.2",
     "expo-system-ui": "~5.0.5",
     "expo-web-browser": "^14.2.0",
     "react": "19.0.0",

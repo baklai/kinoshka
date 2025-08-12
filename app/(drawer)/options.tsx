@@ -1,28 +1,40 @@
-import ParallaxView from '@/components/ParallaxView';
+import StyledIcon from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet } from 'react-native';
+import { Drawer } from 'expo-router/drawer';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function OptionsScreen() {
   return (
-    <ParallaxView
-      headerBackgroundColor={{ light: '#217FC9', dark: '#217FC9' }}
-      headerImage={
-        <MaterialIcons size={scaledPixels(140)} name="settings" style={styles.headerImage} />
-      }
-    ></ParallaxView>
+    <>
+      <Drawer.Screen
+        options={{
+          headerRight: () => null,
+          headerTitle: () => (
+            <View style={styles.header}>
+              <StyledIcon name="cog-outline" />
+              <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Налаштування</Text>
+            </View>
+          )
+        }}
+      />
+
+      <View style={styles.container}></View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#042E5C',
-    bottom: scaledPixels(-10),
-    left: scaledPixels(-10),
-    position: 'absolute'
-  },
-  titleContainer: {
+  header: {
     flexDirection: 'row',
-    gap: scaledPixels(8)
+    alignItems: 'center',
+    gap: scaledPixels(6)
+  },
+  container: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    overflowX: 'auto',
+    padding: 6,
+    gap: 6
   }
 });

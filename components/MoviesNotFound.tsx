@@ -13,9 +13,7 @@ export default function MoviesNotFound({ text }: { text: string }) {
 
 const styles = StyleSheet.create({
   emptyСontainer: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },

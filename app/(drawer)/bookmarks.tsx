@@ -1,8 +1,10 @@
 import MovieItem from '@/components/MovieCard';
 import MoviesNotFound from '@/components/MoviesNotFound';
+import StyledIcon from '@/components/StyledIcon';
 import { useSecureStore } from '@/hooks/useAsyncStorage';
+import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
-import { Stack } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function BookmarksScreen() {
@@ -12,16 +14,18 @@ export default function BookmarksScreen() {
 
   return (
     <>
-      <Stack.Screen
+      <Drawer.Screen
         options={{
-          headerBackVisible: true,
+          headerRight: () => null,
           headerTitle: () => (
-            <View>
+            <View style={styles.header}>
+              <StyledIcon name="bookmark" />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Закладки</Text>
             </View>
           )
         }}
       />
+
       <View style={styles.container}>
         {movies.length > 0 ? (
           movies.map((movie: MovieProps) => <MovieItem {...movie} key={movie.id} />)
@@ -34,9 +38,13 @@ export default function BookmarksScreen() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scaledPixels(6)
+  },
   container: {
     flex: 1,
-    display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'row',
     overflowX: 'auto',

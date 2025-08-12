@@ -1,6 +1,6 @@
+import StyledIcon from '@/components/StyledIcon';
 import categories from '@/constants/Categories';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MaterialIcons } from '@expo/vector-icons';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -9,6 +9,8 @@ import {
 import { Image } from 'expo-image';
 import React, { useEffect } from 'react';
 import { BackHandler, Platform, StyleSheet, Text, View } from 'react-native';
+
+const Separator = () => <View style={styles.separator} hasTVPreferredFocus />;
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
   const { navigation } = props;
@@ -32,7 +34,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 
   return (
     <>
-      <View style={styles.headerContainer} hasTVPreferredFocus>
+      <View style={styles.headerContainer}>
         <Image
           source={require('@/assets/images/logo.png')}
           style={{ width: 32, height: 32 }}
@@ -44,6 +46,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
       <DrawerContentScrollView
         {...props}
         scrollEnabled
+        hasTVPreferredFocus
         contentContainerStyle={styles.drawerScrollContainer}
       >
         {categories.map((category, index) => (
@@ -53,7 +56,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
             style={styles.drawerItem}
             labelStyle={styles.drawerItemLabel}
             icon={({ color, size }) => (
-              <MaterialIcons color={color} size={size} name={category.icon || 'folder'} />
+              <StyledIcon color={color} name={category.icon || 'folder-open-outline'} />
             )}
             onPress={() => navigation.navigate('index')}
           />
@@ -65,7 +68,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           label="Історія"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="history" />}
+          icon={({ color, size }) => <StyledIcon color={color} name="history" />}
           onPress={() => navigation.navigate('history')}
         />
 
@@ -73,17 +76,17 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           label="Закладки"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="bookmark" />}
+          icon={({ color, size }) => <StyledIcon color={color} name="bookmark" />}
           onPress={() => navigation.navigate('bookmarks')}
         />
 
-        <View style={styles.separator} />
+        <Separator />
 
         <DrawerItem
           label="Налаштування"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="settings" />}
+          icon={({ color, size }) => <StyledIcon color={color} name="cog-outline" />}
           onPress={() => navigation.navigate('options')}
         />
 
@@ -91,17 +94,17 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           label="Про додаток"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="info" />}
+          icon={({ color, size }) => <StyledIcon color={color} name="information-outline" />}
           onPress={() => navigation.navigate('about')}
         />
 
-        <View style={styles.separator} />
+        <Separator />
 
         <DrawerItem
           label="Вихід"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <MaterialIcons color={color} size={size} name="exit-to-app" />}
+          icon={({ color, size }) => <StyledIcon color={color} name="exit-to-app" />}
           onPress={handleExit}
         />
       </View>
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
     height: scaledPixels(90),
     gap: scaledPixels(14),
     paddingHorizontal: scaledPixels(18),
-    backgroundColor: '#ca563f',
+    backgroundColor: '#1B1C1E',
     borderBottomColor: '#17171A',
     borderBottomWidth: 1
   },

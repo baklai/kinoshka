@@ -2,9 +2,11 @@ import MovieCard from '@/components/MovieCard';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
 
-const LIMIT = 6;
+const LIMIT = 20;
+const IMAGE_SIZE = 100;
+const IMAGE_MARGIN = 5;
 
 const MoviesFlatList = ({
   api,
@@ -18,9 +20,12 @@ const MoviesFlatList = ({
   onPress: (id: MovieProps) => void;
 }) => {
   const [data, setData] = useState<MovieProps[]>([]);
-  const [offset, setOffset] = useState(0);
+  const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  const screenWidth = Dimensions.get('window').width;
+  const numColumns = Math.floor(screenWidth / (IMAGE_SIZE + IMAGE_MARGIN * 2));
 
   const fetchData = useCallback(async () => {
     if (loading || !hasNextPage) return;
@@ -28,7 +33,7 @@ const MoviesFlatList = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `${api}/api/movies?limit=${LIMIT}&offset=${offset}&filters={"category": "${filters.category}"}`
+        `${api}/movies?limit=${LIMIT}&page=${page}&filters={"category": "${filters.category}"}`
       );
 
       const result = await response.json();
@@ -40,43 +45,38 @@ const MoviesFlatList = ({
         const filteredNewItems = newItems.filter((item: MovieProps) => !existingIds.has(item.id));
         return [...prev, ...filteredNewItems];
       });
-      setOffset(prev => prev + LIMIT);
+
       setHasNextPage(result.hasNextPage);
     } catch (error) {
       console.error('Ошибка загрузки:', error);
     } finally {
       setLoading(false);
     }
-  }, [loading, offset, hasNextPage]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  }, [loading, page, hasNextPage]);
 
   const renderItem = useCallback(
     ({ item }: { item: MovieProps }) => <MovieCard {...item} handlePress={item => onPress(item)} />,
     [onPress]
   );
 
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
   if (!data.length) {
     return null;
   }
 
   return (
-    <>
-      <Text style={styles.title}>{category}</Text>
-      <FlatList
-        data={data}
-        horizontal
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        onEndReached={fetchData}
-        onEndReachedThreshold={0.5}
-        ListEmptyComponent={<Text>Немає даних</Text>}
-      />
-    </>
+    <FlatList
+      data={data}
+      keyExtractor={item => item?.id}
+      numColumns={5}
+      renderItem={renderItem}
+      onEndReached={() => setPage(prev => prev + 1)}
+      onEndReachedThreshold={0.5}
+      ListEmptyComponent={<Text>Немає даних</Text>}
+    />
   );
 };
 

@@ -1,9 +1,9 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
+type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
 export interface CategoryProps {
   name: string;
   description: string;
-  icon: MaterialIconName;
+  icon: IconName;
 }
