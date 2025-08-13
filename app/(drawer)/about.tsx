@@ -1,7 +1,8 @@
-import StyledIcon from '@/components/StyledIcon';
+import { AboutSvgIcon } from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Image } from 'expo-image';
 import { Drawer } from 'expo-router/drawer';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function AboutScreen() {
@@ -12,7 +13,7 @@ export default function AboutScreen() {
           headerRight: () => null,
           headerTitle: () => (
             <View style={styles.header}>
-              <StyledIcon name="information-outline" />
+              <AboutSvgIcon />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Про додаток</Text>
             </View>
           )

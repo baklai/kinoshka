@@ -1,7 +1,6 @@
 import DropdownButton from '@/components/DropdownButton';
 import MoviesFlatList from '@/components/MoviesFlatList';
-import StyledIcon from '@/components/StyledIcon';
-import { BLUR_HASH_MOVIE_CARD } from '@/constants/Blurhash';
+import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
@@ -89,10 +88,10 @@ export default function IndexScreen() {
                 style={[styles.bookmarkButton, isBookmarked && styles.bookmarkButtonActive]}
                 onPress={handleBookmark}
               >
-                <StyledIcon
+                {/* <StyledIcon
                   name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
                   color={isBookmarked ? '#00ff55ff' : '#fff'}
-                />
+                /> */}
               </TouchableOpacity>
             </View>
           </View>
@@ -134,7 +133,7 @@ export default function IndexScreen() {
         options={{
           headerTitle: () => (
             <View style={styles.header}>
-              <StyledIcon name="movie" />
+              {/* <NewSvgIcon /> */}
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>
                 Поточна категорія
               </Text>

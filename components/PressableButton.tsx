@@ -1,4 +1,5 @@
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import React from 'react';
 import { Pressable, PressableProps, StyleSheet, Text, ViewStyle } from 'react-native';
 
 interface CustomPressableProps extends PressableProps {

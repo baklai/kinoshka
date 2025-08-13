@@ -1,4 +1,4 @@
-import StyledIcon from '@/components/StyledIcon';
+import { DotsVerticalSvgIcon } from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -16,7 +16,7 @@ export default function OptionsButton() {
       <View style={{ position: 'relative' }}>
         <View style={styles.container}>
           <TouchableOpacity onPress={openModal}>
-            <StyledIcon name="dots-vertical" />
+            <DotsVerticalSvgIcon />
           </TouchableOpacity>
         </View>
       </View>

@@ -4,6 +4,7 @@ import SearchableButton from '@/components/SearchableButton';
 import SortableButton from '@/components/SortableButton';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Drawer } from 'expo-router/drawer';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -35,6 +36,7 @@ export default function DrawerLayout() {
           headerTitleStyle: {
             fontWeight: 'bold'
           },
+
           headerLeft: () => null,
           headerRight: () => (
             <View style={styles.headerRight}>

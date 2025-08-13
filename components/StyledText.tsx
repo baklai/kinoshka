@@ -1,4 +1,5 @@
-import { COLORS } from '@/constants/ui';
+import { COLORS } from '@/constants/ui.constant';
+import React from 'react';
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
 type StyledTextProps = TextProps & {

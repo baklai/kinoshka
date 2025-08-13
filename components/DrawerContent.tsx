@@ -1,5 +1,15 @@
-import StyledIcon from '@/components/StyledIcon';
-import categories from '@/constants/Categories';
+import {
+  AboutSvgIcon,
+  BookmarkSvgIcon,
+  CartoonsSvgIcon,
+  ExitSvgIcon,
+  HistorySvgIcon,
+  MoviesSvgIcon,
+  NewsSvgIcon,
+  OptionsSvgIcon,
+  SeriesSvgIcon,
+  TVShowsSvgIcon
+} from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import {
   DrawerContentComponentProps,
@@ -49,34 +59,77 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
         hasTVPreferredFocus
         contentContainerStyle={styles.drawerScrollContainer}
       >
-        {categories.map((category, index) => (
-          <DrawerItem
-            key={category.name}
-            label={category.description}
-            style={styles.drawerItem}
-            labelStyle={styles.drawerItemLabel}
-            icon={({ color, size }) => (
-              <StyledIcon color={color} name={category.icon || 'folder-open-outline'} />
-            )}
-            onPress={() => navigation.navigate('index')}
-          />
-        ))}
+        <DrawerItem
+          key="news"
+          label="Новинки"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={() => <NewsSvgIcon {...props} />}
+          onPress={() => navigation.navigate('index')}
+        />
+
+        <DrawerItem
+          key="movies"
+          label="Фільми"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={() => <MoviesSvgIcon {...props} />}
+          onPress={() => navigation.navigate('index')}
+        />
+        <DrawerItem
+          key="series"
+          label="Серіали"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={() => <SeriesSvgIcon {...props} />}
+          onPress={() => navigation.navigate('index')}
+        />
+        <DrawerItem
+          key="cartoons"
+          label="Мультфільми"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={() => <CartoonsSvgIcon {...props} />}
+          onPress={() => navigation.navigate('index')}
+        />
+        <DrawerItem
+          key="tvshows"
+          label="Телепередачі"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
+          style={styles.drawerItem}
+          labelStyle={styles.drawerItemLabel}
+          icon={() => <TVShowsSvgIcon {...props} />}
+          onPress={() => navigation.navigate('index')}
+        />
       </DrawerContentScrollView>
 
       <View style={styles.footerContainer}>
         <DrawerItem
           label="Історія"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <StyledIcon color={color} name="history" />}
+          icon={() => <HistorySvgIcon />}
           onPress={() => navigation.navigate('history')}
         />
 
         <DrawerItem
           label="Закладки"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <StyledIcon color={color} name="bookmark" />}
+          icon={() => <BookmarkSvgIcon />}
           onPress={() => navigation.navigate('bookmarks')}
         />
 
@@ -84,17 +137,21 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 
         <DrawerItem
           label="Налаштування"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <StyledIcon color={color} name="cog-outline" />}
+          icon={() => <OptionsSvgIcon />}
           onPress={() => navigation.navigate('options')}
         />
 
         <DrawerItem
           label="Про додаток"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <StyledIcon color={color} name="information-outline" />}
+          icon={() => <AboutSvgIcon />}
           onPress={() => navigation.navigate('about')}
         />
 
@@ -102,9 +159,11 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 
         <DrawerItem
           label="Вихід"
+          pressOpacity={0.5}
+          pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={({ color, size }) => <StyledIcon color={color} name="exit-to-app" />}
+          icon={() => <ExitSvgIcon />}
           onPress={handleExit}
         />
       </View>

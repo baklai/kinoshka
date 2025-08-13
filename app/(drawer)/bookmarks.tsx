@@ -1,10 +1,11 @@
 import MovieItem from '@/components/MovieCard';
 import MoviesNotFound from '@/components/MoviesNotFound';
-import StyledIcon from '@/components/StyledIcon';
+import { BookmarkSvgIcon } from '@/components/StyledIcons';
 import { useSecureStore } from '@/hooks/useAsyncStorage';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Drawer } from 'expo-router/drawer';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function BookmarksScreen() {
@@ -19,7 +20,7 @@ export default function BookmarksScreen() {
           headerRight: () => null,
           headerTitle: () => (
             <View style={styles.header}>
-              <StyledIcon name="bookmark" />
+              <BookmarkSvgIcon />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Закладки</Text>
             </View>
           )

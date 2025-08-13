@@ -1,5 +1,6 @@
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import type { PropsWithChildren, ReactElement } from 'react';
+import React from 'react';
 import { StyleSheet, useColorScheme, View } from 'react-native';
 import Animated, {
   interpolate,

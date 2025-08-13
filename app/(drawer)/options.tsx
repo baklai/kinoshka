@@ -1,6 +1,7 @@
-import StyledIcon from '@/components/StyledIcon';
+import { OptionsSvgIcon } from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Drawer } from 'expo-router/drawer';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function OptionsScreen() {
@@ -11,7 +12,7 @@ export default function OptionsScreen() {
           headerRight: () => null,
           headerTitle: () => (
             <View style={styles.header}>
-              <StyledIcon name="cog-outline" />
+              <OptionsSvgIcon />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Налаштування</Text>
             </View>
           )

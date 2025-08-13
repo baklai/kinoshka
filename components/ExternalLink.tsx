@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { type ComponentProps } from 'react';
+import React, { type ComponentProps } from 'react';
 import { Linking, Pressable } from 'react-native';
 
 type Props = Omit<ComponentProps<typeof Link>, 'href'> & { href: string };

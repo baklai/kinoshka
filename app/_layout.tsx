@@ -1,7 +1,7 @@
 import { ApplicationProvider } from '@/providers/ApplicationProvider';
-
 import { DarkTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
+import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
