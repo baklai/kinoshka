@@ -2,7 +2,8 @@ import MovieCard from '@/components/MovieCard';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text } from 'react-native';
+import { Dimensions, FlatList, StyleSheet } from 'react-native';
+import MoviesNotFound from './MoviesNotFound';
 
 const LIMIT = 20;
 const IMAGE_SIZE = 100;
@@ -75,7 +76,7 @@ const MoviesFlatList = ({
       renderItem={renderItem}
       onEndReached={() => setPage(prev => prev + 1)}
       onEndReachedThreshold={0.5}
-      ListEmptyComponent={<Text>Немає даних</Text>}
+      ListEmptyComponent={<MoviesNotFound text="" />}
     />
   );
 };

@@ -20,7 +20,7 @@ import { Image } from 'expo-image';
 import React, { useEffect } from 'react';
 import { BackHandler, Platform, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
 
-const Separator = () => <View style={styles.separator} hasTVPreferredFocus />;
+const Separator = () => <View style={styles.separator} />;
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
   const { navigation } = props;
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: scaledPixels(32),
     textAlign: 'left',
-    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowColor: '#ca563f',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 1
   },
