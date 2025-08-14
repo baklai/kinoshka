@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scaledPixels(6)
+    gap: scaledPixels(10)
   },
   container: {
     flex: 1,

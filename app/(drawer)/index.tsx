@@ -1,5 +1,6 @@
 import DropdownButton from '@/components/DropdownButton';
 import MoviesFlatList from '@/components/MoviesFlatList';
+import { MultimediaSvgIcon } from '@/components/StyledIcons';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -134,7 +135,7 @@ export default function IndexScreen() {
         options={{
           headerTitle: () => (
             <View style={styles.header}>
-              {/* <NewSvgIcon /> */}
+              <MultimediaSvgIcon />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>
                 Поточна категорія
               </Text>
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scaledPixels(6)
+    gap: scaledPixels(10)
   },
   animatedContainer: {
     padding: scaledPixels(10),
