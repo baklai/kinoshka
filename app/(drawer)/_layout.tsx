@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function DrawerLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} hasTVPreferredFocus={true}>
       <Drawer
         drawerContent={props => <DrawerContent {...props} />}
         defaultStatus="open"

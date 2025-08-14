@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
     zIndex: 10
   },
   overlayTop: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     position: 'absolute',
@@ -104,7 +103,6 @@ const styles = StyleSheet.create({
     zIndex: 10
   },
   overlayBottom: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     position: 'absolute',
@@ -117,11 +115,10 @@ const styles = StyleSheet.create({
     right: 0
   },
   rating: {
-    backgroundColor: '#19875480',
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#19875480',
     paddingHorizontal: scaledPixels(4),
     paddingVertical: scaledPixels(2),
     borderRadius: scaledPixels(4),

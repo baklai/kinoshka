@@ -18,7 +18,7 @@ import {
 } from '@react-navigation/drawer';
 import { Image } from 'expo-image';
 import React, { useEffect } from 'react';
-import { BackHandler, Platform, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Platform, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
 
 const Separator = () => <View style={styles.separator} hasTVPreferredFocus />;
 
@@ -43,8 +43,8 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
   }, []);
 
   return (
-    <>
-      <View style={styles.headerContainer}>
+    <TVFocusGuideView style={{ flex: 1 }} trapFocusRight trapFocusDown trapFocusUp trapFocusLeft>
+      <View style={styles.headerContainer} hasTVPreferredFocus>
         <Image
           source={require('@/assets/images/logo.png')}
           style={{ width: 32, height: 32 }}
@@ -53,12 +53,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
         <Text style={styles.headerTitle}>KinoshkaTV</Text>
       </View>
 
-      <DrawerContentScrollView
-        {...props}
-        scrollEnabled
-        hasTVPreferredFocus
-        contentContainerStyle={styles.drawerScrollContainer}
-      >
+      <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerScrollContainer}>
         <DrawerItem
           key="news"
           label="Новинки"
@@ -167,13 +162,12 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           onPress={handleExit}
         />
       </View>
-    </>
+    </TVFocusGuideView>
   );
 }
 
 const styles = StyleSheet.create({
   headerContainer: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     textAlign: 'center',
@@ -207,7 +201,9 @@ const styles = StyleSheet.create({
   },
 
   drawerItemLabel: {
-    color: '#fff'
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: scaledPixels(20)
   },
 
   separator: {
@@ -217,7 +213,6 @@ const styles = StyleSheet.create({
   },
 
   footerContainer: {
-    display: 'flex',
     flexDirection: 'column'
   }
 });

@@ -14,6 +14,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TVFocusGuideView,
   useAnimatedValue,
   View
 } from 'react-native';
@@ -128,7 +129,7 @@ export default function IndexScreen() {
   }, [focusedItem]);
 
   return (
-    <>
+    <TVFocusGuideView style={{ flex: 1 }} trapFocusRight trapFocusDown trapFocusUp trapFocusLeft>
       <Drawer.Screen
         options={{
           headerTitle: () => (
@@ -150,7 +151,7 @@ export default function IndexScreen() {
         filters={{ category: 'filmy' }}
         onPress={handleSelectItem}
       />
-    </>
+    </TVFocusGuideView>
   );
 }
 
