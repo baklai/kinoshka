@@ -6,16 +6,18 @@ import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function MovieCard(
-  props: MovieProps & { handlePress?: (item: MovieProps) => void }
-) {
+interface MovieCardProps extends MovieProps {
+  handlePress?: (item: MovieProps) => void;
+}
+
+export default function MovieCard(props: MovieCardProps) {
   const { poster, title, rating, handlePress } = props;
   const [focused, setFocused] = useState(false);
 
   return (
     <TouchableOpacity
       activeOpacity={1}
-      style={[styles.container, focused && styles.containerFocused]}
+      style={styles.container}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       onPress={() => handlePress && handlePress(props)}
@@ -51,6 +53,8 @@ export default function MovieCard(
         )}
 
         {focused && <View style={styles.overlay} />}
+
+        {focused && <View style={styles.borderOverlay} />}
       </View>
 
       <View style={styles.overlayBottom}>
@@ -62,19 +66,14 @@ export default function MovieCard(
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: scaledPixels(11),
     alignItems: 'center',
-    borderWidth: scaledPixels(3),
-    borderColor: 'transparent',
-    margin: scaledPixels(6)
+    marginVertical: scaledPixels(4)
   },
-  containerFocused: {
-    borderColor: '#ca563f'
-  },
+
   imageWrapper: {
-    width: scaledPixels(200),
-    height: scaledPixels(300),
-    borderRadius: scaledPixels(8),
+    paddingVertical: scaledPixels(3),
+    width: scaledPixels(196),
+    height: scaledPixels(277),
     overflow: 'hidden',
     position: 'relative'
   },
@@ -153,5 +152,11 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.6)'
+  },
+  borderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: scaledPixels(3),
+    borderColor: '#ca563f',
+    pointerEvents: 'none'
   }
 });

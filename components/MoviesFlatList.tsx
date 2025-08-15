@@ -6,8 +6,8 @@ import { Dimensions, FlatList, StyleSheet } from 'react-native';
 import MoviesNotFound from './MoviesNotFound';
 
 const LIMIT = 20;
-const IMAGE_SIZE = 100;
-const IMAGE_MARGIN = 5;
+const CARD_SIZE = 196;
+const CARD_MARGIN = 3;
 
 const MoviesFlatList = ({
   api,
@@ -26,7 +26,9 @@ const MoviesFlatList = ({
   const [loading, setLoading] = useState(false);
 
   const screenWidth = Dimensions.get('window').width;
-  const numColumns = Math.floor(screenWidth / (IMAGE_SIZE + IMAGE_MARGIN * 2));
+  const numColumns = Math.floor(
+    screenWidth / (scaledPixels(CARD_SIZE) + scaledPixels(CARD_MARGIN * 2))
+  );
 
   const fetchData = useCallback(async () => {
     if (loading || !hasNextPage) return;
@@ -72,22 +74,20 @@ const MoviesFlatList = ({
     <FlatList
       data={data}
       keyExtractor={item => item?.id}
-      numColumns={5}
+      numColumns={numColumns}
       renderItem={renderItem}
       onEndReached={() => setPage(prev => prev + 1)}
       onEndReachedThreshold={0.5}
-      ListEmptyComponent={<MoviesNotFound text="" />}
+      columnWrapperStyle={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-around'
+      }}
+      ListEmptyComponent={<MoviesNotFound text="Не вдалось знайти відео" />}
     />
   );
 };
 
-const styles = StyleSheet.create({
-  title: {
-    color: '#ca563f',
-    fontWeight: 'bold',
-    fontSize: scaledPixels(24),
-    padding: scaledPixels(10)
-  }
-});
+const styles = StyleSheet.create({});
 
 export default MoviesFlatList;
