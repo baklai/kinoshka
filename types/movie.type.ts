@@ -1,17 +1,20 @@
 export interface MovieProps {
   id: string;
-  title?: string;
+  title: string;
   originalTitle?: string;
-  link?: string;
+  description?: string;
   poster?: string;
-  category?: string;
   quality?: string;
-  rating?: string;
+  duration?: string;
+  age?: string;
   year?: string;
-  country?: string;
-  genres?: string;
+  imdb?: string;
+  likes?: string;
+  dislikes?: string;
+  categories?: string[];
+  genres?: string[];
   actors?: string[];
   directors?: string[];
-  description?: string;
-  episode?: string[];
+  countries?: string[];
+  episodes?: string[];
 }

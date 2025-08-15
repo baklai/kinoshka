@@ -11,7 +11,7 @@ interface MovieCardProps extends MovieProps {
 }
 
 export default function MovieCard(props: MovieCardProps) {
-  const { poster, title, rating, handlePress } = props;
+  const { poster, title, imdb, handlePress } = props;
   const [focused, setFocused] = useState(false);
 
   return (
@@ -32,10 +32,14 @@ export default function MovieCard(props: MovieCardProps) {
         />
 
         <View style={styles.overlayTop}>
-          <View style={styles.rating}>
-            <MaterialIcons name="recommend" size={scaledPixels(14)} color="#c5c5c5" />
-            <Text style={styles.ratingText}>{rating}</Text>
-          </View>
+          {imdb ? (
+            <View style={styles.rating}>
+              <MaterialIcons name="recommend" size={scaledPixels(14)} color="#c5c5c5" />
+              <Text style={styles.ratingText}>{imdb}</Text>
+            </View>
+          ) : (
+            <View></View>
+          )}
 
           <View style={styles.quality}>
             <Text style={styles.qualityText}>1080p</Text>

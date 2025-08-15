@@ -20,7 +20,7 @@ export default function DropdownButton({ episodes = [], onPlay }: Props) {
     return (
       <TouchableOpacity style={styles.playButton} onPress={() => handleSelect(episodes[0])}>
         <Ionicons name="play" size={18} color="#fff" />
-        <Text style={styles.playButtonText}>Смотреть</Text>
+        <Text style={styles.playButtonText}>Дивитись відео</Text>
       </TouchableOpacity>
     );
   }
@@ -29,7 +29,7 @@ export default function DropdownButton({ episodes = [], onPlay }: Props) {
     <View style={{ position: 'relative' }}>
       <TouchableOpacity style={styles.playButton} onPress={() => setOpen(prev => !prev)}>
         <Ionicons name="play" size={18} color="#fff" />
-        <Text style={styles.playButtonText}>Смотреть</Text>
+        <Text style={styles.playButtonText}>Дивитись відео</Text>
         <Ionicons
           name={open ? 'chevron-up' : 'chevron-down'}
           size={16}
@@ -45,7 +45,7 @@ export default function DropdownButton({ episodes = [], onPlay }: Props) {
             keyExtractor={(_, i) => i.toString()}
             renderItem={({ item, index }) => (
               <TouchableOpacity style={styles.dropdownItem} onPress={() => handleSelect(item)}>
-                <Text style={styles.dropdownText}>Серия {index + 1}</Text>
+                <Text style={styles.dropdownText}>Серія {index + 1}</Text>
               </TouchableOpacity>
             )}
           />
