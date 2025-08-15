@@ -2,6 +2,7 @@ import DrawerContent from '@/components/DrawerContent';
 import OptionsButton from '@/components/OptionsButton';
 import SearchableButton from '@/components/SearchableButton';
 import SortableButton from '@/components/SortableButton';
+import useDrawerWidth from '@/hooks/useDrawerWidth';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Drawer } from 'expo-router/drawer';
 import React from 'react';
@@ -9,6 +10,8 @@ import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function DrawerLayout() {
+  const drawerWidth = useDrawerWidth();
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }} hasTVPreferredFocus={true}>
       <Drawer
@@ -23,7 +26,7 @@ export default function DrawerLayout() {
           drawerPosition: 'left',
           drawerStyle: {
             backgroundColor: '#202124',
-            width: scaledPixels(320)
+            width: scaledPixels(drawerWidth)
           },
           overlayColor: 'rgba(0,0,0,0.6)',
           keyboardDismissMode: 'none',
