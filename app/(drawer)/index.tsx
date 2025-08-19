@@ -1,20 +1,18 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
-import { MultimediaSvgIcon } from '@/components/StyledIcons';
+import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Drawer } from 'expo-router/drawer';
 import React from 'react';
 import { StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
 
 export default function IndexScreen() {
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-
   return (
-    <TVFocusGuideView style={{ flex: 1 }} trapFocusRight trapFocusDown trapFocusUp trapFocusLeft>
+    <TVFocusGuideView style={{ flex: 1 }} trapFocusUp trapFocusDown trapFocusRight trapFocusLeft>
       <Drawer.Screen
         options={{
           headerTitle: () => (
             <View style={styles.header}>
-              <MultimediaSvgIcon />
+              <StyledIcon name="card-multiple" />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>
                 Поточна категорія
               </Text>
@@ -23,7 +21,7 @@ export default function IndexScreen() {
         }}
       />
 
-      <MoviesFlatList api={apiUrl} category={'filmy'} filters={{ categories: ['filmy'] }} />
+      <MoviesFlatList filters={{ categories: ['filmy'] }} />
     </TVFocusGuideView>
   );
 }

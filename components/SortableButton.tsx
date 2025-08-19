@@ -1,7 +1,7 @@
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SortSvgIcon } from './StyledIcons';
+import { StyledIcon } from './StyledIcon';
 
 interface SortableButtonProps {
   onSort?: (field: string, direction: 'asc' | 'desc') => void;
@@ -33,7 +33,7 @@ export default function SortableButton({ onSort, fields }: SortableButtonProps) 
       <View style={{ position: 'relative' }}>
         <View style={styles.container}>
           <TouchableOpacity onPress={toggleDirection} onLongPress={openModal}>
-            <SortSvgIcon />
+            <StyledIcon name="sort" />
           </TouchableOpacity>
         </View>
       </View>

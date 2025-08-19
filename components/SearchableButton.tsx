@@ -1,7 +1,7 @@
-import { SearchSvgIcon } from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useRef, useState } from 'react';
 import { Animated, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyledIcon } from './StyledIcon';
 
 interface SearchableButtonProps {
   onSearch?: (query: string) => void;
@@ -35,7 +35,7 @@ export default function SearchableButton({ onSearch }: SearchableButtonProps) {
     >
       {expanded ? (
         <View style={styles.inputWrapper}>
-          <SearchSvgIcon />
+          <StyledIcon name="magnify" />
           <TextInput
             style={styles.input}
             placeholder="Пошук..."
@@ -51,7 +51,7 @@ export default function SearchableButton({ onSearch }: SearchableButtonProps) {
         </View>
       ) : (
         <TouchableOpacity onPress={toggleSearch}>
-          <SearchSvgIcon />
+          <StyledIcon name="magnify" />
         </TouchableOpacity>
       )}
     </Animated.View>

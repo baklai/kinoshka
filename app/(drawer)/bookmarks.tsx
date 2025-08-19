@@ -1,6 +1,6 @@
 import MovieItem from '@/components/MovieCard';
 import MoviesNotFound from '@/components/MoviesNotFound';
-import { BookmarkSvgIcon } from '@/components/StyledIcons';
+import { StyledIcon } from '@/components/StyledIcon';
 import { useSecureStore } from '@/hooks/useAsyncStorage';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -20,7 +20,7 @@ export default function BookmarksScreen() {
           headerRight: () => null,
           headerTitle: () => (
             <View style={styles.header}>
-              <BookmarkSvgIcon />
+              <StyledIcon name="bookmark" />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Закладки</Text>
             </View>
           )

@@ -55,7 +55,7 @@ export default function DrawerLayout() {
       >
         <Drawer.Screen name="index" />
         <Drawer.Screen name="about" />
-        <Drawer.Screen name="options" />
+        <Drawer.Screen name="options" options={{ headerShown: false }} />
         <Drawer.Screen name="history" />
         <Drawer.Screen name="bookmarks" />
       </Drawer>

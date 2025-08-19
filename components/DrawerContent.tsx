@@ -1,24 +1,12 @@
-import {
-  AboutSvgIcon,
-  BookmarkSvgIcon,
-  CartoonsSvgIcon,
-  ExitSvgIcon,
-  HistorySvgIcon,
-  MoviesSvgIcon,
-  NewsSvgIcon,
-  OptionsSvgIcon,
-  SeriesSvgIcon,
-  TVShowsSvgIcon
-} from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItem
 } from '@react-navigation/drawer';
-import { Image } from 'expo-image';
 import React, { useEffect } from 'react';
-import { BackHandler, Platform, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
+import { BackHandler, Platform, StyleSheet, TVFocusGuideView, View } from 'react-native';
+import { StyledIcon } from './StyledIcon';
 
 const Separator = () => <View style={styles.separator} />;
 
@@ -44,16 +32,11 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 
   return (
     <TVFocusGuideView style={{ flex: 1 }} trapFocusRight trapFocusDown trapFocusUp trapFocusLeft>
-      <View style={styles.headerContainer} hasTVPreferredFocus>
-        <Image
-          source={require('@/assets/images/logo.png')}
-          style={{ width: 32, height: 32 }}
-          contentFit="cover"
-        />
-        <Text style={styles.headerTitle}>KinoshkaTV</Text>
-      </View>
-
-      <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerScrollContainer}>
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={styles.drawerScrollContainer}
+        hasTVPreferredFocus
+      >
         <DrawerItem
           key="news"
           label="Новинки"
@@ -61,7 +44,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <NewsSvgIcon {...props} />}
+          icon={() => <StyledIcon name="new-box" />}
           onPress={() => navigation.navigate('index')}
         />
 
@@ -72,7 +55,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <MoviesSvgIcon {...props} />}
+          icon={() => <StyledIcon name="filmstrip-box" />}
           onPress={() => navigation.navigate('index')}
         />
         <DrawerItem
@@ -82,7 +65,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <SeriesSvgIcon {...props} />}
+          icon={() => <StyledIcon name="filmstrip-box-multiple" />}
           onPress={() => navigation.navigate('index')}
         />
         <DrawerItem
@@ -92,7 +75,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <CartoonsSvgIcon {...props} />}
+          icon={() => <StyledIcon name="sticker-emoji" />}
           onPress={() => navigation.navigate('index')}
         />
         <DrawerItem
@@ -102,7 +85,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <TVShowsSvgIcon {...props} />}
+          icon={() => <StyledIcon name="youtube-tv" />}
           onPress={() => navigation.navigate('index')}
         />
       </DrawerContentScrollView>
@@ -114,7 +97,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <HistorySvgIcon />}
+          icon={() => <StyledIcon name="history" />}
           onPress={() => navigation.navigate('history')}
         />
 
@@ -124,7 +107,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <BookmarkSvgIcon />}
+          icon={() => <StyledIcon name="bookmark" />}
           onPress={() => navigation.navigate('bookmarks')}
         />
 
@@ -136,7 +119,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <OptionsSvgIcon />}
+          icon={() => <StyledIcon name="cog-outline" />}
           onPress={() => navigation.navigate('options')}
         />
 
@@ -146,7 +129,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <AboutSvgIcon />}
+          icon={() => <StyledIcon name="information-outline" />}
           onPress={() => navigation.navigate('about')}
         />
 
@@ -158,7 +141,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
           pressColor="#ca563f"
           style={styles.drawerItem}
           labelStyle={styles.drawerItemLabel}
-          icon={() => <ExitSvgIcon />}
+          icon={() => <StyledIcon name="exit-to-app" />}
           onPress={handleExit}
         />
       </View>
@@ -177,16 +160,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B1C1E',
     borderBottomColor: '#17171A',
     borderBottomWidth: 1
-  },
-
-  headerTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: scaledPixels(32),
-    textAlign: 'left',
-    textShadowColor: '#ca563f',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1
   },
 
   drawerScrollContainer: {

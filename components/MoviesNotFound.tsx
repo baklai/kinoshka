@@ -1,11 +1,11 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { StyledIcon } from './StyledIcon';
 
 export default function MoviesNotFound({ text }: { text: string }) {
   return (
     <View style={styles.emptyСontainer}>
-      <MaterialIcons name="folder-open" size={120} color="#c5c5c5" />
+      <StyledIcon name="folder-open" size="xlarge" color="#c5c5c5" />
       <Text style={styles.emptyText}>{text}</Text>
     </View>
   );

@@ -1,6 +1,6 @@
 import MovieItem from '@/components/MovieCard';
 import MoviesNotFound from '@/components/MoviesNotFound';
-import { HistorySvgIcon } from '@/components/StyledIcons';
+import { StyledIcon } from '@/components/StyledIcon';
 import { useSecureStore } from '@/hooks/useAsyncStorage';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -20,7 +20,7 @@ export default function HistoryScreen() {
           headerRight: () => null,
           headerTitle: () => (
             <View style={styles.header}>
-              <HistorySvgIcon />
+              <StyledIcon name="history" />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>
                 Історія перегляду
               </Text>

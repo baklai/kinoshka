@@ -1,7 +1,7 @@
-import { DotsVerticalSvgIcon } from '@/components/StyledIcons';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyledIcon } from './StyledIcon';
 
 interface SortableButtonProps {}
 
@@ -16,7 +16,7 @@ export default function OptionsButton() {
       <View style={{ position: 'relative' }}>
         <View style={styles.container}>
           <TouchableOpacity onPress={openModal}>
-            <DotsVerticalSvgIcon />
+            <StyledIcon name="dots-vertical" />
           </TouchableOpacity>
         </View>
       </View>

@@ -1,4 +1,5 @@
 import MovieCard from '@/components/MovieCard';
+import { useAsyncApi } from '@/hooks/useAsyncApi';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -18,19 +19,12 @@ const LIMIT = 20;
 const CARD_SIZE = 196;
 const CARD_MARGIN = 3;
 
-const MoviesFlatList = ({
-  api,
-  category,
-  filters
-}: {
-  api?: string;
-  category: string;
-  filters: Record<string, any>;
-}) => {
-  const [data, setData] = useState<MovieProps[]>([]);
+const MoviesFlatList = ({ filters }: { filters: Record<string, any> }) => {
+  const { loading, findAll, findOneById } = useAsyncApi('movies');
+
+  const [records, setRecords] = useState<MovieProps[]>([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
-  const [loading, setLoading] = useState(false);
 
   const [focusedItem, setFocusedItem] = useState<MovieProps | null>(null);
   const fadeAnimated = useAnimatedValue(0);
@@ -44,38 +38,33 @@ const MoviesFlatList = ({
   const fetchData = useCallback(async () => {
     if (loading || !hasNextPage) return;
 
-    console.log(filters);
-
-    setLoading(true);
     try {
-      const response = await fetch(
-        `${api}/movies?limit=${LIMIT}&page=${page}&filters={"categories": { "$in": "${filters.categories}" }}`
-      );
+      const response = await findAll({
+        params: {
+          limit: LIMIT,
+          page: page
+          // filters: { genres: { $in: ['Фільми'] } }
+        }
+      });
 
-      const result = await response.json();
+      const newItems = response.docs || [];
 
-      const newItems = result.docs || [];
-
-      setData((prev: MovieProps[]) => {
+      setRecords((prev: MovieProps[]) => {
         const existingIds = new Set(prev.map((item: MovieProps) => item.id));
         const filteredNewItems = newItems.filter((item: MovieProps) => !existingIds.has(item.id));
         return [...prev, ...filteredNewItems];
       });
 
-      setHasNextPage(result.hasNextPage);
+      setHasNextPage(response.hasNextPage);
     } catch (error) {
       console.error('Ошибка загрузки:', error);
-    } finally {
-      setLoading(false);
     }
   }, [loading, page, hasNextPage]);
 
   const handleSelectItem = async (value: MovieProps) => {
-    const response = await fetch(`${api}/movies/${value.id}`);
+    const response = await findOneById(value.id);
 
-    const result = await response.json();
-
-    setFocusedItem(result);
+    setFocusedItem(response);
     Animated.timing(fadeAnimated, {
       toValue: 1,
       duration: 1000,
@@ -116,14 +105,14 @@ const MoviesFlatList = ({
     fetchData();
   }, [page]);
 
-  if (!data.length) {
+  if (!records.length) {
     return null;
   }
 
   return (
     <>
       <FlatList
-        data={data}
+        data={records}
         keyExtractor={item => item?.id}
         numColumns={numColumns}
         renderItem={renderItem}

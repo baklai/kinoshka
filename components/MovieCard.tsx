@@ -1,10 +1,10 @@
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
-import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyledIcon } from './StyledIcon';
 
 interface MovieCardProps extends MovieProps {
   handlePress?: (item: MovieProps) => void;
@@ -34,7 +34,6 @@ export default function MovieCard(props: MovieCardProps) {
         <View style={styles.overlayTop}>
           {imdb ? (
             <View style={styles.rating}>
-              <MaterialIcons name="recommend" size={scaledPixels(14)} color="#c5c5c5" />
               <Text style={styles.ratingText}>{imdb}</Text>
             </View>
           ) : (
@@ -46,16 +45,6 @@ export default function MovieCard(props: MovieCardProps) {
           </View>
         </View>
 
-        {focused && (
-          <MaterialIcons
-            name="play-circle"
-            size={scaledPixels(80)}
-            color="#ca563f"
-            style={styles.playIcon}
-            pointerEvents="none"
-          />
-        )}
-
         {focused && <View style={styles.overlay} />}
 
         {focused && <View style={styles.borderOverlay} />}
@@ -64,6 +53,10 @@ export default function MovieCard(props: MovieCardProps) {
       <View style={styles.overlayBottom}>
         <Text style={styles.title}>{title}</Text>
       </View>
+
+      {focused && (
+        <StyledIcon name="play-circle" size="xlarge" color="#ca563f" style={styles.playIcon} />
+      )}
     </TouchableOpacity>
   );
 }
@@ -73,7 +66,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: scaledPixels(4)
   },
-
   imageWrapper: {
     paddingVertical: scaledPixels(3),
     width: scaledPixels(196),
@@ -88,13 +80,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#0E0E0F'
   },
   playIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    opacity: 0.8,
-    marginLeft: -scaledPixels(40),
-    marginTop: -scaledPixels(40),
-    zIndex: 10
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.8
   },
   overlayTop: {
     flexDirection: 'row',
@@ -147,9 +136,10 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#fff',
-    fontSize: scaledPixels(18),
     fontWeight: 'bold',
     textAlign: 'center',
+    fontSize: scaledPixels(18),
+    paddingHorizontal: scaledPixels(2),
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1
   },

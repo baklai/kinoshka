@@ -1,19 +1,19 @@
 import { createContext } from 'react';
 
 export interface ApplicationContextType {
-  selectedCategory: string;
-  setSelectedCategory: (name: string) => void;
+  apiBaseUrl: string | null;
+  setApiBaseUrl: (value: string) => void;
 
-  categoryDescription: string;
-  setCategoryDescription: (description: string) => void;
+  apiBaseToken: string | null;
+  setApiBaseToken: (value: string) => void;
 
-  clearCategory: () => void;
+  clearApiBase: () => void;
 }
 
 export const ApplicationContext = createContext<ApplicationContextType>({
-  selectedCategory: '',
-  setSelectedCategory: () => {},
-  categoryDescription: '',
-  setCategoryDescription: () => {},
-  clearCategory: () => {}
+  apiBaseUrl: null,
+  setApiBaseUrl: () => {},
+  apiBaseToken: null,
+  setApiBaseToken: () => {},
+  clearApiBase: () => {}
 });

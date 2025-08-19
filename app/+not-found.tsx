@@ -1,4 +1,6 @@
+import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Link } from 'expo-router';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function NotFoundScreen() {
@@ -17,16 +19,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20
+    padding: scaledPixels(20)
   },
   text: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: scaledPixels(24),
     fontWeight: 600
   },
   link: {
     color: '#fff',
-    marginTop: 15,
-    paddingVertical: 15
+    marginTop: scaledPixels(15),
+    paddingVertical: scaledPixels(15)
   }
 });

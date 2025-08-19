@@ -6,7 +6,7 @@
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
-    "scheme": "routertv",
+    "scheme": "kinoshka",
     "plugins": [
       [
         "@react-native-tvos/config-tv",

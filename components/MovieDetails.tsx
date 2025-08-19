@@ -1,3 +1,4 @@
+import DropdownButton from '@/components/DropdownButton';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -5,11 +6,13 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DropdownButton from './DropdownButton';
 
 interface MovieDetailsProps extends MovieProps {
   animated: any;
 }
+
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 const Separator = () => <View style={styles.separator} />;
 
@@ -31,11 +34,21 @@ const MovieDetails = (props: MovieDetailsProps) => {
         style={styles.linearGradientBackground}
       />
 
+      <View style={styles.container}>
+        <Image
+          style={styles.image}
+          source="https://picsum.photos/seed/696/3000/2000"
+          placeholder={{ blurhash }}
+          contentFit="cover"
+          transition={1000}
+        />
+      </View>
+
       <View style={styles.headerContainer}>
         <View style={styles.headerImageContainer}>
           <Image
             style={styles.headerImage}
-            source={props?.poster}
+            source={{ uri: 'https://picsum.photos/seed/696/3000/2000' }}
             placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
             contentFit="cover"
             transition={1000}
@@ -111,6 +124,18 @@ const MovieDetails = (props: MovieDetailsProps) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  image: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#0553'
+  },
+
   animatedContainer: {
     padding: scaledPixels(10),
     backgroundColor: 'rgb(39, 39, 41)'

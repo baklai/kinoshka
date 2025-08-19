@@ -1,24 +1,22 @@
-import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Image } from 'expo-image';
-import { Drawer } from 'expo-router/drawer';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function AboutScreen() {
+export default function VideoScreen() {
   return (
     <>
-      <Drawer.Screen
+      {/* <Drawer.Screen
         options={{
           headerRight: () => null,
           headerTitle: () => (
             <View style={styles.header}>
-              <StyledIcon name="information-outline" />
+              <StyledIcon name="about" />
               <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Про додаток</Text>
             </View>
           )
         }}
-      />
+      /> */}
 
       <View style={styles.container}>
         <Image

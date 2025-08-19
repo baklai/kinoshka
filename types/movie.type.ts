@@ -11,10 +11,9 @@ export interface MovieProps {
   imdb?: string;
   likes?: string;
   dislikes?: string;
-  categories?: string[];
   genres?: string[];
   actors?: string[];
   directors?: string[];
   countries?: string[];
-  episodes?: string[];
+  episodes?: Record<string, any>[];
 }
