@@ -1,7 +1,7 @@
+import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useRef, useState } from 'react';
 import { Animated, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { StyledIcon } from './StyledIcon';
 
 interface SearchableButtonProps {
   onSearch?: (query: string) => void;

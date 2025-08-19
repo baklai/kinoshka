@@ -1,3 +1,4 @@
+import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import {
   DrawerContentComponentProps,
@@ -6,7 +7,6 @@ import {
 } from '@react-navigation/drawer';
 import React, { useEffect } from 'react';
 import { BackHandler, Platform, StyleSheet, TVFocusGuideView, View } from 'react-native';
-import { StyledIcon } from './StyledIcon';
 
 const Separator = () => <View style={styles.separator} />;
 
@@ -37,17 +37,6 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
         contentContainerStyle={styles.drawerScrollContainer}
         hasTVPreferredFocus
       >
-        <DrawerItem
-          key="news"
-          label="Новинки"
-          pressOpacity={0.5}
-          pressColor="#ca563f"
-          style={styles.drawerItem}
-          labelStyle={styles.drawerItemLabel}
-          icon={() => <StyledIcon name="new-box" />}
-          onPress={() => navigation.navigate('index')}
-        />
-
         <DrawerItem
           key="movies"
           label="Фільми"

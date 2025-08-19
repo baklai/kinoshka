@@ -1,7 +1,7 @@
+import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { StyledIcon } from './StyledIcon';
 
 interface SortableButtonProps {
   onSort?: (field: string, direction: 'asc' | 'desc') => void;

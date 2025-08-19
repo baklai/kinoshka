@@ -1,6 +1,6 @@
+import { StyledIcon } from '@/components/StyledIcon';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { StyledIcon } from './StyledIcon';
 
 export default function MoviesNotFound({ text }: { text: string }) {
   return (

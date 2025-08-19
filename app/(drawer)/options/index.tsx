@@ -1,8 +1,7 @@
 import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { useApplication } from '@/providers/ApplicationProvider';
-import { router } from 'expo-router';
-import { Drawer } from 'expo-router/drawer';
+import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -40,7 +39,7 @@ export default function OptionsScreen() {
   );
   return (
     <>
-      <Drawer.Screen
+      <Stack.Screen
         options={{
           headerRight: () => null,
           headerTitle: () => (

@@ -1,10 +1,10 @@
+import { StyledIcon } from '@/components/StyledIcon';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { StyledIcon } from './StyledIcon';
 
 interface MovieCardProps extends MovieProps {
   handlePress?: (item: MovieProps) => void;
