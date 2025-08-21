@@ -16,7 +16,7 @@ export default function SearchScreen() {
       {movies.length > 0 ? (
         movies.map((movie: MovieProps) => <MovieItem {...movie} key={movie.id} />)
       ) : (
-        <MoviesNotFound text="Історія перегляду порожня" />
+        <MoviesNotFound text="Історія пошуку порожня" />
       )}
     </View>
   );
