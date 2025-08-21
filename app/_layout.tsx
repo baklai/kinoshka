@@ -38,12 +38,20 @@ function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
+          gestureEnabled: false,
+          headerBackVisible: false,
           animation: 'fade_from_bottom'
         }}
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="about" />
         <Stack.Screen name="search" />
+        <Stack.Screen
+          name="details"
+          options={{
+            gestureEnabled: true
+          }}
+        />
         <Stack.Screen name="bookmarks" />
         <Stack.Screen name="history" />
         <Stack.Screen name="options" />

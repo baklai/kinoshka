@@ -29,7 +29,7 @@ export default function OptionsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.item} onPress={() => router.push('/options/catalog')}>
+    <TouchableOpacity style={styles.item} onPress={() => router.replace('/options')}>
       <StyledIcon name="cog-outline" size="large" color="#fff" style={styles.icon} />
       <View style={styles.textBlock}>
         <Text style={styles.title}>{item.title}</Text>

@@ -4,13 +4,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
-  const genres = [
-    ['Фільми', 'Екшн'],
-    ['Фільми', 'Трилери'],
-    ['Пригоди'],
-    ['Серіали'],
-    ['Мультфільми']
-  ];
+  const genres = [['Екшн'], ['Трилери'], ['Пригоди'], ['Серіали'], ['Мультфільми']];
 
   return (
     <TVFocusGuideView style={{ flex: 1 }} trapFocusLeft trapFocusRight trapFocusDown>

@@ -40,7 +40,7 @@ export default function HeaderContent() {
                 key={idx}
                 focusable
                 hasTVPreferredFocus={route === '/'}
-                onPress={() => router.push(route)}
+                onPress={() => router.replace(route)}
                 style={({ focused, pressed }) => [
                   styles.touchableText,
                   focused && { color: '#272727' },
@@ -61,9 +61,6 @@ export default function HeaderContent() {
                     </Text>
                   </View>
                 )}
-                {/* <View style={isActive && styles.withUnderline}>
-                  <Text style={[styles.label, isActive && styles.labelFocuse]}>{title}</Text>
-                </View> */}
               </Pressable>
             );
           })}
@@ -75,7 +72,7 @@ export default function HeaderContent() {
               <Pressable
                 key={idx}
                 focusable
-                onPress={() => router.push(route)}
+                onPress={() => router.replace(route)}
                 style={({ focused, pressed }) => [
                   styles.touchableIcon,
                   focused && { backgroundColor: '#272727' },
