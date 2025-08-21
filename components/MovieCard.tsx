@@ -11,7 +11,7 @@ interface MovieCardProps extends MovieProps {
 }
 
 export default function MovieCard(props: MovieCardProps) {
-  const { poster, title, imdb, handlePress } = props;
+  const { poster, title, imdb, quality, handlePress } = props;
   const [focused, setFocused] = useState(false);
 
   return (
@@ -41,7 +41,7 @@ export default function MovieCard(props: MovieCardProps) {
           )}
 
           <View style={styles.quality}>
-            <Text style={styles.qualityText}>1080p</Text>
+            <Text style={styles.qualityText}>{quality}</Text>
           </View>
         </View>
 
@@ -63,20 +63,17 @@ export default function MovieCard(props: MovieCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    marginVertical: scaledPixels(4)
+    alignItems: 'center'
   },
   imageWrapper: {
-    paddingVertical: scaledPixels(3),
-    width: scaledPixels(196),
-    height: scaledPixels(277),
+    width: scaledPixels(181),
+    height: scaledPixels(259),
     overflow: 'hidden',
     position: 'relative'
   },
   image: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: scaledPixels(6),
     backgroundColor: '#0E0E0F'
   },
   playIcon: {
@@ -149,6 +146,7 @@ const styles = StyleSheet.create({
   },
   borderOverlay: {
     ...StyleSheet.absoluteFillObject,
+    borderRadius: scaledPixels(6),
     borderWidth: scaledPixels(3),
     borderColor: '#ca563f',
     pointerEvents: 'none'

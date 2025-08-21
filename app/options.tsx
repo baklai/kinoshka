@@ -1,7 +1,7 @@
 import { StyledIcon } from '@/components/StyledIcon';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { useApplication } from '@/providers/ApplicationProvider';
-import { router, Stack } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -38,23 +38,9 @@ export default function OptionsScreen() {
     </TouchableOpacity>
   );
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerRight: () => null,
-          headerTitle: () => (
-            <View style={styles.header}>
-              <StyledIcon name="cog-outline" />
-              <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Налаштування</Text>
-            </View>
-          )
-        }}
-      />
-
-      <View style={styles.container}>
-        <FlatList data={settingsData} renderItem={renderItem} keyExtractor={item => item.id} />
-      </View>
-    </>
+    <View style={styles.container}>
+      <FlatList data={settingsData} renderItem={renderItem} keyExtractor={item => item.id} />
+    </View>
   );
 }
 
@@ -66,7 +52,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#1c1c1c',
     padding: 10
   },
   item: {

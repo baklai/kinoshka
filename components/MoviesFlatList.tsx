@@ -1,39 +1,24 @@
 import MovieCard from '@/components/MovieCard';
-import { useAsyncApi } from '@/hooks/useAsyncApi';
+import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  Animated,
-  BackHandler,
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  useAnimatedValue,
-  View
-} from 'react-native';
-import MovieDetails from './MovieDetails';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import MoviesNotFound from './MoviesNotFound';
 
-const LIMIT = 20;
-const CARD_SIZE = 196;
-const CARD_MARGIN = 3;
+const LIMIT = 6;
 
-const MoviesFlatList = ({ filters }: { filters: Record<string, any> }) => {
-  const { loading, findAll, findOneById } = useAsyncApi('movies');
+interface MoviesFlatListProps {
+  genres?: string[];
+}
+
+const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
+  const { loading, findAll } = useAsyncFetch('movies');
 
   const [records, setRecords] = useState<MovieProps[]>([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
-
-  const [focusedItem, setFocusedItem] = useState<MovieProps | null>(null);
-  const fadeAnimated = useAnimatedValue(0);
-
-  const screenWidth = Dimensions.get('window').width;
-
-  const numColumns = Math.floor(
-    screenWidth / (scaledPixels(CARD_SIZE) + scaledPixels(CARD_MARGIN * 2))
-  );
 
   const fetchData = useCallback(async () => {
     if (loading || !hasNextPage) return;
@@ -42,16 +27,16 @@ const MoviesFlatList = ({ filters }: { filters: Record<string, any> }) => {
       const response = await findAll({
         params: {
           limit: LIMIT,
-          page: page
-          // filters: { genres: { $in: ['Фільми'] } }
+          page,
+          filters: genres?.filter(Boolean).length ? { genres: { $in: genres } } : {}
         }
       });
 
       const newItems = response.docs || [];
 
-      setRecords((prev: MovieProps[]) => {
-        const existingIds = new Set(prev.map((item: MovieProps) => item.id));
-        const filteredNewItems = newItems.filter((item: MovieProps) => !existingIds.has(item.id));
+      setRecords(prev => {
+        const existingIds = new Set(prev.map(item => item.id));
+        const filteredNewItems = newItems.filter((item: any) => !existingIds.has(item.id));
         return [...prev, ...filteredNewItems];
       });
 
@@ -59,92 +44,58 @@ const MoviesFlatList = ({ filters }: { filters: Record<string, any> }) => {
     } catch (error) {
       console.error('Ошибка загрузки:', error);
     }
-  }, [loading, page, hasNextPage]);
+  }, [loading, page, hasNextPage, genres, findAll]);
 
-  const handleSelectItem = async (value: MovieProps) => {
-    const response = await findOneById(value.id);
-
-    setFocusedItem(response);
-    Animated.timing(fadeAnimated, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true
-    }).start();
+  const handleSelectItem = async (item: MovieProps) => {
+    router.push({
+      pathname: '/details',
+      params: { id: item.id }
+    });
   };
 
   useEffect(() => {
-    const onBackPress = () => {
-      if (focusedItem) {
-        Animated.timing(fadeAnimated, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true
-        }).start(() => setFocusedItem(null));
-        return true;
-      }
-      return false;
-    };
-
-    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-    return () => subscription.remove();
-  }, [focusedItem]);
+    fetchData();
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: MovieProps }) => (
-      <MovieCard
-        {...item}
-        handlePress={item => {
-          handleSelectItem(item);
-        }}
-      />
+      <MovieCard {...item} handlePress={() => handleSelectItem(item)} />
     ),
     []
   );
 
-  useEffect(() => {
-    fetchData();
-  }, [page]);
-
-  if (!records.length) {
-    return null;
-  }
+  if (!records.length) return null;
 
   return (
-    <>
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>{genres?.join(', ')}</Text>
+      </View>
       <FlatList
+        horizontal
         data={records}
-        keyExtractor={item => item?.id}
-        numColumns={numColumns}
+        keyExtractor={item => item.id?.toString()}
         renderItem={renderItem}
         onEndReached={() => setPage(prev => prev + 1)}
         onEndReachedThreshold={0.5}
-        columnWrapperStyle={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'space-around'
-        }}
-        scrollEnabled={!focusedItem}
-        ListEmptyComponent={<MoviesNotFound text="Не вдалось знайти відео" />}
+        ItemSeparatorComponent={() => <View style={{ width: scaledPixels(24) }} />}
+        ListEmptyComponent={() => <MoviesNotFound text="Не удалось найти видео" />}
       />
-
-      {focusedItem && (
-        <View style={styles.overlay}>
-          <MovieDetails {...focusedItem} animated={1} />
-        </View>
-      )}
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.95)', // затемнение подложки
-    zIndex: 999
+  container: {
+    flex: 1
+  },
+  headerContainer: {
+    paddingVertical: scaledPixels(8)
+  },
+  headerText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: scaledPixels(22)
   }
 });
 

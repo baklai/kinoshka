@@ -1,4 +1,5 @@
-import { COLORS } from '@/constants/ui.constant';
+import { AppTheme } from '@/constants/ui.constant';
+import { scaledPixels } from '@/hooks/useScaledPixels';
 import React from 'react';
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
@@ -12,17 +13,17 @@ const StyledText: React.FC<StyledTextProps> = ({ style, variant = 'body', ...pro
 
 const styles = StyleSheet.create({
   base: {
-    color: COLORS.PRIMARY_TEXT
+    color: AppTheme.colors.text
   },
   title: {
-    fontSize: 24,
+    fontSize: scaledPixels(24),
     fontWeight: 'bold'
   },
   body: {
-    fontSize: 16
+    fontSize: scaledPixels(16)
   },
   caption: {
-    fontSize: 12,
+    fontSize: scaledPixels(12),
     opacity: 0.8
   }
 });

@@ -12,18 +12,38 @@ interface RequestArgs extends RequestOptions {
   body?: any;
 }
 
-export const useAsyncApi = <T = any>(endpoint: string) => {
+export const useAsyncFetch = <T = any>(endpoint: string) => {
   const { apiBaseUrl, apiBaseToken } = useApplication();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
 
   const buildQuery = (params: Record<string, any> = {}) => {
     const query = new URLSearchParams();
+
+    const cleanValue = (value: any): any => {
+      if (Array.isArray(value)) {
+        return value.filter(v => v !== null && v !== undefined);
+      }
+      if (value && typeof value === 'object') {
+        const cleaned: Record<string, any> = {};
+        Object.entries(value).forEach(([k, v]) => {
+          const cv = cleanValue(v);
+          if (cv !== undefined && (Array.isArray(cv) ? cv.length > 0 : true)) {
+            cleaned[k] = cv;
+          }
+        });
+        return Object.keys(cleaned).length > 0 ? cleaned : undefined;
+      }
+      return value;
+    };
+
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        query.append(key, String(value));
+      const cleaned = cleanValue(value);
+      if (cleaned !== undefined) {
+        query.append(key, typeof cleaned === 'object' ? JSON.stringify(cleaned) : String(cleaned));
       }
     });
+
     return query.toString() ? `?${query.toString()}` : '';
   };
 
@@ -42,7 +62,7 @@ export const useAsyncApi = <T = any>(endpoint: string) => {
             ...(config?.headers || {})
           },
           body: body ? JSON.stringify(body) : undefined,
-          ...config,
+          ...config
         });
 
         const data = await response.json();

@@ -8,6 +8,7 @@ export function ExternalLink({ href, ...props }: Props) {
   // On TV, use a Pressable (which handles focus navigation) instead of the Link component
   return (
     <Pressable
+      focusable
       onPress={() => Linking.openURL(href).catch(reason => alert(`${reason}`))}
       style={({ pressed, focused }) => ({
         opacity: pressed || focused ? 0.6 : 1.0

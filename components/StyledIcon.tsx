@@ -1,8 +1,15 @@
-import { COLORS, ICON_SIZE } from '@/constants/ui.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { type ComponentProps } from 'react';
 import { type OpaqueColorValue, type ViewStyle, StyleSheet, View } from 'react-native';
+
+const ICON_SIZE = {
+  small: 16,
+  normal: 24,
+  large: 32,
+  xlarge: 48
+} as const;
 
 type StyledIconSize = keyof typeof ICON_SIZE;
 
@@ -14,7 +21,7 @@ type StyledIconProps = Omit<ComponentProps<typeof MaterialCommunityIcons>, 'size
 
 export const StyledIcon = ({
   size = 'normal' as StyledIconSize,
-  color = COLORS.PRIMARY_TEXT,
+  color = AppTheme.colors.text,
   style,
   ...props
 }: StyledIconProps) => {
