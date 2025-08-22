@@ -68,6 +68,7 @@ function RootLayout() {
         <Stack.Screen name="options" />
         <Stack.Screen name="+not-found" />
       </Stack>
+
       <StatusBar hidden />
     </SafeAreaView>
   );
