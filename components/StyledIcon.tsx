@@ -8,8 +8,7 @@ const ICON_SIZE = {
   small: 16,
   normal: 24,
   large: 32,
-  xlarge: 48,
-  display: 64
+  xlarge: 48
 } as const;
 
 type StyledIconSize = keyof typeof ICON_SIZE;
