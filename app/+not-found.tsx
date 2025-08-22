@@ -1,3 +1,4 @@
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Link } from 'expo-router';
 import React from 'react';
@@ -22,12 +23,12 @@ const styles = StyleSheet.create({
     padding: scaledPixels(20)
   },
   text: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(24),
     fontWeight: 600
   },
   link: {
-    color: '#fff',
+    color: AppTheme.colors.primary,
     marginTop: scaledPixels(15),
     paddingVertical: scaledPixels(15)
   }

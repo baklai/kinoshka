@@ -1,4 +1,5 @@
 import MovieCard from '@/components/MovieCard';
+import { AppTheme } from '@/constants/theme.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -78,6 +79,8 @@ const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
         renderItem={renderItem}
         onEndReached={() => setPage(prev => prev + 1)}
         onEndReachedThreshold={0.5}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ width: scaledPixels(24) }} />}
         ListEmptyComponent={() => <MoviesNotFound text="Не удалось найти видео" />}
       />
@@ -90,10 +93,13 @@ const styles = StyleSheet.create({
     flex: 1
   },
   headerContainer: {
-    paddingVertical: scaledPixels(8)
+    paddingVertical: scaledPixels(8),
+
+    borderColor: 'red',
+    borderWidth: 1
   },
   headerText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontWeight: 'bold',
     fontSize: scaledPixels(22)
   }

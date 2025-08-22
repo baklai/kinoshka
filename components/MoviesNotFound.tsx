@@ -1,11 +1,12 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function MoviesNotFound({ text }: { text: string }) {
   return (
     <View style={styles.emptyСontainer}>
-      <StyledIcon name="folder-open" size="xlarge" color="#c5c5c5" />
+      <StyledIcon name="folder-open" size={120} color={AppTheme.colors.subtext} />
       <Text style={styles.emptyText}>{text}</Text>
     </View>
   );
@@ -18,6 +19,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   emptyText: {
-    color: '#c5c5c5'
+    color: AppTheme.colors.subtext
   }
 });

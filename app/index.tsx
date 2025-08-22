@@ -1,5 +1,4 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import React from 'react';
 import { ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
@@ -25,6 +24,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    paddingHorizontal: scaledPixels(26)
+    borderColor: 'red',
+    borderWidth: 1
   }
 });

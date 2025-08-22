@@ -1,4 +1,5 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     maxWidth: scaledPixels(600)
   },
   modalTitle: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(16),
     marginBottom: scaledPixels(12)
   },
@@ -97,15 +98,15 @@ const styles = StyleSheet.create({
     borderRadius: scaledPixels(6)
   },
   menuItemText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(14)
   },
   radioOuter: {
     width: scaledPixels(18),
     height: scaledPixels(18),
     borderRadius: scaledPixels(9),
-    borderWidth: 2,
-    borderColor: '#fff',
+    borderWidth: scaledPixels(2),
+    borderColor: AppTheme.colors.text,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: scaledPixels(8)
@@ -114,6 +115,6 @@ const styles = StyleSheet.create({
     width: scaledPixels(10),
     height: scaledPixels(10),
     borderRadius: scaledPixels(5),
-    backgroundColor: '#fff'
+    backgroundColor: AppTheme.colors.text
   }
 });

@@ -1,4 +1,5 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -55,7 +56,12 @@ export default function MovieCard(props: MovieCardProps) {
       </View>
 
       {focused && (
-        <StyledIcon name="play-circle" size="xlarge" color="#ca563f" style={styles.playIcon} />
+        <StyledIcon
+          name="play-circle"
+          size="xlarge"
+          color={AppTheme.colors.primary}
+          style={styles.playIcon}
+        />
       )}
     </TouchableOpacity>
   );
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
   image: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: scaledPixels(6),
-    backgroundColor: '#0E0E0F'
+    backgroundColor: AppTheme.colors.background
   },
   playIcon: {
     ...StyleSheet.absoluteFillObject,
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     position: 'absolute',
-    backgroundColor: '#33333370',
+    backgroundColor: AppTheme.colors.surface,
     borderBottomLeftRadius: scaledPixels(3),
     borderBottomRightRadius: scaledPixels(3),
     paddingVertical: scaledPixels(4),
@@ -115,7 +121,7 @@ const styles = StyleSheet.create({
     gap: scaledPixels(2)
   },
   ratingText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(14),
     paddingHorizontal: scaledPixels(3)
   },
@@ -128,11 +134,11 @@ const styles = StyleSheet.create({
     marginBottom: scaledPixels(4)
   },
   qualityText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(14)
   },
   title: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: scaledPixels(18),
@@ -148,7 +154,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: scaledPixels(6),
     borderWidth: scaledPixels(3),
-    borderColor: '#ca563f',
+    borderColor: AppTheme.colors.primary,
     pointerEvents: 'none'
   }
 });

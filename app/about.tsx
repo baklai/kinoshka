@@ -1,3 +1,4 @@
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { Image } from 'expo-image';
 import React from 'react';
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: scaledPixels(18),
     fontWeight: 600,
-    color: '#fff',
+    color: AppTheme.colors.text,
     maxWidth: scaledPixels(400),
     textAlign: 'center'
   }

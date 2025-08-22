@@ -2,11 +2,15 @@ import { ApplicationContext, ApplicationContextType } from '@/context/Applicatio
 import { useSecureStore } from '@/hooks/useAsyncStorage';
 import { SplashScreen } from 'expo-router';
 import React, { ReactNode, useContext, useEffect, useState } from 'react';
+import { useWindowDimensions } from 'react-native';
 
 export const useApplication = () => useContext(ApplicationContext);
 
 export const ApplicationProvider = ({ children }: { children: ReactNode }) => {
+  const { width, height } = useWindowDimensions();
   const [isApplicationReady, setIsApplicationReady] = useState(false);
+
+  const orientation: 'portrait' | 'landscape' = height >= width ? 'portrait' : 'landscape';
 
   const [apiBaseUrl, setApiBaseUrl, refreshApiBaseUrl, removeApiBaseUrl] = useSecureStore<
     string | null
@@ -39,6 +43,8 @@ export const ApplicationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const contextValue: ApplicationContextType = {
+    orientation: orientation ?? null,
+
     apiBaseUrl: apiBaseUrl ?? null,
     setApiBaseUrl: async (value: string) => {
       await setApiBaseUrl(value);

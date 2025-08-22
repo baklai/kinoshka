@@ -19,7 +19,7 @@ export default function SpeechButton({ onPress }: SpeechButtonProps) {
       ]}
     >
       <View style={styles.icon}>
-        <StyledIcon size="normal" name="microphone" color="#666" />
+        <StyledIcon size="large" name="microphone" color="#666" />
       </View>
     </Pressable>
   );
@@ -36,6 +36,10 @@ const styles = StyleSheet.create({
   },
   icon: {
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    width: scaledPixels(48),
+    height: scaledPixels(48),
+    borderRadius: scaledPixels(48 / 2),
+    backgroundColor: '#272727'
   }
 });

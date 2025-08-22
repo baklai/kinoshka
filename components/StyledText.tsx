@@ -1,4 +1,4 @@
-import { AppTheme } from '@/constants/ui.constant';
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React from 'react';
 import { StyleSheet, Text, type TextProps } from 'react-native';

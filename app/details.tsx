@@ -1,4 +1,5 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
@@ -55,7 +56,7 @@ export default function DetailsScreen() {
   if (loading && !movie) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#fff" />
+        <ActivityIndicator size="large" color={AppTheme.colors.text} />
       </View>
     );
   }
@@ -64,7 +65,7 @@ export default function DetailsScreen() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <StyledIcon name="movie-off-outline" size="xlarge" />
-        <Text style={{ color: '#fff' }}>Відео не знайдено</Text>
+        <Text style={{ color: AppTheme.colors.text }}>Відео не знайдено</Text>
       </View>
     );
   }
@@ -86,7 +87,7 @@ export default function DetailsScreen() {
             onPress={() => openInVLC(movie?.episodes?.[0]?.source ?? '')}
             style={({ focused, pressed }) => [
               styles.playButton,
-              focused && { backgroundColor: '#272727' },
+              focused && { backgroundColor: AppTheme.colors.muted },
               pressed && { opacity: 0.7 }
             ]}
           >
@@ -177,19 +178,19 @@ const styles = StyleSheet.create({
     flex: 1
   },
   headerTitle: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     textAlign: 'center',
     fontSize: scaledPixels(28),
     fontWeight: 'bold'
   },
   headerOriginalText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     textAlign: 'left',
     fontSize: scaledPixels(24),
     fontWeight: 'bold'
   },
   headerText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(18)
   },
   textBold: {
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     fontSize: scaledPixels(20)
   },
   headerDescription: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontSize: scaledPixels(16),
     fontWeight: '500',
     lineHeight: 22,
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
   playButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ca563f',
+    backgroundColor: AppTheme.colors.primary,
     paddingHorizontal: scaledPixels(24),
     paddingVertical: scaledPixels(8),
     borderRadius: scaledPixels(6)
@@ -226,13 +227,13 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   playButtonText: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontWeight: 'bold',
     marginLeft: scaledPixels(6)
   },
   separator: {
     height: scaledPixels(1),
     marginVertical: scaledPixels(8),
-    backgroundColor: 'rgba(255,255,255,0.2)'
+    backgroundColor: AppTheme.colors.border
   }
 });

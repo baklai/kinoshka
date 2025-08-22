@@ -1,4 +1,5 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { useApplication } from '@/providers/ApplicationProvider';
 import { router } from 'expo-router';
@@ -30,7 +31,12 @@ export default function OptionsScreen() {
 
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.item} onPress={() => router.replace('/options')}>
-      <StyledIcon name="cog-outline" size="large" color="#fff" style={styles.icon} />
+      <StyledIcon
+        name="cog-outline"
+        size="large"
+        color={AppTheme.colors.text}
+        style={styles.icon}
+      />
       <View style={styles.textBlock}>
         <Text style={styles.title}>{item.title}</Text>
         {item.subtitle ? <Text style={styles.subtitle}>{item.subtitle}</Text> : null}
@@ -52,29 +58,29 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 10
+    padding: scaledPixels(10)
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#333'
+    paddingVertical: scaledPixels(12),
+    borderBottomWidth: scaledPixels(0.5),
+    borderBottomColor: AppTheme.colors.border
   },
   icon: {
-    marginRight: 15
+    marginRight: scaledPixels(15)
   },
   textBlock: {
     flex: 1
   },
   title: {
-    color: '#fff',
-    fontSize: 16,
+    color: AppTheme.colors.text,
+    fontSize: scaledPixels(16),
     fontWeight: '600'
   },
   subtitle: {
-    color: '#aaa',
-    fontSize: 13,
-    marginTop: 2
+    color: AppTheme.colors.subtext,
+    fontSize: scaledPixels(13),
+    marginTop: scaledPixels(2)
   }
 });

@@ -1,13 +1,15 @@
 import HeaderContent from '@/components/HeaderContent';
-import { AppTheme } from '@/constants/ui.constant';
-import { ApplicationProvider } from '@/providers/ApplicationProvider';
+import { AppTheme } from '@/constants/theme.constant';
+import { scaledPixels } from '@/hooks/useScaledPixels';
+import { ApplicationProvider, useApplication } from '@/providers/ApplicationProvider';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -17,30 +19,39 @@ configureReanimatedLogger({
 export default function RootLayoutProvider() {
   return (
     <ApplicationProvider>
-      <ThemeProvider value={AppTheme}>
+      <GestureHandlerRootView>
         <SafeAreaProvider>
-          <GestureHandlerRootView style={styles.container}>
-            <SafeAreaView style={styles.container}>
-              <RootLayout />
-            </SafeAreaView>
-          </GestureHandlerRootView>
+          <ThemeProvider value={AppTheme}>
+            <RootLayout />
+          </ThemeProvider>
         </SafeAreaProvider>
-      </ThemeProvider>
+      </GestureHandlerRootView>
     </ApplicationProvider>
   );
 }
 
 function RootLayout() {
+  const { orientation } = useApplication();
+
   return (
-    <>
-      <HeaderContent />
+    <SafeAreaView
+      style={[
+        styles.container,
+        orientation === 'landscape' && { paddingHorizontal: scaledPixels(40) }
+      ]}
+      edges={orientation === 'portrait' ? ['top', 'bottom'] : []}
+    >
+      <HeaderContent style={styles.header} />
 
       <Stack
         screenOptions={{
           headerShown: false,
           gestureEnabled: false,
           headerBackVisible: false,
-          animation: 'fade_from_bottom'
+          animation: 'fade_from_bottom',
+          contentStyle: {
+            backgroundColor: AppTheme.colors.background
+          }
         }}
       >
         <Stack.Screen name="index" />
@@ -57,14 +68,20 @@ function RootLayout() {
         <Stack.Screen name="options" />
         <Stack.Screen name="+not-found" />
       </Stack>
-
       <StatusBar hidden />
-    </>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: AppTheme.colors.background,
+
+    borderColor: 'red',
+    borderWidth: 1
+  },
+  header: {
+    marginVertical: scaledPixels(20)
   }
 });

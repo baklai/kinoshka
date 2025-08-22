@@ -1,13 +1,14 @@
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/ui.constant';
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
 import React, { ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
-import SpeechButton from './SpeechButton';
+import { Pressable, StyleSheet, Text, TVFocusGuideView, View, ViewProps } from 'react-native';
 
-export default function HeaderContent() {
+interface HeaderContentProps extends ViewProps {}
+
+const HeaderContent = (props: HeaderContentProps) => {
   const pathname = usePathname();
 
   const navTabs = [
@@ -22,16 +23,10 @@ export default function HeaderContent() {
     { icon: 'cog-outline', route: '/options' }
   ];
 
-  const handleMicrophone = () => {
-    return null;
-  };
-
   return (
     <TVFocusGuideView trapFocusLeft trapFocusRight trapFocusUp>
-      <View style={styles.container}>
+      <View style={[styles.container, props.style]}>
         <View style={styles.section}>
-          <SpeechButton onPress={handleMicrophone} />
-
           {navTabs.map(({ title, route }, idx) => {
             const isCurrentRoute = pathname === route;
 
@@ -43,7 +38,7 @@ export default function HeaderContent() {
                 onPress={() => router.replace(route)}
                 style={({ focused, pressed }) => [
                   styles.touchableText,
-                  focused && { color: '#272727' },
+                  focused && { color: AppTheme.colors.surface },
                   pressed && { opacity: 0.7 }
                 ]}
               >
@@ -53,11 +48,11 @@ export default function HeaderContent() {
                       style={[
                         styles.label,
                         focused && styles.withUnderline,
-                        focused && !isCurrentRoute && { borderColor: '#444444' },
+                        focused && !isCurrentRoute && { borderColor: AppTheme.colors.border },
                         isCurrentRoute && styles.labelFocuse
                       ]}
                     >
-                      {title}
+                      {title.toUpperCase()}
                     </Text>
                   </View>
                 )}
@@ -75,16 +70,19 @@ export default function HeaderContent() {
                 onPress={() => router.replace(route)}
                 style={({ focused, pressed }) => [
                   styles.touchableIcon,
-                  focused && { backgroundColor: '#272727' },
+                  focused && { backgroundColor: AppTheme.colors.surface },
                   pressed && { opacity: 0.7 }
                 ]}
               >
-                <View style={styles.iconWrapper}>
-                  <StyledIcon
-                    size="large"
-                    name={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
-                  />
-                </View>
+                {({ focused, pressed }) => (
+                  <View style={[styles.iconWrapper, pressed && { opacity: 0.7 }]}>
+                    <StyledIcon
+                      size="large"
+                      color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+                      name={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
+                    />
+                  </View>
+                )}
               </Pressable>
             );
           })}
@@ -92,27 +90,31 @@ export default function HeaderContent() {
       </View>
     </TVFocusGuideView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: scaledPixels(80),
-    paddingHorizontal: scaledPixels(8),
-    backgroundColor: AppTheme.colors.background
+    backgroundColor: AppTheme.colors.background,
+
+    borderColor: 'red',
+    borderWidth: scaledPixels(1)
   },
 
   section: {
-    gap: scaledPixels(8),
+    gap: scaledPixels(6),
     flexDirection: 'row',
     alignItems: 'center'
   },
 
   touchableText: {
-    paddingVertical: scaledPixels(3),
-    paddingHorizontal: scaledPixels(12)
+    // paddingVertical: scaledPixels(3),
+    // paddingHorizontal: scaledPixels(12)
+
+    borderColor: 'red',
+    borderWidth: 1
   },
 
   touchableIcon: {
@@ -121,7 +123,9 @@ const styles = StyleSheet.create({
     borderRadius: scaledPixels(48 / 2),
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: scaledPixels(4)
+
+    borderColor: 'red',
+    borderWidth: 1
   },
 
   iconWrapper: {
@@ -130,20 +134,22 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: '#ffffff95',
+    color: AppTheme.colors.subtext,
     fontWeight: '500',
     fontSize: scaledPixels(18),
     paddingVertical: scaledPixels(6)
   },
 
   labelFocuse: {
-    color: '#fff',
+    color: AppTheme.colors.text,
     fontWeight: 'bold'
   },
 
   withUnderline: {
     borderBottomWidth: scaledPixels(3),
-    borderColor: '#fff',
+    borderColor: AppTheme.colors.text,
     alignSelf: 'flex-start'
   }
 });
+
+export default HeaderContent;

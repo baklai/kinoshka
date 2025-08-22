@@ -1,4 +1,4 @@
-import { AppTheme } from '@/constants/ui.constant';
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { type ComponentProps } from 'react';
@@ -8,7 +8,8 @@ const ICON_SIZE = {
   small: 16,
   normal: 24,
   large: 32,
-  xlarge: 48
+  xlarge: 48,
+  display: 64
 } as const;
 
 type StyledIconSize = keyof typeof ICON_SIZE;

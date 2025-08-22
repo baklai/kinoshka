@@ -75,6 +75,15 @@
             ]
           }
         }
+      ],
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": ["en", "ua", "ru"],
+            "android": ["en", "ua", "ru"]
+          }
+        }
       ]
     ],
     "android": {
