@@ -47,6 +47,7 @@ const HeaderContent = (props: HeaderContentProps) => {
                       styles.label,
                       focused && styles.underline,
                       isCurrentRoute && styles.focused,
+                      isCurrentRoute && { fontSize: scaledPixels(20) },
                       pressed && styles.pressed
                     ]}
                   >
