@@ -1,21 +1,20 @@
 import MovieCard from '@/components/MovieCard';
+import MoviesNotFound from '@/components/MoviesNotFound';
 import { AppTheme } from '@/constants/theme.constant';
+import { LIMIT } from '@/constants/ui.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import MoviesNotFound from './MoviesNotFound';
-
-const LIMIT = 6;
 
 interface MoviesFlatListProps {
   genres?: string[];
 }
 
 const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
-  const { navigate, replace } = useNamedRouter();
+  const { navigate } = useNamedRouter();
 
   const { loading, findAll } = useAsyncFetch('movies');
 
@@ -45,17 +44,13 @@ const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
 
       setHasNextPage(response.hasNextPage);
     } catch (error) {
-      console.error('Ошибка загрузки:', error);
+      console.error('Помилка завантаження:', error);
     }
   }, [loading, page, hasNextPage, genres, findAll]);
 
   const handleSelectItem = async (item: MovieProps) => {
     navigate('DETAILS', { id: item.id });
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: MovieProps }) => (
@@ -64,7 +59,11 @@ const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
     []
   );
 
-  if (!records.length) return null;
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
+  if (!records.length && !loading) return null;
 
   return (
     <View style={styles.container}>

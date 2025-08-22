@@ -11,3 +11,5 @@ export const COLORS = {
   focus: '#3EA6FF',
   muted: '#272727'
 };
+
+export const LIMIT = 10;
