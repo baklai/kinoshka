@@ -106,44 +106,53 @@ export default function DetailsScreen() {
       >
         <View style={styles.textContainer}>
           {movie?.title && <Text style={styles.headerTitle}>{movie.title}</Text>}
+
           {movie?.originalTitle && (
             <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
           )}
-          {movie?.year && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
-            </Text>
-          )}
+
           {movie?.imdb && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
             </Text>
           )}
+
+          {movie?.year && (
+            <Text style={styles.headerText}>
+              <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
+            </Text>
+          )}
+
           {movie?.age && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>Вік. рейтинг:</Text> {movie.age}
             </Text>
           )}
+
           {movie?.duration && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>Тривалість:</Text> {movie.duration}
             </Text>
           )}
+
           {movie?.genres?.length && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>Жанр:</Text> {movie.genres.join(', ')}
             </Text>
           )}
+
           {movie?.countries?.length && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>Країна:</Text> {movie.countries.join(', ')}
             </Text>
           )}
+
           {movie?.directors?.length && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>Режисер:</Text> {movie.directors.join(', ')}
             </Text>
           )}
+
           {movie?.actors?.length && (
             <Text style={styles.headerText}>
               <Text style={styles.textBold}>Актори:</Text> {movie.actors.join(', ')}
@@ -163,11 +172,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    paddingVertical: scaledPixels(10)
+
+    borderColor: 'red',
+    borderWidth: scaledPixels(1)
   },
   imageContainer: {
     width: 'auto',
-    height: 'auto'
+    height: 'auto',
+    padding: scaledPixels(10)
   },
   textContainer: {
     flexDirection: 'column',
@@ -183,10 +195,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   headerOriginalText: {
-    color: AppTheme.colors.text,
-    textAlign: 'left',
-    fontSize: scaledPixels(24),
-    fontWeight: 'bold'
+    color: AppTheme.colors.subtext,
+    textAlign: 'center',
+    fontSize: scaledPixels(18)
   },
   headerText: {
     color: AppTheme.colors.text,
@@ -204,8 +215,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap'
   },
   headerImage: {
-    width: '90%',
-    height: '90%',
+    width: '80%',
+    height: '80%',
     borderRadius: scaledPixels(8)
   },
   headerButtonContainer: {
