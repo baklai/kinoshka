@@ -100,10 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: AppTheme.colors.background,
-
-    borderColor: 'red',
-    borderWidth: scaledPixels(1)
+    backgroundColor: AppTheme.colors.background
   },
 
   section: {
@@ -115,9 +112,6 @@ const styles = StyleSheet.create({
   touchableText: {
     // paddingVertical: scaledPixels(3),
     // paddingHorizontal: scaledPixels(12)
-
-    borderColor: 'red',
-    borderWidth: 1
   },
 
   touchableIcon: {
@@ -125,10 +119,7 @@ const styles = StyleSheet.create({
     height: scaledPixels(48),
     borderRadius: scaledPixels(48 / 2),
     alignItems: 'center',
-    justifyContent: 'center',
-
-    borderColor: 'red',
-    borderWidth: 1
+    justifyContent: 'center'
   },
 
   iconWrapper: {

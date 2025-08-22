@@ -171,10 +171,7 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
-
-    borderColor: 'red',
-    borderWidth: scaledPixels(1)
+    flexDirection: 'row'
   },
   imageContainer: {
     width: 'auto',

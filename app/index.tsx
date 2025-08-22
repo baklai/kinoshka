@@ -22,9 +22,6 @@ export default function IndexScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-
-    borderColor: 'red',
-    borderWidth: 1
+    flex: 1
   }
 });

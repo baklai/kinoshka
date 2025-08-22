@@ -76,10 +76,7 @@ function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppTheme.colors.background,
-
-    borderColor: 'red',
-    borderWidth: 1
+    backgroundColor: AppTheme.colors.background
   },
   header: {
     marginVertical: scaledPixels(20)

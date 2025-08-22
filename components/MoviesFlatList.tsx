@@ -1,12 +1,12 @@
 import MovieCard from '@/components/MovieCard';
 import { AppTheme } from '@/constants/theme.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
+import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import MoviesNotFound from './MoviesNotFound';
-import { useNamedRouter } from '@/hooks/useNamedRouter';
 
 const LIMIT = 6;
 
@@ -92,10 +92,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   headerContainer: {
-    paddingVertical: scaledPixels(8),
-
-    borderColor: 'red',
-    borderWidth: 1
+    paddingVertical: scaledPixels(8)
   },
   headerText: {
     color: AppTheme.colors.text,
