@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
   headerText: {
     color: AppTheme.colors.text,
     fontWeight: 'bold',
+    letterSpacing: scaledPixels(2),
     fontSize: scaledPixels(22)
   }
 });

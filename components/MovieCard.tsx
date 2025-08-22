@@ -1,11 +1,11 @@
-import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyledIcon } from './StyledIcon';
 
 interface MovieCardProps extends MovieProps {
   handlePress?: (item: MovieProps) => void;
@@ -13,57 +13,58 @@ interface MovieCardProps extends MovieProps {
 
 export default function MovieCard(props: MovieCardProps) {
   const { poster, title, imdb, quality, handlePress } = props;
-  const [focused, setFocused] = useState(false);
 
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      style={styles.container}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+    <Pressable
+      focusable
       onPress={() => handlePress && handlePress(props)}
+      style={({ pressed }) => [pressed && { opacity: 0.7 }]}
     >
-      <View style={styles.imageWrapper}>
-        <Image
-          style={styles.image}
-          source={poster}
-          placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
-          contentFit="cover"
-          transition={1000}
-        />
+      {({ focused }) => (
+        <>
+          <View style={styles.imageWrapper}>
+            <Image
+              style={styles.image}
+              source={poster}
+              placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
+              contentFit="cover"
+              transition={1000}
+            />
 
-        <View style={styles.overlayTop}>
-          {imdb ? (
-            <View style={styles.rating}>
-              <Text style={styles.ratingText}>{imdb}</Text>
+            <View style={styles.overlayTop}>
+              {imdb ? (
+                <View style={styles.rating}>
+                  <Text style={styles.ratingText}>{imdb}</Text>
+                </View>
+              ) : (
+                <View></View>
+              )}
+
+              <View style={styles.quality}>
+                <Text style={styles.qualityText}>{quality}</Text>
+              </View>
             </View>
-          ) : (
-            <View></View>
-          )}
 
-          <View style={styles.quality}>
-            <Text style={styles.qualityText}>{quality}</Text>
+            {focused && <View style={styles.overlay} />}
+
+            {focused && <View style={styles.borderOverlay} />}
           </View>
-        </View>
 
-        {focused && <View style={styles.overlay} />}
+          <View style={styles.overlayBottom}>
+            <Text style={styles.title}>{title}</Text>
+          </View>
 
-        {focused && <View style={styles.borderOverlay} />}
-      </View>
-
-      <View style={styles.overlayBottom}>
-        <Text style={styles.title}>{title}</Text>
-      </View>
-
-      {focused && (
-        <StyledIcon
-          name="play-circle"
-          size="xlarge"
-          color={AppTheme.colors.primary}
-          style={styles.playIcon}
-        />
+          {focused && (
+            <StyledIcon
+              name="play-circle"
+              size="xlarge"
+              color={AppTheme.colors.primary}
+              style={styles.playIcon}
+            />
+          )}
+        </>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     position: 'absolute',
-    backgroundColor: AppTheme.colors.surface,
+    backgroundColor: `${AppTheme.colors.surface}80`,
     borderBottomLeftRadius: scaledPixels(3),
     borderBottomRightRadius: scaledPixels(3),
     paddingVertical: scaledPixels(4),

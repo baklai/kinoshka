@@ -1,5 +1,5 @@
 import { StyledIcon } from '@/components/StyledIcon';
-import { RouteName } from '@/constants/routes.constant';
+import { RouteName, ROUTES } from '@/constants/routes.constant';
 import { AppTheme } from '@/constants/theme.constant';
 import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { scaledPixels } from '@/hooks/useScaledPixels';
@@ -31,7 +31,7 @@ const HeaderContent = (props: HeaderContentProps) => {
       <View style={[styles.container, props.style]}>
         <View style={styles.section}>
           {navTabs.map(({ title, route }, idx) => {
-            const isCurrentRoute = pathname === route;
+            const isCurrentRoute = pathname === ROUTES[route];
 
             return (
               <Pressable
@@ -39,25 +39,19 @@ const HeaderContent = (props: HeaderContentProps) => {
                 focusable
                 hasTVPreferredFocus={route === 'HOME'}
                 onPress={() => replace(route)}
-                style={({ focused, pressed }) => [
-                  styles.touchableText,
-                  focused && { color: AppTheme.colors.surface },
-                  pressed && { opacity: 0.7 }
-                ]}
+                style={({ pressed }) => [pressed && { opacity: 0.7 }]}
               >
                 {({ focused, pressed }) => (
-                  <View style={[styles.touchableText, pressed && { opacity: 0.7 }]}>
-                    <Text
-                      style={[
-                        styles.label,
-                        focused && styles.withUnderline,
-                        focused && !isCurrentRoute && { borderColor: AppTheme.colors.border },
-                        isCurrentRoute && styles.labelFocuse
-                      ]}
-                    >
-                      {title.toUpperCase()}
-                    </Text>
-                  </View>
+                  <Text
+                    style={[
+                      styles.label,
+                      focused && styles.underline,
+                      isCurrentRoute && styles.focused,
+                      pressed && styles.pressed
+                    ]}
+                  >
+                    {title.toUpperCase()}
+                  </Text>
                 )}
               </Pressable>
             );
@@ -81,7 +75,7 @@ const HeaderContent = (props: HeaderContentProps) => {
                   <View style={[styles.iconWrapper, pressed && { opacity: 0.7 }]}>
                     <StyledIcon
                       size="large"
-                      color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+                      color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
                       name={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
                     />
                   </View>
@@ -109,11 +103,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  touchableText: {
-    // paddingVertical: scaledPixels(3),
-    // paddingHorizontal: scaledPixels(12)
-  },
-
   touchableIcon: {
     width: scaledPixels(48),
     height: scaledPixels(48),
@@ -128,21 +117,27 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: AppTheme.colors.subtext,
     fontWeight: '500',
+    color: AppTheme.colors.subtext,
     fontSize: scaledPixels(18),
     paddingVertical: scaledPixels(6)
   },
 
-  labelFocuse: {
-    color: AppTheme.colors.text,
+  underline: {
+    borderColor: AppTheme.colors.subtext,
+    borderBottomWidth: scaledPixels(3),
+    alignSelf: 'flex-start'
+  },
+
+  focused: {
+    color: AppTheme.colors.primary,
+    borderColor: AppTheme.colors.primary,
     fontWeight: 'bold'
   },
 
-  withUnderline: {
-    borderBottomWidth: scaledPixels(3),
-    borderColor: AppTheme.colors.text,
-    alignSelf: 'flex-start'
+  pressed: {
+    color: AppTheme.colors.text,
+    borderColor: AppTheme.colors.text
   }
 });
 
