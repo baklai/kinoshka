@@ -3,10 +3,10 @@ import { AppTheme } from '@/constants/theme.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
-import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import MoviesNotFound from './MoviesNotFound';
+import { useNamedRouter } from '@/hooks/useNamedRouter';
 
 const LIMIT = 6;
 
@@ -15,6 +15,8 @@ interface MoviesFlatListProps {
 }
 
 const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
+  const { navigate, replace } = useNamedRouter();
+
   const { loading, findAll } = useAsyncFetch('movies');
 
   const [records, setRecords] = useState<MovieProps[]>([]);
@@ -48,10 +50,7 @@ const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
   }, [loading, page, hasNextPage, genres, findAll]);
 
   const handleSelectItem = async (item: MovieProps) => {
-    router.push({
-      pathname: '/details',
-      params: { id: item.id }
-    });
+    navigate('DETAILS', { id: item.id });
   };
 
   useEffect(() => {

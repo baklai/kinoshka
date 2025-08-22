@@ -1,26 +1,29 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { RouteName } from '@/constants/routes.constant';
 import { AppTheme } from '@/constants/theme.constant';
+import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router, usePathname } from 'expo-router';
+import { usePathname } from 'expo-router';
 import React, { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, TVFocusGuideView, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
 
 const HeaderContent = (props: HeaderContentProps) => {
+  const { navigate, replace } = useNamedRouter();
   const pathname = usePathname();
 
-  const navTabs = [
-    { title: 'Пошук', route: '/search' },
-    { title: 'Головна', route: '/' },
-    { title: 'Закладки', route: '/bookmarks' }
+  const navTabs: { title: string; route: RouteName }[] = [
+    { title: 'Пошук', route: 'SEARCH' },
+    { title: 'Головна', route: 'HOME' },
+    { title: 'Закладки', route: 'BOOKMARKS' }
   ];
 
-  const navBtns = [
-    { icon: 'history', route: '/history' },
-    { icon: 'information-outline', route: '/about' },
-    { icon: 'cog-outline', route: '/options' }
+  const navBtns: { icon: string; route: RouteName }[] = [
+    { icon: 'history', route: 'HISTORY' },
+    { icon: 'information-outline', route: 'ABOUT' },
+    { icon: 'cog-outline', route: 'OPTIONS' }
   ];
 
   return (
@@ -34,8 +37,8 @@ const HeaderContent = (props: HeaderContentProps) => {
               <Pressable
                 key={idx}
                 focusable
-                hasTVPreferredFocus={route === '/'}
-                onPress={() => router.replace(route)}
+                hasTVPreferredFocus={route === 'HOME'}
+                onPress={() => replace(route)}
                 style={({ focused, pressed }) => [
                   styles.touchableText,
                   focused && { color: AppTheme.colors.surface },
@@ -67,7 +70,7 @@ const HeaderContent = (props: HeaderContentProps) => {
               <Pressable
                 key={idx}
                 focusable
-                onPress={() => router.replace(route)}
+                onPress={() => replace(route)}
                 style={({ focused, pressed }) => [
                   styles.touchableIcon,
                   focused && { backgroundColor: AppTheme.colors.surface },
