@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    gap: scaledPixels(6),
+    gap: scaledPixels(20),
     flexDirection: 'row',
     alignItems: 'center'
   },
