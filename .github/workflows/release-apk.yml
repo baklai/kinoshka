@@ -46,4 +46,4 @@ jobs:
         with:
           files: ${{ env.APK_PATH }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.KINOSHKA_GITHUB_TOKEN }}
