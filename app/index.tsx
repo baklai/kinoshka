@@ -5,12 +5,21 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
-  const { loading, findAll } = useAsyncFetch('');
+  const { loading, findAll } = useAsyncFetch('/');
 
   const genres = [['Фільми'], ['Серіали'], ['Мультфільми']];
 
   useEffect(() => {
-    findAll();
+    const fetchData = async () => {
+      try {
+        const response = await findAll();
+        console.info(response);
+      } catch (error) {
+        console.error('Помилка під час завантаження даних:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   if (loading) {
@@ -27,7 +36,9 @@ export default function IndexScreen() {
         showsHorizontalScrollIndicator={false}
       >
         {genres.map((item, idx) => {
-          return <MoviesFlatList key={idx} header={item.join(', ')} genres={item} />;
+          return (
+            <MoviesFlatList key={`movie-flat-list-${idx}`} header={item.join(', ')} genres={item} />
+          );
         })}
       </ScrollView>
     </TVFocusGuideView>
