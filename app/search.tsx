@@ -5,16 +5,15 @@ import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { useApplication } from '@/providers/ApplicationProvider';
-import { transpose } from '@/utils';
+import { createMovieFilters, transpose } from '@/utils';
 import * as Localization from 'expo-localization';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 export default function SearchScreen() {
   const { orientation } = useApplication();
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([
-    'Матриця',
     'Дулітл',
     'Хижі пташки',
     'Нова Людина-Павук',
@@ -60,12 +59,6 @@ export default function SearchScreen() {
   const handleVoiceSearch = () => {
     ToastAndroid.show('Голосовий пошук ще не реалізовано!', ToastAndroid.SHORT);
   };
-
-  useEffect(() => {
-    if (query && query.length >= 3) {
-      console.log('query:', query);
-    }
-  }, [query]);
 
   return (
     <View style={styles.container}>
@@ -222,7 +215,7 @@ export default function SearchScreen() {
       </View>
 
       <View style={{ flexDirection: 'row', marginVertical: scaledPixels(10) }}>
-        <MoviesFlatList genres={['Фільми']} />
+        {query.length >= 3 && <MoviesFlatList filters={createMovieFilters({ title: query })} />}
       </View>
     </View>
   );

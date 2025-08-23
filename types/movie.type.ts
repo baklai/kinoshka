@@ -1,3 +1,5 @@
+export type SortDirection = 'asc' | 'desc';
+
 export interface MovieProps {
   id: string;
   title: string;
@@ -16,4 +18,19 @@ export interface MovieProps {
   directors?: string[];
   countries?: string[];
   episodes?: Record<string, any>[];
+}
+
+export interface MovieFilterProps {
+  title?: { $regex: string; $options: 'i' };
+  originalTitle?: { $regex: string; $options: 'i' };
+  year?: { $regex: string; $options: 'i' };
+  genres?: { $in: string[] };
+  countries?: { $in: string[] };
+}
+
+export interface MovieSortProps {
+  year?: SortDirection;
+  imdb?: SortDirection;
+  likes?: SortDirection;
+  dislikes?: SortDirection;
 }

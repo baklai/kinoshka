@@ -1,23 +1,25 @@
 import MovieCard from '@/components/MovieCard';
 import MoviesNotFound from '@/components/MoviesNotFound';
 import { AppTheme } from '@/constants/theme.constant';
-import { LIMIT } from '@/constants/ui.constant';
+import { PAGE_LIMIT } from '@/constants/ui.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MovieProps } from '@/types/movie.type';
+import { MovieFilterProps, MovieProps, MovieSortProps } from '@/types/movie.type';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 interface MoviesFlatListProps {
   header?: string;
-  genres?: string[];
+  limit?: number;
+  sort?: MovieSortProps;
+  filters?: MovieFilterProps;
 }
 
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({ header, genres }: MoviesFlatListProps) => {
+const MoviesFlatList = ({ header, limit = PAGE_LIMIT, sort, filters }: MoviesFlatListProps) => {
   const { navigate } = useNamedRouter();
 
   const { loading, findAll } = useAsyncFetch('movies');
@@ -30,13 +32,7 @@ const MoviesFlatList = ({ header, genres }: MoviesFlatListProps) => {
     if (loading || !hasNextPage) return;
 
     try {
-      const response = await findAll({
-        params: {
-          page,
-          limit: LIMIT,
-          filters: genres?.filter(Boolean).length ? { genres: { $in: genres } } : {}
-        }
-      });
+      const response = await findAll({ params: { page, limit, sort, filters } });
 
       const newItems = response?.docs || [];
 
@@ -53,7 +49,7 @@ const MoviesFlatList = ({ header, genres }: MoviesFlatListProps) => {
       ToastAndroid.show('Помилка завантаження!', ToastAndroid.SHORT);
       console.error('Помилка завантаження:', error);
     }
-  }, [loading, page, hasNextPage, genres, findAll]);
+  }, [loading, page, hasNextPage, sort, filters, findAll]);
 
   const handleSelectItem = useCallback(
     (item: MovieProps) => {
@@ -81,6 +77,18 @@ const MoviesFlatList = ({ header, genres }: MoviesFlatListProps) => {
   useEffect(() => {
     fetchData();
   }, [page]);
+
+  useEffect(() => {
+    const loadFirstPage = async () => {
+      setPage(1);
+      setRecords([]);
+      const response = await findAll({ params: { page: 1, limit, sort, filters } });
+      const newItems = response?.docs || [];
+      setRecords(newItems);
+      setHasNextPage(response.hasNextPage);
+    };
+    loadFirstPage();
+  }, [sort, filters]);
 
   return (
     <View style={styles.container}>

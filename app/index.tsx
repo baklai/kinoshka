@@ -1,6 +1,7 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
 import { AppTheme } from '@/constants/theme.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
+import { createMovieFilters, createMovieSorts } from '@/utils';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
@@ -35,9 +36,14 @@ export default function IndexScreen() {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        {genres.map((item, idx) => {
+        {genres.map((genre, idx) => {
           return (
-            <MoviesFlatList key={`movie-flat-list-${idx}`} header={item.join(', ')} genres={item} />
+            <MoviesFlatList
+              key={`movie-flat-list-${idx}`}
+              header={genre.join(', ')}
+              sort={createMovieSorts({ imdb: 'desc', year: 'desc' })}
+              filters={createMovieFilters({ genres: genre })}
+            />
           );
         })}
       </ScrollView>

@@ -44,7 +44,6 @@ function RootLayout() {
       <HeaderContent style={styles.header} />
 
       <Stack
-        initialRouteName="search"
         screenOptions={{
           headerShown: false,
           gestureEnabled: false,

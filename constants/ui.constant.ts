@@ -12,4 +12,4 @@ export const COLORS = {
   muted: '#272727'
 };
 
-export const LIMIT = 10;
+export const PAGE_LIMIT = 10;
