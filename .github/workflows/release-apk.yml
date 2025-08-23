@@ -22,7 +22,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 22
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -34,7 +35,7 @@ jobs:
           echo "EXPO_TV=${{ secrets.EXPO_TV }}" >> $GITHUB_ENV
 
       - name: Generate android/ folder
-        run: expo prebuild --clean
+        run: npx expo prebuild --platform android
 
       - name: Build Android Release APK
         working-directory: android
@@ -42,7 +43,7 @@ jobs:
 
       - name: Find APK
         run: |
-          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
           echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
 
       - name: Create Release and Upload APK
