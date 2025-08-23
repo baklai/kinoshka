@@ -39,7 +39,8 @@
     "lint": "expo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx}\"",
     "prebuild": "cross-env EXPO_TV=1 expo prebuild --clean",
-    "release": "cd android && gradlew assembleRelease"
+    "release": "cd android && gradlew assembleRelease",
+    "release-apk": "git tag v1.0.0 && git push origin v1.0.0"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
