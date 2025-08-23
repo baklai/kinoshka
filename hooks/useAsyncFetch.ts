@@ -59,6 +59,7 @@ export const useAsyncFetch = <T = any>(endpoint: string) => {
           headers: {
             ...(apiBaseToken ? { Authorization: `Bearer ${apiBaseToken}` } : {}),
             'Content-Type': 'application/json',
+            cache: 'no-cache',
             ...(config?.headers || {})
           },
           body: body ? JSON.stringify(body) : undefined,

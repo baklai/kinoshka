@@ -11,6 +11,8 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, ToastAndroid, View } fro
 
 interface MoviesFlatListProps {
   header?: string;
+  loader?: boolean;
+  empty?: boolean;
   limit?: number;
   sort?: MovieSortProps;
   filters?: MovieFilterProps;
@@ -19,7 +21,14 @@ interface MoviesFlatListProps {
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({ header, limit = PAGE_LIMIT, sort, filters }: MoviesFlatListProps) => {
+const MoviesFlatList = ({
+  header,
+  loader = true,
+  empty = false,
+  limit = PAGE_LIMIT,
+  sort,
+  filters
+}: MoviesFlatListProps) => {
   const { navigate } = useNamedRouter();
 
   const { loading, findAll } = useAsyncFetch('movies');
@@ -92,7 +101,7 @@ const MoviesFlatList = ({ header, limit = PAGE_LIMIT, sort, filters }: MoviesFla
 
   return (
     <View style={styles.container}>
-      {header && header.length > 0 && (
+      {header && header.length > 0 && records.length > 0 && (
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>{header}</Text>
         </View>
@@ -118,11 +127,11 @@ const MoviesFlatList = ({ header, limit = PAGE_LIMIT, sort, filters }: MoviesFla
               paddingVertical: scaledPixels(10)
             }}
           >
-            {loading && records.length === 0 ? (
+            {loading && records.length === 0 && loader ? (
               <ActivityIndicator size="large" color={AppTheme.colors.primary} />
-            ) : (
+            ) : empty ? (
               <MoviesNotFound text="Не вдалося знайти відео" size={64} />
-            )}
+            ) : null}
           </View>
         )}
         contentContainerStyle={{ flexGrow: 1 }}

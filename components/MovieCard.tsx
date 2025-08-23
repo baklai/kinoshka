@@ -5,7 +5,7 @@ import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface MovieCardProps extends MovieProps {
   handlePress?: (item: MovieProps) => void;
@@ -21,8 +21,8 @@ export default function MovieCard(props: MovieCardProps) {
       style={({ pressed }) => [pressed && { opacity: 0.7 }]}
     >
       {({ focused }) => (
-        <>
-          <View style={styles.imageWrapper}>
+        <Animated.View style={{ transform: [{ scale: focused ? 1 : 1 }] }}>
+          <View style={[styles.imageWrapper, { overflow: 'hidden' }]}>
             <Image
               style={styles.image}
               source={poster}
@@ -62,7 +62,7 @@ export default function MovieCard(props: MovieCardProps) {
               style={styles.playIcon}
             />
           )}
-        </>
+        </Animated.View>
       )}
     </Pressable>
   );

@@ -41,7 +41,8 @@ export default function IndexScreen() {
             <MoviesFlatList
               key={`movie-flat-list-${idx}`}
               header={genre.join(', ')}
-              sort={createMovieSorts({ imdb: 'desc', year: 'desc' })}
+              loader={false}
+              sort={createMovieSorts({ year: 'desc', imdb: 'desc' })}
               filters={createMovieFilters({ genres: genre })}
             />
           );
