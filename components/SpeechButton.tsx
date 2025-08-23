@@ -1,4 +1,5 @@
 import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -12,26 +13,28 @@ export default function SpeechButton({ onPress }: SpeechButtonProps) {
     <Pressable
       focusable
       onPress={onPress}
-      style={({ focused, pressed }) => [
-        styles.button,
-        focused && { backgroundColor: '#272727' },
-        pressed && { opacity: 0.7 }
-      ]}
+      style={({ pressed }) => [styles.button, pressed && { opacity: 0.7 }]}
     >
-      <View style={styles.icon}>
-        <StyledIcon size="large" name="microphone" color="#666" />
-      </View>
+      {({ focused }) => (
+        <View style={styles.icon}>
+          <StyledIcon
+            size="large"
+            name="microphone"
+            color={focused ? AppTheme.colors.primary : AppTheme.colors.text}
+          />
+        </View>
+      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
+    alignItems: 'center',
+    justifyContent: 'center',
     width: scaledPixels(48),
     height: scaledPixels(48),
     borderRadius: scaledPixels(48 / 2),
-    alignItems: 'center',
-    justifyContent: 'center',
     marginHorizontal: scaledPixels(4)
   },
   icon: {
@@ -40,6 +43,6 @@ const styles = StyleSheet.create({
     width: scaledPixels(48),
     height: scaledPixels(48),
     borderRadius: scaledPixels(48 / 2),
-    backgroundColor: '#272727'
+    backgroundColor: AppTheme.colors.card
   }
 });

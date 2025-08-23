@@ -1,26 +1,26 @@
+import MoviesFlatList from '@/components/MoviesFlatList';
 import SpeechButton from '@/components/SpeechButton';
+import { StyledIcon } from '@/components/StyledIcon';
 import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { transpose } from '@/utils';
 import * as Localization from 'expo-localization';
-import React, { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
-const suggestions = [
-  'soda pop',
-  'kirby air riders',
-  'squid game',
-  'spongebob squarepants full e...',
-  'not enough nelsons',
-  'ssundee',
-  'lego batman',
-  'kountry wayne',
-  'pink pony club',
-  'mrs rachel'
-];
-
-export default function YouTubeTVSearch() {
-  const [query, setQuery] = useState('');
+export default function SearchScreen() {
+  const [query, setQuery] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<string[]>([
+    'Матриця',
+    'Дулітл',
+    'Хижі пташки',
+    'Нова Людина-Павук',
+    'Ван Хелсінг',
+    'Індіана Джонс: У пошуках втраченого ковчега',
+    'Водій для копа',
+    'Гаррі Поттер і таємна кімната'
+  ]);
   const [lang, setLang] = useState<LanguageCode>(() => {
     const [{ languageCode }] = Localization.getLocales();
     const systemLang = languageCode ? languageCode.toUpperCase() : 'EN';
@@ -41,14 +41,7 @@ export default function YouTubeTVSearch() {
     return mapLang(systemLang);
   });
 
-  const handleKeyPress = (key: string) => {
-    if (key === 'SPACE') setQuery(prev => prev + ' ');
-    else if (key === 'CLEAR') setQuery('');
-    else if (key === 'SEARCH') console.log('Поиск:', query);
-    else setQuery(prev => prev + key);
-  };
-
-  const switchLang = () => {
+  const toggleLang = () => {
     if (lang === 'UA') setLang('RU');
     else if (lang === 'RU') setLang('EN');
     else if (lang === 'EN') setLang('UA');
@@ -58,43 +51,88 @@ export default function YouTubeTVSearch() {
     setLang(lang === 'NUM' ? 'UA' : 'NUM');
   };
 
-  const handleMicrophone = () => {
-    return null;
+  const handleKeyPress = (key: string) => {
+    setQuery(prev => prev + key);
   };
+
+  const handleVoiceSearch = () => {
+    ToastAndroid.show('Голосовий пошук ще не реалізовано!', ToastAndroid.SHORT);
+  };
+
+  useEffect(() => {
+    if (query && query.length >= 3) {
+      console.log('query:', query);
+    }
+  }, [query]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <SpeechButton onPress={handleMicrophone} />
-        <View style={styles.searchBarInput}>
-          <Text style={styles.searchBarInputPlaceholder}>{query || 'Пошук...'}</Text>
+      <View style={styles.searchSection}>
+        <SpeechButton onPress={handleVoiceSearch} />
+        <View style={styles.searchSectionInput}>
+          <Text style={styles.searchSectionInputText}>{query || 'Пошук...'}</Text>
         </View>
       </View>
 
-      <View style={styles.content}>
-        <FlatList
-          data={suggestions}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <Pressable
-              style={({ focused }) => [styles.suggestion, focused && styles.focusedSuggestion]}
-              onPress={() => setQuery(item)}
-            >
-              <Text style={styles.suggestionText}>{item}</Text>
-            </Pressable>
-          )}
-        />
+      <View style={[styles.mainSection, { maxHeight: scaledPixels(260) }]}>
+        <View style={[styles.suggestionSection, { maxHeight: scaledPixels(240) }]}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+          >
+            {suggestions.map((item, idx) => {
+              return (
+                <Pressable
+                  key={`suggestions-${idx}`}
+                  style={({ focused, pressed }) => [
+                    styles.suggestionItem,
+                    pressed && { opacity: 0.7 },
+                    focused && { backgroundColor: AppTheme.colors.primary }
+                  ]}
+                  onPress={() => setQuery(item)}
+                >
+                  {({ focused }) => (
+                    <>
+                      <StyledIcon name="history" />
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={[styles.suggestionText, focused && { fontWeight: 'bold' }]}
+                      >
+                        {item}
+                      </Text>
+                    </>
+                  )}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
 
-        <View style={styles.keyboardContainer}>
-          {KEYBOARD[lang].map((row, rowIndex) => (
+        <View style={styles.keyboardSection}>
+          {transpose(KEYBOARD[lang]).map((row, rowIndex) => (
             <View key={rowIndex} style={styles.keyboardRow}>
-              {row.map(key => (
+              {row.map((key: string) => (
                 <Pressable
                   key={key}
                   onPress={() => handleKeyPress(key)}
-                  style={({ focused }) => [styles.key, focused && styles.focusedKey]}
+                  style={({ focused, pressed }) => [
+                    styles.key,
+                    focused && styles.focusedKey,
+                    pressed && { opacity: 0.7 }
+                  ]}
                 >
-                  <Text style={styles.keyText}>{key}</Text>
+                  {({ focused }) => (
+                    <Text
+                      style={[
+                        styles.keyText,
+                        focused && { color: AppTheme.colors.surface, fontWeight: 'bold' }
+                      ]}
+                    >
+                      {key}
+                    </Text>
+                  )}
                 </Pressable>
               ))}
             </View>
@@ -102,111 +140,163 @@ export default function YouTubeTVSearch() {
 
           <View style={styles.keyboardRow}>
             <Pressable
-              onPress={() => handleKeyPress('SPACE')}
-              style={({ focused }) => [styles.keyWide, focused && styles.focusedKey]}
+              style={({ focused, pressed }) => [
+                styles.key,
+                focused && styles.focusedKey,
+                pressed && { opacity: 0.7 }
+              ]}
+              onPress={() => setQuery(prev => (prev.length > 0 ? prev.slice(0, -1) : prev))}
             >
-              <Text style={styles.keyText}>SPACE</Text>
+              {({ focused }) => (
+                <StyledIcon
+                  name="backspace-outline"
+                  color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
+                />
+              )}
             </Pressable>
 
             <Pressable
-              onPress={() => handleKeyPress('CLEAR')}
-              style={({ focused }) => [styles.keyWide, focused && styles.focusedKey]}
-            >
-              <Text style={styles.keyText}>CLEAR</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={() => handleKeyPress('SEARCH')}
-              style={({ focused }) => [styles.keyWide, focused && styles.focusedKey]}
-            >
-              <Text style={styles.keyText}>SEARCH</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.sideButtons}>
-            <Pressable
-              style={({ focused }) => [styles.sideBtn, focused && styles.focusedSideBtn]}
-              onPress={switchLang}
-            >
-              <Text style={styles.sideBtnText}>{lang}</Text>
-            </Pressable>
-
-            <Pressable
-              style={({ focused }) => [styles.sideBtn, focused && styles.focusedSideBtn]}
+              style={({ focused, pressed }) => [
+                styles.key,
+                focused && styles.focusedKey,
+                pressed && { opacity: 0.7 }
+              ]}
               onPress={toggleNum}
             >
-              <Text style={styles.sideBtnText}>&123</Text>
+              {({ focused }) => (
+                <StyledIcon
+                  name="numeric"
+                  color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
+                />
+              )}
             </Pressable>
+
+            <Pressable
+              style={({ focused, pressed }) => [
+                styles.key,
+                focused && styles.focusedKey,
+                pressed && { opacity: 0.7 }
+              ]}
+              onPress={toggleLang}
+            >
+              {({ focused }) => (
+                <StyledIcon
+                  name="web"
+                  color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
+                />
+              )}
+            </Pressable>
+
+            {lang !== 'NUM' && (
+              <Pressable
+                style={({ focused, pressed }) => [
+                  styles.key,
+                  focused && styles.focusedKey,
+                  pressed && { opacity: 0.7 }
+                ]}
+                onPress={() => setQuery(prev => prev + ' ')}
+              >
+                {({ focused }) => (
+                  <StyledIcon
+                    name="keyboard-space"
+                    color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
+                  />
+                )}
+              </Pressable>
+            )}
           </View>
         </View>
       </View>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        <MoviesFlatList genres={['Фільми']} />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111', padding: 15 },
-
-  searchContainer: {
-    height: scaledPixels(64),
-    flexDirection: 'row'
+  container: {
+    flex: 1
   },
-  searchBarInput: {
+
+  searchSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: scaledPixels(10)
+  },
+  searchSectionInput: {
     flex: 1,
-    backgroundColor: 'transparent',
-    borderRadius: scaledPixels(25),
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: scaledPixels(10),
+    height: scaledPixels(48),
+    justifyContent: 'space-between',
+    borderRadius: scaledPixels(48),
+    marginLeft: scaledPixels(10),
     paddingHorizontal: scaledPixels(20),
-    marginBottom: scaledPixels(15),
+    backgroundColor: AppTheme.colors.card
+  },
+  searchSectionInputText: {
+    color: AppTheme.colors.subtext,
+    fontSize: scaledPixels(18),
+    fontWeight: 'bold'
+  },
+
+  mainSection: {
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between'
   },
-  searchBarInputPlaceholder: { color: AppTheme.colors.subtext, fontSize: scaledPixels(18) },
 
-  content: { flexDirection: 'row', flex: 1 },
-
-  suggestion: {
-    paddingVertical: scaledPixels(10),
-    paddingHorizontal: scaledPixels(15),
+  suggestionSection: {
+    flex: 1,
+    paddingVertical: scaledPixels(10)
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    paddingVertical: scaledPixels(6),
+    paddingHorizontal: scaledPixels(10),
     borderRadius: scaledPixels(20),
     marginBottom: scaledPixels(8),
     backgroundColor: AppTheme.colors.surface
   },
-  focusedSuggestion: { backgroundColor: AppTheme.colors.text },
-  suggestionText: { color: AppTheme.colors.surface, fontSize: scaledPixels(16) },
+  suggestionText: {
+    maxWidth: '90%',
+    color: AppTheme.colors.text,
+    fontSize: scaledPixels(16),
+    paddingHorizontal: scaledPixels(8)
+  },
 
-  keyboardContainer: { marginLeft: scaledPixels(30) },
-  keyboardRow: { flexDirection: 'row', marginBottom: scaledPixels(8) },
+  keyboardSection: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
+  keyboardRow: {
+    flexDirection: 'column',
+    marginBottom: scaledPixels(6)
+  },
+
   key: {
-    backgroundColor: AppTheme.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
     margin: scaledPixels(3),
-    paddingVertical: scaledPixels(12),
+    paddingVertical: scaledPixels(10),
     paddingHorizontal: scaledPixels(15),
     borderRadius: scaledPixels(6)
   },
-  keyWide: {
-    backgroundColor: AppTheme.colors.surface,
-    margin: scaledPixels(3),
-    paddingVertical: scaledPixels(12),
-    paddingHorizontal: scaledPixels(25),
-    borderRadius: scaledPixels(6)
+  keyText: {
+    color: AppTheme.colors.text,
+    fontSize: scaledPixels(18)
   },
-  focusedKey: { borderColor: AppTheme.colors.text, borderWidth: scaledPixels(2) },
-  keyText: { color: AppTheme.colors.text, fontSize: scaledPixels(18) },
-
-  sideButtons: {
-    position: 'absolute',
-    right: -scaledPixels(60),
-    top: 0,
-    justifyContent: 'flex-start'
-  },
-  sideBtn: {
-    backgroundColor: 'transparent',
-    padding: scaledPixels(10),
-    borderRadius: scaledPixels(6),
-    marginBottom: scaledPixels(10)
-  },
-  focusedSideBtn: { borderColor: AppTheme.colors.text, borderWidth: scaledPixels(2) },
-  sideBtnText: { color: AppTheme.colors.text, fontSize: scaledPixels(16) }
+  focusedKey: {
+    backgroundColor: AppTheme.colors.text
+  }
 });
