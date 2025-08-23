@@ -4,12 +4,14 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { useApplication } from '@/providers/ApplicationProvider';
 import { transpose } from '@/utils';
 import * as Localization from 'expo-localization';
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 export default function SearchScreen() {
+  const { orientation } = useApplication();
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([
     'Матриця',
@@ -74,7 +76,12 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <View style={[styles.mainSection, { maxHeight: scaledPixels(260) }]}>
+      <View
+        style={[
+          styles.mainSection,
+          orientation === 'portrait' && { flex: 1, flexDirection: 'column' }
+        ]}
+      >
         <View style={[styles.suggestionSection, { maxHeight: scaledPixels(240) }]}>
           <ScrollView
             style={{ flex: 1 }}
@@ -87,6 +94,7 @@ export default function SearchScreen() {
                   key={`suggestions-${idx}`}
                   style={({ focused, pressed }) => [
                     styles.suggestionItem,
+                    orientation === 'portrait' && { alignSelf: 'auto' },
                     pressed && { opacity: 0.7 },
                     focused && { backgroundColor: AppTheme.colors.primary }
                   ]}
@@ -110,7 +118,12 @@ export default function SearchScreen() {
           </ScrollView>
         </View>
 
-        <View style={styles.keyboardSection}>
+        <View
+          style={[
+            styles.keyboardSection,
+            orientation === 'portrait' && { alignItems: 'center', justifyContent: 'center' }
+          ]}
+        >
           {transpose(KEYBOARD[lang]).map((row, rowIndex) => (
             <View key={rowIndex} style={styles.keyboardRow}>
               {row.map((key: string) => (
@@ -208,13 +221,9 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-      >
+      <View style={{ flexDirection: 'row', marginVertical: scaledPixels(10) }}>
         <MoviesFlatList genres={['Фільми']} />
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -248,7 +257,6 @@ const styles = StyleSheet.create({
   },
 
   mainSection: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between'
   },

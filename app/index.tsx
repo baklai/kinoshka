@@ -27,7 +27,7 @@ export default function IndexScreen() {
         showsHorizontalScrollIndicator={false}
       >
         {genres.map((item, idx) => {
-          return <MoviesFlatList key={idx} genres={item} />;
+          return <MoviesFlatList key={idx} header={item.join(', ')} genres={item} />;
         })}
       </ScrollView>
     </TVFocusGuideView>

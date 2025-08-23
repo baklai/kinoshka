@@ -10,13 +10,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 interface MoviesFlatListProps {
+  header?: string;
   genres?: string[];
 }
 
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
+const MoviesFlatList = ({ header, genres }: MoviesFlatListProps) => {
   const { navigate } = useNamedRouter();
 
   const { loading, findAll } = useAsyncFetch('movies');
@@ -83,9 +84,12 @@ const MoviesFlatList = ({ genres }: MoviesFlatListProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>{genres?.join(', ')}</Text>
-      </View>
+      {header && header.length > 0 && (
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>{header}</Text>
+        </View>
+      )}
+
       <FlatList
         horizontal
         data={records}
