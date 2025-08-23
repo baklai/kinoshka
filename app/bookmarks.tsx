@@ -1,5 +1,3 @@
-import MovieItem from '@/components/MovieCard';
-import MoviesNotFound from '@/components/MoviesNotFound';
 import { useSecureStore } from '@/hooks/useAsyncStorage';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
@@ -13,11 +11,11 @@ export default function BookmarksScreen() {
 
   return (
     <View style={styles.container}>
-      {movies.length > 0 ? (
+      {/* {movies.length > 0 ? (
         movies.map((movie: MovieProps) => <MovieItem {...movie} key={movie.id} />)
       ) : (
         <MoviesNotFound text="Список закладок порожній" />
-      )}
+      )} */}
     </View>
   );
 }
