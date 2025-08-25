@@ -1,9 +1,8 @@
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { useApplication } from '@/providers/ApplicationProvider';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const settingsData = [
@@ -26,11 +25,8 @@ const settingsData = [
 ];
 
 export default function OptionsScreen() {
-  const { apiBaseUrl, setApiBaseUrl } = useApplication();
-  const [modalVisible, setModalVisible] = useState(false);
-
   const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.item} onPress={() => router.replace('/options')}>
+    <TouchableOpacity style={styles.item} onPress={() => router.push('/options')}>
       <StyledIcon
         icon="cog-outline"
         size="large"

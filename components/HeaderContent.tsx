@@ -1,29 +1,26 @@
 import { StyledIcon } from '@/components/StyledIcon';
-import { RouteName, ROUTES } from '@/constants/routes.constant';
 import { AppTheme } from '@/constants/theme.constant';
-import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import React, { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, TVFocusGuideView, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
 
 const HeaderContent = (props: HeaderContentProps) => {
-  const { navigate, replace } = useNamedRouter();
   const pathname = usePathname();
 
-  const navTabs: { title: string; route: RouteName }[] = [
-    { title: 'Пошук', route: 'SEARCH' },
-    { title: 'Головна', route: 'HOME' },
-    { title: 'Закладки', route: 'BOOKMARKS' }
+  const navTabs: { title: string; route: string }[] = [
+    { title: 'Пошук', route: '/search' },
+    { title: 'Головна', route: '/' },
+    { title: 'Закладки', route: '/bookmarks' }
   ];
 
-  const navBtns: { icon: string; route: RouteName }[] = [
-    { icon: 'history', route: 'HISTORY' },
-    { icon: 'information-outline', route: 'ABOUT' },
-    { icon: 'cog-outline', route: 'OPTIONS' }
+  const navBtns: { icon: string; route: string }[] = [
+    { icon: 'history', route: '/history' },
+    { icon: 'information-outline', route: '/about' },
+    { icon: 'cog-outline', route: '/options' }
   ];
 
   return (
@@ -31,14 +28,14 @@ const HeaderContent = (props: HeaderContentProps) => {
       <View style={[styles.container, props.style]}>
         <View style={styles.section}>
           {navTabs.map(({ title, route }, idx) => {
-            const isCurrentRoute = pathname === ROUTES[route];
+            const isCurrentRoute = pathname === route;
 
             return (
               <Pressable
                 key={idx}
                 focusable
                 hasTVPreferredFocus={route === 'HOME'}
-                onPress={() => replace(route)}
+                onPress={() => router.push(route)}
                 style={({ pressed }) => [pressed && { opacity: 0.7 }]}
               >
                 {({ focused, pressed }) => (
@@ -65,7 +62,7 @@ const HeaderContent = (props: HeaderContentProps) => {
               <Pressable
                 key={idx}
                 focusable
-                onPress={() => replace(route)}
+                onPress={() => router.push(route)}
                 style={({ focused, pressed }) => [
                   styles.pressableIcon,
                   focused && { backgroundColor: AppTheme.colors.surface },

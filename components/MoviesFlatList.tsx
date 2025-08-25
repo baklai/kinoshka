@@ -2,12 +2,12 @@ import MovieCard from '@/components/MovieCard';
 import AnyNotFound from '@/components/NotFoundView';
 import { AppTheme } from '@/constants/theme.constant';
 import { PAGE_LIMIT } from '@/constants/ui.constant';
-import { useNamedRouter } from '@/hooks/useNamedRouter';
 import { usePaginatedMovie } from '@/hooks/usePaginatedMovie';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieFilterProps } from '@/types/filters.type';
 import { MovieProps } from '@/types/movie.type';
 import { MovieSortProps } from '@/types/sorts.type';
+import { router } from 'expo-router';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 
@@ -31,8 +31,6 @@ const MoviesFlatList = ({
   sort,
   filters
 }: MoviesFlatListProps) => {
-  const { navigate } = useNamedRouter();
-
   const {
     data: records,
     isLoading,
@@ -45,12 +43,12 @@ const MoviesFlatList = ({
     sort
   });
 
-  const handleSelectItem = useCallback(
-    (item: MovieProps) => {
-      navigate('DETAILS', { id: item.id });
-    },
-    [navigate]
-  );
+  const handleSelectItem = useCallback((item: MovieProps) => {
+    router.push({
+      pathname: '/details',
+      params: { id: item.id }
+    });
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: MovieProps }) => (
