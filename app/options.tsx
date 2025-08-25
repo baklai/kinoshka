@@ -26,7 +26,7 @@ const settingsData = [
 
 export default function OptionsScreen() {
   const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.item} onPress={() => router.push('/options')}>
+    <TouchableOpacity style={styles.item} onPress={() => router.replace('/options')}>
       <StyledIcon
         icon="cog-outline"
         size="large"

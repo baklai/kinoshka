@@ -34,8 +34,8 @@ const HeaderContent = (props: HeaderContentProps) => {
               <Pressable
                 key={idx}
                 focusable
-                hasTVPreferredFocus={route === 'HOME'}
-                onPress={() => router.push(route)}
+                hasTVPreferredFocus={isCurrentRoute}
+                onPress={() => router.replace(route)}
                 style={({ pressed }) => [pressed && { opacity: 0.7 }]}
               >
                 {({ focused, pressed }) => (
@@ -62,7 +62,7 @@ const HeaderContent = (props: HeaderContentProps) => {
               <Pressable
                 key={idx}
                 focusable
-                onPress={() => router.push(route)}
+                onPress={() => router.replace(route)}
                 style={({ focused, pressed }) => [
                   styles.pressableIcon,
                   focused && { backgroundColor: AppTheme.colors.surface },
