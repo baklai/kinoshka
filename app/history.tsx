@@ -1,7 +1,7 @@
 import MovieItem from '@/components/MovieCard';
-import MoviesNotFound from '@/components/MoviesNotFound';
-import { useSecureStore } from '@/hooks/useAsyncStorage';
+import AnyNotFound from '@/components/NotFoundView';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { useSecureStore } from '@/hooks/useSecureStore';
 import { MovieProps } from '@/types/movie.type';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -16,7 +16,7 @@ export default function HistoryScreen() {
       {movies.length > 0 ? (
         movies.map((movie: MovieProps) => <MovieItem {...movie} key={movie.id} />)
       ) : (
-        <MoviesNotFound text="Історія перегляду порожня" />
+        <AnyNotFound icon="folder-open" text="Історія перегляду порожня" />
       )}
     </View>
   );

@@ -1,13 +1,15 @@
 import MovieCard from '@/components/MovieCard';
-import MoviesNotFound from '@/components/MoviesNotFound';
+import AnyNotFound from '@/components/NotFoundView';
 import { AppTheme } from '@/constants/theme.constant';
 import { PAGE_LIMIT } from '@/constants/ui.constant';
-import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { useNamedRouter } from '@/hooks/useNamedRouter';
+import { usePaginatedMovie } from '@/hooks/usePaginatedMovie';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MovieFilterProps, MovieProps, MovieSortProps } from '@/types/movie.type';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, ToastAndroid, View } from 'react-native';
+import { MovieFilterProps } from '@/types/filters.type';
+import { MovieProps } from '@/types/movie.type';
+import { MovieSortProps } from '@/types/sorts.type';
+import React, { useCallback } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 
 interface MoviesFlatListProps {
   header?: string;
@@ -31,34 +33,17 @@ const MoviesFlatList = ({
 }: MoviesFlatListProps) => {
   const { navigate } = useNamedRouter();
 
-  const { loading, findAll } = useAsyncFetch('movies');
-
-  const [records, setRecords] = useState<MovieProps[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(true);
-
-  const fetchData = useCallback(async () => {
-    if (loading || !hasNextPage) return;
-
-    try {
-      const response = await findAll({ params: { page, limit, sort, filters } });
-
-      const newItems = response?.docs || [];
-
-      if (newItems.length > 0) {
-        setRecords(prev => {
-          const existingIds = new Set(prev.map(item => item.id));
-          const filteredNewItems = newItems.filter((item: any) => !existingIds.has(item.id));
-          return [...prev, ...filteredNewItems];
-        });
-
-        setHasNextPage(response.hasNextPage);
-      }
-    } catch (error) {
-      ToastAndroid.show('Помилка завантаження!', ToastAndroid.SHORT);
-      console.error('Помилка завантаження:', error);
-    }
-  }, [loading, page, hasNextPage, sort, filters, findAll]);
+  const {
+    data: records,
+    isLoading,
+    hasMoreData,
+    loadMore
+  } = usePaginatedMovie({
+    path: 'movies',
+    filters,
+    limit,
+    sort
+  });
 
   const handleSelectItem = useCallback(
     (item: MovieProps) => {
@@ -83,21 +68,24 @@ const MoviesFlatList = ({
     []
   );
 
-  useEffect(() => {
-    fetchData();
-  }, [page]);
-
-  useEffect(() => {
-    const loadFirstPage = async () => {
-      setPage(1);
-      setRecords([]);
-      const response = await findAll({ params: { page: 1, limit, sort, filters } });
-      const newItems = response?.docs || [];
-      setRecords(newItems);
-      setHasNextPage(response.hasNextPage);
-    };
-    loadFirstPage();
-  }, [sort, filters]);
+  const renderEmpty = useCallback(() => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: scaledPixels(10)
+        }}
+      >
+        {isLoading && records.length === 0 && loader ? (
+          <ActivityIndicator size="large" color={AppTheme.colors.primary} />
+        ) : empty ? (
+          <AnyNotFound icon="folder-open" text="Не вдалося знайти відео" size={64} />
+        ) : null}
+      </View>
+    );
+  }, [isLoading, records.length, loader, empty]);
 
   return (
     <View style={styles.container}>
@@ -113,27 +101,12 @@ const MoviesFlatList = ({
         keyExtractor={item => item.id?.toString()}
         renderItem={renderItem}
         getItemLayout={getItemLayout}
-        onEndReached={() => setPage(prev => prev + 1)}
+        onEndReached={loadMore}
         onEndReachedThreshold={0.5}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ width: ITEM_SPACING }} />}
-        ListEmptyComponent={() => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingVertical: scaledPixels(10)
-            }}
-          >
-            {loading && records.length === 0 && loader ? (
-              <ActivityIndicator size="large" color={AppTheme.colors.primary} />
-            ) : empty ? (
-              <MoviesNotFound text="Не вдалося знайти відео" size={64} />
-            ) : null}
-          </View>
-        )}
+        ListEmptyComponent={renderEmpty}
         contentContainerStyle={{ flexGrow: 1 }}
         initialNumToRender={5}
         maxToRenderPerBatch={5}

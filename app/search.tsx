@@ -95,7 +95,7 @@ export default function SearchScreen() {
                 >
                   {({ focused }) => (
                     <>
-                      <StyledIcon name="history" />
+                      <StyledIcon icon="history" />
                       <Text
                         numberOfLines={1}
                         ellipsizeMode="tail"
@@ -155,7 +155,7 @@ export default function SearchScreen() {
             >
               {({ focused }) => (
                 <StyledIcon
-                  name="backspace-outline"
+                  icon="backspace-outline"
                   color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
                 />
               )}
@@ -171,7 +171,7 @@ export default function SearchScreen() {
             >
               {({ focused }) => (
                 <StyledIcon
-                  name="numeric"
+                  icon="numeric"
                   color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
                 />
               )}
@@ -187,7 +187,7 @@ export default function SearchScreen() {
             >
               {({ focused }) => (
                 <StyledIcon
-                  name="web"
+                  icon="web"
                   color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
                 />
               )}
@@ -204,7 +204,7 @@ export default function SearchScreen() {
               >
                 {({ focused }) => (
                   <StyledIcon
-                    name="keyboard-space"
+                    icon="keyboard-space"
                     color={focused ? AppTheme.colors.surface : AppTheme.colors.subtext}
                   />
                 )}

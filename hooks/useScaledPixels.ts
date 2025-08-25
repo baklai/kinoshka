@@ -3,7 +3,7 @@ import { Dimensions } from 'react-native';
 const { height, width } = Dimensions.get('window');
 const CURRENT_RESOLUTION = Math.sqrt(height * height + width * width);
 
-export const PREDEF_RES = {
+const PREDEF_RES = {
   iphoneX: {
     px: { width: 1125, height: 2436 },
     dp: { width: 375, height: 812 }
@@ -46,7 +46,7 @@ export const PREDEF_RES = {
   }
 };
 
-export const create = (designSize = { width: 350, height: 680 }) => {
+const create = (designSize = { width: 350, height: 680 }) => {
   if (
     !designSize ||
     !designSize.width ||

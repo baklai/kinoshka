@@ -1,19 +1,22 @@
+import AnimatedLoader from '@/components/AnimatedLoader';
+import NotFoundView from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
+import { openPlaylistInVLC } from '@/utils';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   Linking,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  ToastAndroid,
   useWindowDimensions,
   View
 } from 'react-native';
@@ -23,10 +26,12 @@ const Separator = () => <View style={styles.separator} />;
 export default function DetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { width, height } = useWindowDimensions();
-  const { loading, findOneById } = useAsyncFetch('movies');
+  const { loading, error, fetch } = useAsyncFetch('movies');
   const [movie, setMovie] = useState<MovieProps | null>(null);
 
-  const isPortrait = height >= width;
+  const orientation = useMemo<'portrait' | 'landscape'>(() => {
+    return height >= width ? 'portrait' : 'landscape';
+  }, [width, height]);
 
   const openInVLC = async (url: string) => {
     const vlcUrl = `vlc://${url}`;
@@ -34,7 +39,7 @@ export default function DetailsScreen() {
     if (supported) {
       await Linking.openURL(vlcUrl);
     } else {
-      alert('VLC не встановлено або схема не підтримується');
+      ToastAndroid.show('VLC не встановлено або схема не підтримується', ToastAndroid.SHORT);
     }
   };
 
@@ -42,10 +47,11 @@ export default function DetailsScreen() {
     const fetchMovie = async () => {
       try {
         if (id) {
-          const response = await findOneById(id);
+          const response = await fetch(id, {});
           setMovie(response);
         }
       } catch (error) {
+        ToastAndroid.show('Помилка завантаження фільму', ToastAndroid.SHORT);
         console.error('Movie loading error:', error);
       }
     };
@@ -53,137 +59,132 @@ export default function DetailsScreen() {
     fetchMovie();
   }, [id]);
 
-  if (loading && !movie) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color={AppTheme.colors.text} />
-      </View>
-    );
-  }
-
-  if (!movie) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <StyledIcon name="movie-off-outline" size="xlarge" />
-        <Text style={{ color: AppTheme.colors.text }}>Відео не знайдено</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={[styles.container, { flexDirection: isPortrait ? 'column' : 'row' }]}>
-      <View style={[styles.imageContainer, { width: isPortrait ? width : scaledPixels(400) }]}>
-        <Image
-          style={styles.headerImage}
-          source={movie?.poster}
-          placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
-          contentFit="cover"
-          transition={1000}
-        />
-
-        <View style={styles.headerButtonContainer}>
-          <Pressable
-            focusable
-            onPress={() => openInVLC(movie?.episodes?.[0]?.source ?? '')}
-            style={({ focused, pressed }) => [
-              styles.playButton,
-              focused && { backgroundColor: AppTheme.colors.muted },
-              pressed && { opacity: 0.7 }
+    <>
+      {loading ? (
+        <AnimatedLoader />
+      ) : error ? (
+        <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
+      ) : (
+        <View style={[styles.container, orientation === 'portrait' && { flexDirection: 'column' }]}>
+          <View
+            style={[
+              styles.asideContainer,
+              { width: orientation === 'portrait' ? width : scaledPixels(400) }
             ]}
           >
-            <View style={styles.playButtonContent}>
-              <StyledIcon name="play-circle-outline" />
-              <Text style={styles.playButtonText}>Дивитись відео</Text>
+            <Image
+              style={styles.headerImage}
+              source={movie?.poster}
+              placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
+              contentFit="cover"
+              transition={1000}
+            />
+
+            <Pressable
+              focusable
+              hasTVPreferredFocus
+              onPress={() => openPlaylistInVLC(movie?.episodes?.map(e => e.source) ?? [])}
+              style={({ focused, pressed }) => [
+                styles.playButton,
+                focused && { backgroundColor: AppTheme.colors.primary },
+                pressed && { opacity: 0.7 }
+              ]}
+            >
+              <View style={styles.playButtonContent}>
+                <StyledIcon icon="play-circle-outline" />
+                <Text style={styles.playButtonText}>Дивитись відео</Text>
+              </View>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+          >
+            <View style={styles.textContainer}>
+              {movie?.title && <Text style={styles.headerTitle}>{movie.title}</Text>}
+
+              {movie?.originalTitle && (
+                <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
+              )}
+
+              {movie?.imdb && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
+                </Text>
+              )}
+
+              {movie?.year && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
+                </Text>
+              )}
+
+              {movie?.age && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Вік. рейтинг:</Text> {movie.age}
+                </Text>
+              )}
+
+              {movie?.duration && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Тривалість:</Text> {movie.duration}
+                </Text>
+              )}
+
+              {movie?.genres?.length && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Жанр:</Text> {movie.genres.join(', ')}
+                </Text>
+              )}
+
+              {movie?.countries?.length && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Країна:</Text> {movie.countries.join(', ')}
+                </Text>
+              )}
+
+              {movie?.directors?.length && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Режисер:</Text> {movie.directors.join(', ')}
+                </Text>
+              )}
+
+              {movie?.actors?.length && (
+                <Text style={styles.headerText}>
+                  <Text style={styles.textBold}>Актори:</Text> {movie.actors.join(', ')}
+                </Text>
+              )}
+
+              <Separator />
+
+              {movie?.description && (
+                <Text style={styles.headerDescription}>{movie.description}</Text>
+              )}
             </View>
-          </Pressable>
+          </ScrollView>
         </View>
-      </View>
-
-      <ScrollView
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-      >
-        <View style={styles.textContainer}>
-          {movie?.title && <Text style={styles.headerTitle}>{movie.title}</Text>}
-
-          {movie?.originalTitle && (
-            <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
-          )}
-
-          {movie?.imdb && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
-            </Text>
-          )}
-
-          {movie?.year && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
-            </Text>
-          )}
-
-          {movie?.age && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Вік. рейтинг:</Text> {movie.age}
-            </Text>
-          )}
-
-          {movie?.duration && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Тривалість:</Text> {movie.duration}
-            </Text>
-          )}
-
-          {movie?.genres?.length && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Жанр:</Text> {movie.genres.join(', ')}
-            </Text>
-          )}
-
-          {movie?.countries?.length && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Країна:</Text> {movie.countries.join(', ')}
-            </Text>
-          )}
-
-          {movie?.directors?.length && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Режисер:</Text> {movie.directors.join(', ')}
-            </Text>
-          )}
-
-          {movie?.actors?.length && (
-            <Text style={styles.headerText}>
-              <Text style={styles.textBold}>Актори:</Text> {movie.actors.join(', ')}
-            </Text>
-          )}
-
-          <Separator />
-
-          {movie?.description && <Text style={styles.headerDescription}>{movie.description}</Text>}
-        </View>
-      </ScrollView>
-    </View>
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: scaledPixels(20),
     flexDirection: 'row'
   },
-  imageContainer: {
-    width: 'auto',
-    height: 'auto',
-    padding: scaledPixels(10)
+  asideContainer: {
+    alignItems: 'center',
+    gap: scaledPixels(15),
+    maxWidth: scaledPixels(181 * 2)
   },
   textContainer: {
     flexDirection: 'column',
     flexShrink: 1
-  },
-  image: {
-    flex: 1
   },
   headerTitle: {
     color: AppTheme.colors.text,
@@ -205,32 +206,34 @@ const styles = StyleSheet.create({
     fontSize: scaledPixels(20)
   },
   headerDescription: {
-    color: AppTheme.colors.text,
+    color: AppTheme.colors.subtext,
     fontSize: scaledPixels(16),
     fontWeight: '500',
     lineHeight: 22,
     flexWrap: 'wrap'
   },
   headerImage: {
-    width: '80%',
+    width: '100%',
     height: '80%',
     borderRadius: scaledPixels(8)
   },
   headerButtonContainer: {
-    gap: scaledPixels(8),
     flexDirection: 'row',
-    paddingVertical: scaledPixels(8)
+    marginVertical: scaledPixels(12)
   },
   playButton: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: AppTheme.colors.primary,
+    backgroundColor: AppTheme.colors.muted,
     paddingHorizontal: scaledPixels(24),
     paddingVertical: scaledPixels(8),
     borderRadius: scaledPixels(6)
   },
   playButtonContent: {
+    width: '100%',
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center'
   },
   playButtonText: {

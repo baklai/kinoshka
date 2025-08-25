@@ -1,7 +1,9 @@
 import { createContext } from 'react';
 
 export interface ApplicationContextType {
-  orientation: 'portrait' | 'landscape' | null;
+  isReady: boolean;
+
+  orientation: 'portrait' | 'landscape' | undefined;
 
   apiBaseUrl: string | null;
   setApiBaseUrl: (value: string) => void;
@@ -9,11 +11,24 @@ export interface ApplicationContextType {
   apiBaseToken: string | null;
   setApiBaseToken: (value: string) => void;
 
+  history: string[];
+  setHistory: (value: string[]) => void;
+
+  bookmarks: string[];
+  setBookmarks: (value: string[]) => void;
+
+  categories: string[];
+  setCategories: (value: string[]) => void;
+
   clearApiBase: () => void;
+  clearHistory: () => void;
+  clearBookmarks: () => void;
 }
 
 export const ApplicationContext = createContext<ApplicationContextType>({
-  orientation: null,
+  isReady: false,
+
+  orientation: undefined,
 
   apiBaseUrl: null,
   setApiBaseUrl: () => {},
@@ -21,5 +36,16 @@ export const ApplicationContext = createContext<ApplicationContextType>({
   apiBaseToken: null,
   setApiBaseToken: () => {},
 
-  clearApiBase: () => {}
+  history: [],
+  setHistory: () => {},
+
+  bookmarks: [],
+  setBookmarks: () => {},
+
+  categories: [],
+  setCategories: () => {},
+
+  clearApiBase: () => {},
+  clearHistory: () => {},
+  clearBookmarks: () => {}
 });

@@ -12,4 +12,6 @@ export const COLORS = {
   muted: '#272727'
 };
 
-export const PAGE_LIMIT = 10;
+export const PAGE_LIMIT: number = 10;
+
+export const GENRES: string[][] = [['Фільми'], ['Серіали'], ['Мультфільми']];

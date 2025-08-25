@@ -32,7 +32,7 @@ export default function OptionsScreen() {
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.item} onPress={() => router.replace('/options')}>
       <StyledIcon
-        name="cog-outline"
+        icon="cog-outline"
         size="large"
         color={AppTheme.colors.text}
         style={styles.icon}

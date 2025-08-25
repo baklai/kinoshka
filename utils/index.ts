@@ -1,4 +1,5 @@
-import { MovieFilterProps, MovieProps, MovieSortProps } from '@/types/movie.type';
+import { Linking, Platform, ToastAndroid } from 'react-native';
+import RNFS from 'react-native-fs';
 
 type Matrix<T> = T[][];
 
@@ -15,41 +16,36 @@ export function transpose<T>(matrix: Matrix<T>): Matrix<T> {
   return result;
 }
 
-export function createMovieSorts(params: Partial<MovieSortProps>): MovieSortProps {
-  const sort: MovieSortProps = {};
+const createM3U = (urls: string[]) => {
+  return `#EXTM3U\n${urls.map(url => `#EXTINF:-1,${url}\n${url}`).join('\n')}`;
+};
 
-  for (const key in params) {
-    const value = params[key as keyof MovieSortProps];
-    if (value) {
-      sort[key as keyof MovieSortProps] = value;
+const savePlaylist = async (content: string) => {
+  const path = `${RNFS.DocumentDirectoryPath}/playlist.m3u`;
+  await RNFS.writeFile(path, content, 'utf8');
+  return path;
+};
+
+export const openPlaylistInVLC = async (urls: string[]) => {
+  if (!urls.length) {
+    ToastAndroid.show('Список посилань пустий', ToastAndroid.SHORT);
+    return;
+  }
+
+  try {
+    const m3uContent = createM3U(urls);
+    const filePath = await savePlaylist(m3uContent);
+
+    const vlcUrl = Platform.OS === 'android' ? `vlc://${filePath}` : filePath;
+
+    const supported = await Linking.canOpenURL(vlcUrl);
+    if (supported) {
+      await Linking.openURL(vlcUrl);
+    } else {
+      ToastAndroid.show('VLC не встановлено або схема не підтримується', ToastAndroid.SHORT);
     }
+  } catch (error) {
+    console.error(error);
+    ToastAndroid.show('Помилка при відкритті VLC', ToastAndroid.SHORT);
   }
-
-  return sort;
-}
-
-export function createMovieFilters(params: Partial<MovieProps>): MovieFilterProps {
-  const filters: MovieFilterProps = {};
-
-  if (params.title) {
-    filters.title = { $regex: params.title, $options: 'i' };
-  }
-
-  if (params.originalTitle) {
-    filters.originalTitle = { $regex: params.originalTitle, $options: 'i' };
-  }
-
-  if (params.year) {
-    filters.year = { $regex: params.year, $options: 'i' };
-  }
-
-  if (params.genres?.length) {
-    filters.genres = { $in: params.genres };
-  }
-
-  if (params.countries?.length) {
-    filters.countries = { $in: params.countries };
-  }
-
-  return filters;
-}
+};

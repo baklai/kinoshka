@@ -56,7 +56,7 @@ export default function MovieCard(props: MovieCardProps) {
 
           {focused && (
             <StyledIcon
-              name="play-circle"
+              icon="play-circle"
               size="xlarge"
               color={AppTheme.colors.primary}
               style={styles.playIcon}

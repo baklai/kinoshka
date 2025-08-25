@@ -1,5 +1,5 @@
-import { useSecureStore } from '@/hooks/useAsyncStorage';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { useSecureStore } from '@/hooks/useSecureStore';
 import { MovieProps } from '@/types/movie.type';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -14,7 +14,7 @@ export default function BookmarksScreen() {
       {/* {movies.length > 0 ? (
         movies.map((movie: MovieProps) => <MovieItem {...movie} key={movie.id} />)
       ) : (
-        <MoviesNotFound text="Список закладок порожній" />
+        <AnyNotFound icon="folder-open" text="Список закладок порожній" />;
       )} */}
     </View>
   );

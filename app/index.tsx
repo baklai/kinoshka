@@ -1,33 +1,26 @@
+import AnimatedLoader from '@/components/AnimatedLoader';
 import MoviesFlatList from '@/components/MoviesFlatList';
-import { AppTheme } from '@/constants/theme.constant';
+import NotFoundView from '@/components/NotFoundView';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
-import { createMovieFilters, createMovieSorts } from '@/utils';
-import React, { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
-  const { loading, findAll } = useAsyncFetch('/');
-
-  const genres = [['Фільми'], ['Серіали'], ['Мультфільми']];
+  const [genres, setGenres] = useState<string[]>([]);
+  const { loading, error, fetch } = useAsyncFetch('genres');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await findAll();
-        console.info(response);
-      } catch (error) {
-        console.error('Помилка під час завантаження даних:', error);
+        const response = await fetch();
+        setGenres(response);
+      } catch (err) {
+        console.error('API connection error:', err);
       }
     };
 
     fetchData();
   }, []);
-
-  if (loading) {
-    return (
-      <ActivityIndicator size="large" color={AppTheme.colors.primary} style={styles.container} />
-    );
-  }
 
   return (
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
@@ -36,17 +29,25 @@ export default function IndexScreen() {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        {genres.map((genre, idx) => {
-          return (
-            <MoviesFlatList
-              key={`movie-flat-list-${idx}`}
-              header={genre.join(', ')}
-              loader={false}
-              sort={createMovieSorts({ year: 'desc', imdb: 'desc' })}
-              filters={createMovieFilters({ genres: genre })}
-            />
-          );
-        })}
+        {loading ? (
+          <AnimatedLoader />
+        ) : error ? (
+          <NotFoundView icon="web-off" text="Не вдалося підключитися" />
+        ) : (
+          <>
+            {genres.map((genre, idx) => {
+              return (
+                <MoviesFlatList
+                  key={`movie-flat-list-${idx}`}
+                  header={genre}
+                  loader={false}
+                  sort={{ year: 'desc' }}
+                  filters={{ genres: [genre] }}
+                />
+              );
+            })}
+          </>
+        )}
       </ScrollView>
     </TVFocusGuideView>
   );

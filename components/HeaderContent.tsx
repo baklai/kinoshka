@@ -67,19 +67,17 @@ const HeaderContent = (props: HeaderContentProps) => {
                 focusable
                 onPress={() => replace(route)}
                 style={({ focused, pressed }) => [
-                  styles.touchableIcon,
+                  styles.pressableIcon,
                   focused && { backgroundColor: AppTheme.colors.surface },
                   pressed && { opacity: 0.7 }
                 ]}
               >
-                {({ focused, pressed }) => (
-                  <View style={[styles.iconWrapper, pressed && { opacity: 0.7 }]}>
-                    <StyledIcon
-                      size="large"
-                      color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
-                      name={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
-                    />
-                  </View>
+                {({ focused }) => (
+                  <StyledIcon
+                    size="large"
+                    color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                    icon={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
+                  />
                 )}
               </Pressable>
             );
@@ -104,15 +102,11 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  touchableIcon: {
+  pressableIcon: {
+    aspectRatio: 1,
     width: scaledPixels(48),
     height: scaledPixels(48),
-    borderRadius: scaledPixels(48 / 2),
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
-  iconWrapper: {
+    borderRadius: '50%',
     alignItems: 'center',
     justifyContent: 'center'
   },

@@ -1,12 +1,14 @@
+import AnimatedLoader from '@/components/AnimatedLoader';
 import HeaderContent from '@/components/HeaderContent';
+import NotFoundView from '@/components/NotFoundView';
 import { AppTheme } from '@/constants/theme.constant';
+import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { ApplicationProvider, useApplication } from '@/providers/ApplicationProvider';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -18,20 +20,36 @@ configureReanimatedLogger({
 
 export default function RootLayoutProvider() {
   return (
-    <ApplicationProvider>
-      <GestureHandlerRootView>
-        <SafeAreaProvider>
-          <ThemeProvider value={AppTheme}>
-            <RootLayout />
-          </ThemeProvider>
-        </SafeAreaProvider>
-      </GestureHandlerRootView>
-    </ApplicationProvider>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
+      <SafeAreaProvider>
+        <ThemeProvider value={AppTheme}>
+          <RootLayout />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 function RootLayout() {
-  const { orientation } = useApplication();
+  const { loading, error, fetch } = useAsyncFetch();
+  const { width, height } = useWindowDimensions();
+
+  const orientation = useMemo<'portrait' | 'landscape'>(() => {
+    return height >= width ? 'portrait' : 'landscape';
+  }, [width, height]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const apiInfo = await fetch();
+        console.info('API Info:', apiInfo);
+      } catch (err) {
+        console.error('API connection error:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <SafeAreaView
@@ -41,34 +59,35 @@ function RootLayout() {
       ]}
       edges={orientation === 'portrait' ? ['top', 'bottom'] : []}
     >
-      <HeaderContent style={styles.header} />
-
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          gestureEnabled: false,
-          headerBackVisible: false,
-          animation: 'fade_from_bottom',
-          contentStyle: {
-            backgroundColor: AppTheme.colors.background
-          }
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="about" />
-        <Stack.Screen name="search" />
-        <Stack.Screen
-          name="details"
-          options={{
-            gestureEnabled: true
-          }}
-        />
-        <Stack.Screen name="bookmarks" />
-        <Stack.Screen name="history" />
-        <Stack.Screen name="options" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-
+      {loading ? (
+        <AnimatedLoader />
+      ) : error ? (
+        <NotFoundView icon="web-off" text="Не вдалося підключитися" />
+      ) : (
+        <>
+          <HeaderContent style={styles.header} />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              gestureEnabled: false,
+              headerBackVisible: false,
+              animation: 'fade_from_bottom',
+              contentStyle: {
+                backgroundColor: AppTheme.colors.background
+              }
+            }}
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen name="about" />
+            <Stack.Screen name="search" />
+            <Stack.Screen name="details" />
+            <Stack.Screen name="bookmarks" />
+            <Stack.Screen name="history" />
+            <Stack.Screen name="options" />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </>
+      )}
       <StatusBar hidden />
     </SafeAreaView>
   );
