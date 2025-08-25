@@ -1,4 +1,4 @@
-import { COLORS } from '@/constants/ui.constant';
+import { THEME_COLORS } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { DarkTheme, Theme } from '@react-navigation/native';
 
@@ -34,16 +34,16 @@ export const AppTheme: CustomTheme = {
   dark: true,
   colors: {
     ...DarkTheme.colors,
-    primary: COLORS.primary,
-    background: COLORS.background,
-    card: COLORS.surface,
-    surface: COLORS.surface,
-    text: COLORS.text,
-    subtext: COLORS.subtext,
-    border: COLORS.border,
-    focus: COLORS.focus,
-    muted: COLORS.muted,
-    notification: COLORS.primary
+    primary: THEME_COLORS.primary,
+    background: THEME_COLORS.background,
+    card: THEME_COLORS.surface,
+    surface: THEME_COLORS.surface,
+    text: THEME_COLORS.text,
+    subtext: THEME_COLORS.subtext,
+    border: THEME_COLORS.border,
+    focus: THEME_COLORS.focus,
+    muted: THEME_COLORS.muted,
+    notification: THEME_COLORS.primary
   },
   spacing: (x: number) => scaledPixels(8 * x),
   radius: {

@@ -18,7 +18,7 @@ export const usePaginatedMovie = ({
   sort
 }: PaginatedMovieProps) => {
   const [data, setData] = useState([]);
-  const { loading, fetch } = useAsyncFetch(path);
+  const { loading, error, fetch } = useAsyncFetch(path);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);

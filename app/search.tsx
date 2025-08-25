@@ -4,14 +4,22 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { useApplication } from '@/providers/ApplicationProvider';
-import { createMovieFilters, transpose } from '@/utils';
+import { transpose } from '@/utils';
 import * as Localization from 'expo-localization';
-import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  useWindowDimensions,
+  View
+} from 'react-native';
 
 export default function SearchScreen() {
-  const { orientation } = useApplication();
+  const { width, height } = useWindowDimensions();
+
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([
     'Дулітл',
@@ -41,6 +49,10 @@ export default function SearchScreen() {
 
     return mapLang(systemLang);
   });
+
+  const orientation = useMemo<'portrait' | 'landscape'>(() => {
+    return height >= width ? 'portrait' : 'landscape';
+  }, [width, height]);
 
   const toggleLang = () => {
     if (lang === 'UA') setLang('RU');
@@ -215,7 +227,7 @@ export default function SearchScreen() {
       </View>
 
       <View style={{ flexDirection: 'row', marginVertical: scaledPixels(10) }}>
-        {query.length >= 3 && <MoviesFlatList filters={createMovieFilters({ title: query })} />}
+        {query.length >= 3 && <MoviesFlatList filters={{ title: query }} />}
       </View>
     </View>
   );
