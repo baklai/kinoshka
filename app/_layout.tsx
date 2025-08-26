@@ -5,7 +5,6 @@ import { AppTheme } from '@/constants/theme.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { ThemeProvider } from '@react-navigation/native';
-import * as Application from 'expo-application';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useMemo } from 'react';
@@ -20,9 +19,6 @@ configureReanimatedLogger({
 });
 
 export default function RootLayoutProvider() {
-  console.log(Application);
-
-  console.log(Application.getAndroidId());
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
       <SafeAreaProvider>
@@ -72,6 +68,7 @@ function RootLayout() {
       ) : (
         <>
           <Stack
+            initialRouteName="home"
             screenOptions={{
               headerShown: false,
               gestureEnabled: false,
@@ -82,7 +79,7 @@ function RootLayout() {
               }
             }}
           >
-            <Stack.Screen name="index" />
+            <Stack.Screen name="home" />
             <Stack.Screen name="about" />
             <Stack.Screen name="search" />
             <Stack.Screen name="details" />

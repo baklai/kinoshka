@@ -39,8 +39,7 @@
     "lint": "expo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx}\"",
     "prebuild": "cross-env EXPO_TV=1 expo prebuild --clean",
-    "release": "cd android && gradlew assembleRelease",
-    "release-apk": "git tag v1.0.0 && git push origin v1.0.0"
+    "release": "cd android && gradlew assembleRelease"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -59,11 +58,9 @@
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.5",
     "expo-web-browser": "^14.2.0",
-    "i": "^0.3.7",
-    "npm": "^11.5.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-native": "npm:react-native-tvos@0.79.5-0",
+    "react-native": "npm:react-native-tvos@0.79.6",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-linear-gradient": "^2.8.3",
@@ -71,8 +68,7 @@
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-video": "^6.16.1",
-    "react-native-web": "^0.20.0",
-    "expo-application": "~6.1.5"
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

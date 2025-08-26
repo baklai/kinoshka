@@ -13,7 +13,7 @@ const HeaderContent = (props: HeaderContentProps) => {
 
   const navTabs: { title: string; route: string }[] = [
     { title: 'Пошук', route: '/search' },
-    { title: 'Головна', route: '/' },
+    { title: 'Головна', route: '/home' },
     { title: 'Закладки', route: '/bookmarks' }
   ];
 
@@ -35,7 +35,7 @@ const HeaderContent = (props: HeaderContentProps) => {
                 key={idx}
                 focusable
                 hasTVPreferredFocus={isCurrentRoute}
-                onFocus={() => !isCurrentRoute && router.replace(route)}
+                onFocus={() => !isCurrentRoute && router.push(route)}
                 style={({ pressed }) => [pressed && { opacity: 0.7 }]}
               >
                 {({ focused }) => (
@@ -66,7 +66,7 @@ const HeaderContent = (props: HeaderContentProps) => {
               <Pressable
                 key={idx}
                 focusable
-                onPress={() => router.replace(route)}
+                onPress={() => router.push(route)}
                 style={({ focused, pressed }) => [
                   styles.pressableIcon,
                   focused && { backgroundColor: AppTheme.colors.surface },
