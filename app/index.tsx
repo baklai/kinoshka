@@ -2,17 +2,21 @@ import AnimatedLoader from '@/components/AnimatedLoader';
 import MoviesFlatList from '@/components/MoviesFlatList';
 import NotFoundView from '@/components/NotFoundView';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
+import * as Application from 'expo-application';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
-  const [genres, setGenres] = useState<string[]>([]);
+  const [genres, setGenres] = useState<Record<string, any>[]>([]);
   const { loading, error, fetch } = useAsyncFetch('genres');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch();
+        const response = await fetch(null, {
+          params: { device: `android-${Application.getAndroidId()}` }
+        });
+
         setGenres(response);
       } catch (err) {
         console.error('API connection error:', err);
@@ -35,14 +39,13 @@ export default function IndexScreen() {
           <NotFoundView icon="web-off" text="Не вдалося підключитися" />
         ) : (
           <>
-            {genres.map((genre, idx) => {
+            {genres.map(item => {
               return (
                 <MoviesFlatList
-                  key={`movie-flat-list-${idx}`}
-                  header={genre}
-                  loader={false}
-                  sort={{ year: 'desc' }}
-                  filters={{ genres: [genre] }}
+                  key={`movie-flat-list-${item.id}`}
+                  title={item.genres.join(', ')}
+                  sort={{ imdb: 'desc' }}
+                  filters={{ genres: item.genres }}
                 />
               );
             })}

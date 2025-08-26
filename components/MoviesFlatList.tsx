@@ -1,20 +1,19 @@
 import MovieCard from '@/components/MovieCard';
-import AnyNotFound from '@/components/NotFoundView';
 import { AppTheme } from '@/constants/theme.constant';
 import { PAGE_LIMIT } from '@/constants/ui.constant';
-import { usePaginatedMovie } from '@/hooks/usePaginatedMovie';
+import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieFilterProps } from '@/types/filters.type';
 import { MovieProps } from '@/types/movie.type';
 import { MovieSortProps } from '@/types/sorts.type';
 import { router } from 'expo-router';
-import React, { useCallback } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import NotFoundView from './NotFoundView';
+import SkeletonView from './SkeletonView';
 
 interface MoviesFlatListProps {
-  header?: string;
-  loader?: boolean;
-  empty?: boolean;
+  title?: string;
   limit?: number;
   sort?: MovieSortProps;
   filters?: MovieFilterProps;
@@ -23,25 +22,10 @@ interface MoviesFlatListProps {
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({
-  header,
-  loader = true,
-  empty = false,
-  limit = PAGE_LIMIT,
-  sort,
-  filters
-}: MoviesFlatListProps) => {
-  const {
-    data: records,
-    isLoading,
-    hasMoreData,
-    loadMore
-  } = usePaginatedMovie({
-    path: 'movies',
-    filters,
-    limit,
-    sort
-  });
+const MoviesFlatList = ({ title, limit = PAGE_LIMIT, sort, filters }: MoviesFlatListProps) => {
+  const [records, setRecords] = useState<MovieProps[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { loading, error, fetch } = useAsyncFetch('movies');
 
   const handleSelectItem = useCallback((item: MovieProps) => {
     router.push({
@@ -49,6 +33,12 @@ const MoviesFlatList = ({
       params: { id: item.id }
     });
   }, []);
+
+  const loadMore = () => {
+    if (!loading) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
   const renderItem = useCallback(
     ({ item }: { item: MovieProps }) => (
@@ -66,38 +56,58 @@ const MoviesFlatList = ({
     []
   );
 
-  const renderEmpty = useCallback(() => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingVertical: scaledPixels(10)
-        }}
-      >
-        {isLoading && records.length === 0 && loader ? (
-          <ActivityIndicator size="large" color={AppTheme.colors.primary} />
-        ) : empty ? (
-          <AnyNotFound icon="folder-open" text="Не вдалося знайти відео" size={64} />
-        ) : null}
-      </View>
-    );
-  }, [isLoading, records.length, loader, empty]);
+  const renderSkeletonItem = useCallback(() => <SkeletonView />, []);
+
+  const renderEmpty = useCallback(
+    () => (
+      <NotFoundView
+        icon="folder-open"
+        text="Не вдалося знайти відео"
+        size={64}
+        style={{ height: scaledPixels(259) }}
+      />
+    ),
+    []
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('', {
+          params: {
+            page: currentPage,
+            limit,
+            sort,
+            filters
+          }
+        });
+
+        if (response?.docs?.length > 0) {
+          setRecords(prev => (currentPage === 1 ? response.docs : [...prev, ...response.docs]));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+
+    return () => {};
+  }, []);
 
   return (
     <View style={styles.container}>
-      {header && header.length > 0 && records.length > 0 && (
+      {title && (
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>{header}</Text>
+          <Text style={styles.headerText}>{title}</Text>
         </View>
       )}
 
       <FlatList
         horizontal
-        data={records}
-        keyExtractor={item => item.id?.toString()}
-        renderItem={renderItem}
+        data={loading ? Array(PAGE_LIMIT).fill({}) : records}
+        keyExtractor={(item, index) => String(item.id || index)}
+        renderItem={loading ? renderSkeletonItem : renderItem}
         getItemLayout={getItemLayout}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -127,6 +137,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: scaledPixels(1),
     fontSize: scaledPixels(22)
+  },
+  skeletonCard: {
+    height: 100,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 12
   }
 });
 

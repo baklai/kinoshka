@@ -3,6 +3,10 @@ import RNFS from 'react-native-fs';
 
 type Matrix<T> = T[][];
 
+export const sleep = (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 export function transpose<T>(matrix: Matrix<T>): Matrix<T> {
   const maxLength = Math.max(...matrix.map(row => row.length));
   const result: Matrix<T> = Array.from({ length: maxLength }, () => []);

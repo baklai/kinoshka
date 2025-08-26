@@ -43,7 +43,7 @@ export const useAsyncFetch = <T = any>(endpoint?: string | undefined) => {
   );
 
   const fetch = useCallback(
-    (id?: string | number, options?: AxiosRequestConfig) => {
+    (id?: string | number | null, options?: AxiosRequestConfig) => {
       const path = id ? `/${id}` : '';
       return request(path, options);
     },

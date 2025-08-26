@@ -35,17 +35,21 @@ const HeaderContent = (props: HeaderContentProps) => {
                 key={idx}
                 focusable
                 hasTVPreferredFocus={isCurrentRoute}
-                onPress={() => router.replace(route)}
+                onFocus={() => !isCurrentRoute && router.replace(route)}
                 style={({ pressed }) => [pressed && { opacity: 0.7 }]}
               >
-                {({ focused, pressed }) => (
+                {({ focused }) => (
                   <Text
                     style={[
                       styles.label,
                       focused && styles.underline,
                       isCurrentRoute && styles.focused,
-                      isCurrentRoute && { fontSize: scaledPixels(20) },
-                      pressed && styles.pressed
+                      isCurrentRoute &&
+                        !focused && [
+                          styles.underline,
+                          { color: AppTheme.colors.text, borderColor: AppTheme.colors.text }
+                        ],
+                      isCurrentRoute && { fontSize: scaledPixels(20) }
                     ]}
                   >
                     {title.toUpperCase()}
