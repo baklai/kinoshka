@@ -19,7 +19,7 @@ export default function IndexScreen() {
               <MoviesFlatList
                 key={`movie-flat-list-${idx}`}
                 title={item}
-                sort={{ imdb: 'desc' }}
+                sort={{ year: 'desc' }}
                 filters={{ genres: [item] }}
               />
             );

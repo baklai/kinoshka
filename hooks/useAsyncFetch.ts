@@ -11,7 +11,7 @@ export const useAsyncFetch = <T = any>(endpoint?: string | undefined) => {
   const instance: AxiosInstance = useMemo(() => {
     return axios.create({
       baseURL: endpoint ? `${API_BASE_URL}/${endpoint}` : API_BASE_URL,
-      timeout: 60000,
+      timeout: 60000 * 5,
       responseType: 'json',
       headers: {
         'Content-Type': 'application/json',
