@@ -27,6 +27,7 @@ export const useAsyncFetch = <T = any>(endpoint?: string | undefined) => {
 
       try {
         const response = await instance.get(path || '', options);
+
         return response.data;
       } catch (err: any) {
         if (axios.isAxiosError(err)) {

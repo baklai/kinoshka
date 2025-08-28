@@ -1,38 +1,42 @@
-import MovieCard from '@/components/MovieCard';
+import MoviesFlatList from '@/components/MoviesFlatList';
 import NotFoundView from '@/components/NotFoundView';
-import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MovieProps } from '@/types/movie.type';
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, TVFocusGuideView, View } from 'react-native';
 
 export default function BookmarksScreen() {
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
-  const movies: MovieProps[] = [];
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await SecureStore.getItemAsync('bookmarks');
+        if (data) {
+          setBookmarks([...JSON.parse(data)]);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadData();
+  }, []);
 
   return (
-    <View style={styles.container}>
-      {movies.length > 0 ? (
-        movies.map((movie: MovieProps) => <MovieCard {...movie} key={movie.id} />)
-      ) : (
-        <NotFoundView icon="folder-open" text="Список закладок порожній" />
-      )}
-    </View>
+    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
+      <View style={styles.container}>
+        {bookmarks?.length > 0 ? (
+          <MoviesFlatList title="Перелік закладок" filters={{ ids: bookmarks }} />
+        ) : (
+          <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
+        )}
+      </View>
+    </TVFocusGuideView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: scaledPixels(10)
-  },
   container: {
-    flex: 1,
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    overflowX: 'auto',
-    padding: scaledPixels(6),
-    gap: scaledPixels(6)
+    flex: 1
   }
 });

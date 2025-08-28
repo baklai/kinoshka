@@ -1,25 +1,10 @@
-import React, { useState } from 'react';
+import MoviesFlatList from '@/components/MoviesFlatList';
+import { AppContext } from '@/context';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
-  const [genres, setGenres] = useState<Record<string, any>[]>([]);
-  // const { loading, error, fetch } = useAsyncFetch('genres');
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch(null, {
-  //         params: { device: `android-${Application.getAndroidId()}` }
-  //       });
-
-  //       setGenres(response);
-  //     } catch (err) {
-  //       console.error('API connection error:', err);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  const appContext = useContext(AppContext);
 
   return (
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
@@ -28,24 +13,17 @@ export default function IndexScreen() {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        {/* {loading ? (
-          <AnimatedLoader />
-        ) : error ? (
-          <NotFoundView icon="web-off" text="Не вдалося підключитися" />
-        ) : (
-          <>
-            {genres.map(item => {
-              return (
-                <MoviesFlatList
-                  key={`movie-flat-list-${item.id}`}
-                  title={item.genres.join(', ')}
-                  sort={{ imdb: 'desc' }}
-                  filters={{ genres: item.genres }}
-                />
-              );
-            })}
-          </>
-        )} */}
+        {appContext?.defaultGenres &&
+          appContext.defaultGenres.map((item, idx) => {
+            return (
+              <MoviesFlatList
+                key={`movie-flat-list-${idx}`}
+                title={item}
+                sort={{ imdb: 'desc' }}
+                filters={{ genres: [item] }}
+              />
+            );
+          })}
       </ScrollView>
     </TVFocusGuideView>
   );

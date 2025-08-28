@@ -2,12 +2,13 @@ import AnimatedLoader from '@/components/AnimatedLoader';
 import HeaderContent from '@/components/HeaderContent';
 import NotFoundView from '@/components/NotFoundView';
 import { AppTheme } from '@/constants/theme.constant';
+import { AppContext } from '@/context';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
@@ -31,6 +32,7 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
+  const [apiInfo, setApiInfo] = useState<Record<string, any>>({});
   const { loading, error, fetch } = useAsyncFetch();
   const { width, height } = useWindowDimensions();
 
@@ -42,7 +44,7 @@ function RootLayout() {
     const fetchData = async () => {
       try {
         const apiInfo = await fetch();
-        console.info('API Info:', apiInfo);
+        setApiInfo(apiInfo);
       } catch (err) {
         console.error('API connection error:', err);
       }
@@ -67,27 +69,29 @@ function RootLayout() {
         <NotFoundView icon="web-off" text="Не вдалося підключитися" />
       ) : (
         <>
-          <Stack
-            initialRouteName="home"
-            screenOptions={{
-              headerShown: false,
-              gestureEnabled: false,
-              headerBackVisible: false,
-              animation: 'fade_from_bottom',
-              contentStyle: {
-                backgroundColor: AppTheme.colors.background
-              }
-            }}
-          >
-            <Stack.Screen name="home" />
-            <Stack.Screen name="about" />
-            <Stack.Screen name="search" />
-            <Stack.Screen name="details" />
-            <Stack.Screen name="bookmarks" />
-            <Stack.Screen name="history" />
-            <Stack.Screen name="options" />
-            <Stack.Screen name="+not-found" />
-          </Stack>
+          <AppContext.Provider value={apiInfo}>
+            <Stack
+              initialRouteName="home"
+              screenOptions={{
+                headerShown: false,
+                gestureEnabled: false,
+                headerBackVisible: false,
+                animation: 'fade_from_bottom',
+                contentStyle: {
+                  backgroundColor: AppTheme.colors.background
+                }
+              }}
+            >
+              <Stack.Screen name="home" />
+              <Stack.Screen name="about" />
+              <Stack.Screen name="search" />
+              <Stack.Screen name="details" />
+              <Stack.Screen name="bookmarks" />
+              <Stack.Screen name="history" />
+              <Stack.Screen name="options" />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </AppContext.Provider>
         </>
       )}
       <StatusBar hidden />

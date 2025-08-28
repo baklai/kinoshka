@@ -1,6 +1,7 @@
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { IconType } from '@/types/icons.type';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
 import React, { ComponentProps } from 'react';
@@ -13,11 +14,11 @@ const HeaderContent = (props: HeaderContentProps) => {
 
   const navTabs: { title: string; route: string }[] = [
     { title: 'Пошук', route: '/search' },
-    { title: 'Головна', route: '/home' },
+    { title: 'Кіношка', route: '/home' },
     { title: 'Закладки', route: '/bookmarks' }
   ];
 
-  const navBtns: { icon: string; route: string }[] = [
+  const navBtns: { icon: IconType; route: string }[] = [
     { icon: 'history', route: '/history' },
     { icon: 'information-outline', route: '/about' },
     { icon: 'cog-outline', route: '/options' }
@@ -35,7 +36,8 @@ const HeaderContent = (props: HeaderContentProps) => {
                 key={idx}
                 focusable
                 hasTVPreferredFocus={isCurrentRoute}
-                onFocus={() => !isCurrentRoute && router.push(route)}
+                // onFocus={() => !isCurrentRoute && Platform.isTV && router.push(route)}
+                onPress={() => router.push(route)}
                 style={({ pressed }) => [pressed && { opacity: 0.7 }]}
               >
                 {({ focused }) => (
