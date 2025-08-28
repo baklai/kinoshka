@@ -1,7 +1,7 @@
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, StyleSheet, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -27,8 +27,8 @@ const SkeletonView = () => {
     <View style={styles.container}>
       <Animated.View
         style={[
+          StyleSheet.absoluteFillObject,
           {
-            ...StyleSheet.absoluteFillObject,
             transform: [{ translateX }]
           }
         ]}
@@ -50,7 +50,8 @@ const styles = StyleSheet.create({
     width: scaledPixels(181),
     height: scaledPixels(259),
     borderRadius: scaledPixels(6),
-    marginVertical: scaledPixels(4)
+    marginVertical: scaledPixels(4),
+    overflow: 'hidden'
   }
 });
 
