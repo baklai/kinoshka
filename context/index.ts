@@ -12,9 +12,9 @@ export type AppContextType = {
   baseUrl: string;
   searchUrl: string;
   categories: CategoryType[];
-  getMovieCards?: (baseUrl: string, source: string) => Promise<MovieProps[]>;
-  searchMovieCards?: (baseUrl: string, searchUrl: string, search: string) => Promise<MovieProps[]>;
-  getMovieDetails?: (baseUrl: string, source: string) => Promise<MovieProps | null>;
+  getMovieCards: (baseUrl: string, source: string) => Promise<MovieProps[]>;
+  searchMovieCards: (baseUrl: string, searchUrl: string, search: string) => Promise<MovieProps[]>;
+  getMovieDetails: (baseUrl: string, source: string) => Promise<MovieProps | null>;
 };
 
 export const AppContext = createContext<AppContextType>({

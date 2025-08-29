@@ -5,9 +5,9 @@ import { database } from '@/constants/database.constant';
 import { AppTheme } from '@/constants/theme.constant';
 import { AppContext, AppContextType } from '@/context';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
@@ -45,7 +45,7 @@ function RootLayout() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const source = await SecureStore.getItemAsync('source');
+        const source = await AsyncStorage.getItem('source');
         const currentSource = source
           ? database.sources.find(({ name }) => name === source)
           : database.sources[database.sources.length - 1];

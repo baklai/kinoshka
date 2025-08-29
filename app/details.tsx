@@ -3,10 +3,12 @@ import NotFoundView from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
+import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { MovieProps } from '@/types/movie.type';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Linking,
@@ -22,25 +24,29 @@ import {
 const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
-  const { url } = useLocalSearchParams<{ url: string }>();
   const { width, height } = useWindowDimensions();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
+  const { baseUrl, getMovieDetails } = useAppContext();
+  const { source } = useLocalSearchParams<{ source: string }>();
   const [movie, setMovie] = useState<any | null>(null);
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
     return height >= width ? 'portrait' : 'landscape';
   }, [width, height]);
 
   const toggleBookmark = async () => {
-    const isBookmarked = bookmarks.includes(url);
-    const updatedBookmarks = isBookmarked
-      ? bookmarks.filter(bookmark => bookmark !== url)
-      : [...bookmarks, url];
+    const isBookmarkCkech = bookmarks.some((bookmark: MovieProps) => bookmark.source === source);
+
+    setIsBookmarked(isBookmarkCkech);
+
+    const updatedBookmarks = isBookmarkCkech
+      ? bookmarks.filter((bookmark: MovieProps) => bookmark.source !== source)
+      : [...bookmarks, movie];
 
     setBookmarks(updatedBookmarks);
-    await SecureStore.setItemAsync('bookmarks', JSON.stringify(updatedBookmarks));
+    await AsyncStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
   };
 
   const openInVLC = async (url: string) => {
@@ -48,9 +54,9 @@ export default function DetailsScreen() {
     const supported = await Linking.canOpenURL(vlcUrl);
     if (supported) {
       await Linking.openURL(vlcUrl);
-      const history = await SecureStore.getItemAsync('history');
+      const history = await AsyncStorage.getItem('history');
       const updatedHistory = history ? new Set([...JSON.parse(history), url]) : [url];
-      await SecureStore.setItemAsync('history', JSON.stringify(updatedHistory));
+      await AsyncStorage.setItem('history', JSON.stringify(updatedHistory));
     } else {
       ToastAndroid.show('VLC не встановлено або схема не підтримується', ToastAndroid.SHORT);
     }
@@ -59,30 +65,33 @@ export default function DetailsScreen() {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        if (url) {
-          // const response = []; // await fetchMovieDetails(url);
-          // console.log('response', response);
-          // setMovie(response);
-          // const bookmarks = await SecureStore.getItemAsync('bookmarks');
-          // if (bookmarks) {
-          //   setBookmarks([...JSON.parse(bookmarks)]);
-          // }
-          // setMovie(response);
+        setLoading(true);
+
+        if (source) {
+          const response = await getMovieDetails(baseUrl, source);
+
+          const bookmarks = await AsyncStorage.getItem('bookmarks');
+          if (bookmarks) {
+            setBookmarks([...JSON.parse(bookmarks)]);
+          }
+          setMovie(response);
         }
       } catch (error) {
         ToastAndroid.show('Помилка завантаження фільму', ToastAndroid.SHORT);
         console.error('Movie loading error:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchMovie();
-  }, [url]);
+  }, [source]);
 
   return (
     <>
       {loading ? (
         <AnimatedLoader />
-      ) : error ? (
+      ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (
         <View style={[styles.container, orientation === 'portrait' && { flexDirection: 'column' }]}>
@@ -139,7 +148,7 @@ export default function DetailsScreen() {
                 <View style={styles.playButtonContent}>
                   <StyledIcon
                     icon="bookmark"
-                    color={bookmarks.includes(url) ? 'green' : AppTheme.colors.text}
+                    color={isBookmarked ? 'green' : AppTheme.colors.text}
                   />
                 </View>
               </Pressable>

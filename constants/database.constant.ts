@@ -10,9 +10,19 @@ export const database = {
       searchUrl: 'https://uakino.best',
       categories: [
         {
-          limit: 40,
+          limit: 10,
           title: 'Найкращі фільми українською',
           source: 'https://uakino.best/filmy/best'
+        },
+        {
+          limit: 10,
+          title: 'Найкращі серіали українською',
+          source: 'https://uakino.best/seriesss/best'
+        },
+        {
+          limit: 10,
+          title: 'Найкраща анімація українською',
+          source: 'https://uakino.best/cartoon/best'
         }
       ],
       getMovieCards: async (baseUrl: string, source: string): Promise<MovieProps[]> => {
@@ -23,7 +33,6 @@ export const database = {
           const items = document.querySelectorAll('div.movie-item.short-item');
 
           return Array.from(items).map((item, index) => {
-            const id = `genre_detective-${index}`;
             const source = (item.querySelector('.movie-title') as HTMLAnchorElement)?.href || '';
             const title = item.querySelector('.movie-title')?.textContent?.trim() || '';
             const poster = (item.querySelector('.movie-img img') as HTMLImageElement)?.src || '';
@@ -31,7 +40,7 @@ export const database = {
             const likes =
               item.querySelector('.related-item-rating.positive')?.textContent?.trim() || '';
 
-            return { id, source, title, poster: `${baseUrl}${poster}`, quality, likes };
+            return { source, title, poster: `${baseUrl}${poster}`, quality, likes };
           });
         } catch (err) {
           console.error('Error during request or parsing:', err);
@@ -61,15 +70,14 @@ export const database = {
           const { document } = parseHTML(html);
           const items = document.querySelectorAll('div.movie-item.short-item');
 
-          return Array.from(items).map((item, index) => {
-            const id = `search-movies-${index}`;
+          return Array.from(items).map(item => {
             const source = (item.querySelector('.full-movie') as HTMLAnchorElement)?.href || '';
             const title = item.querySelector('.full-movie-title')?.textContent?.trim() || '';
             const poster = (item.querySelector('img') as HTMLImageElement)?.src || '';
             const likes =
               item.querySelector('.related-item-rating.positive')?.textContent?.trim() || '';
 
-            return { id, source, title, poster: `${baseUrl}${poster}`, likes };
+            return { source, title, poster: `${baseUrl}${poster}`, likes };
           });
         } catch (err) {
           console.error('Error during request or parsing:', err);
@@ -120,7 +128,7 @@ export const database = {
 
           const title = getText('span.solototle');
           const originalTitle = getText('span.origintitle');
-          const description = getText('div.full-text');
+          const description = getText('div.full-text.clearfix');
 
           const posterEl = movieWrap.querySelector(
             'div.film-poster img'
@@ -134,7 +142,7 @@ export const database = {
 
           let imdb = '';
           let votes = '';
-          const imdbText = findFiDesc('imdb');
+          const imdbText = findFiDesc('/');
           if (imdbText.includes('/')) {
             [imdb, votes] = imdbText.split('/').map(s => s.trim());
           }
@@ -159,7 +167,6 @@ export const database = {
           }
 
           return {
-            id: source,
             source,
             title,
             originalTitle,

@@ -1,15 +1,16 @@
 import NotFoundView from '@/components/NotFoundView';
-import * as SecureStore from 'expo-secure-store';
+import { MovieProps } from '@/types/movie.type';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TVFocusGuideView, View } from 'react-native';
 
 export default function HistoryScreen() {
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<MovieProps[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await SecureStore.getItemAsync('history');
+        const data = await AsyncStorage.getItem('history');
         if (data) {
           setHistory([...JSON.parse(data)]);
         }

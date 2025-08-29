@@ -1,15 +1,16 @@
 import NotFoundView from '@/components/NotFoundView';
-import * as SecureStore from 'expo-secure-store';
+import { MovieProps } from '@/types/movie.type';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TVFocusGuideView, View } from 'react-native';
 
 export default function BookmarksScreen() {
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await SecureStore.getItemAsync('bookmarks');
+        const data = await AsyncStorage.getItem('bookmarks');
         if (data) {
           setBookmarks([...JSON.parse(data)]);
         }

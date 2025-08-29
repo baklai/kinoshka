@@ -1,10 +1,9 @@
 export interface MovieProps {
-  id: string;
   source: string;
+  poster?: string;
   title: string;
   originalTitle?: string;
   description?: string;
-  poster?: string;
   quality?: string;
   duration?: string;
   age?: string;
