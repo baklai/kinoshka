@@ -12,7 +12,7 @@ interface MovieCardProps extends MovieProps {
 }
 
 export default function MovieCard(props: MovieCardProps) {
-  const { poster, title, imdb, quality, handlePress } = props;
+  const { poster, title, imdb, likes, quality, handlePress } = props;
 
   return (
     <Pressable
@@ -32,9 +32,9 @@ export default function MovieCard(props: MovieCardProps) {
             />
 
             <View style={styles.overlayTop}>
-              {imdb ? (
+              {imdb || likes ? (
                 <View style={styles.rating}>
-                  <Text style={styles.ratingText}>{imdb}</Text>
+                  <Text style={styles.ratingText}>{imdb || likes}</Text>
                 </View>
               ) : (
                 <View></View>
