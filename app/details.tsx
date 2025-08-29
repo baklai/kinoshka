@@ -3,9 +3,7 @@ import NotFoundView from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
-import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { fetchMovieDetails } from '@/utils';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -26,7 +24,8 @@ const Separator = () => <View style={styles.separator} />;
 export default function DetailsScreen() {
   const { url } = useLocalSearchParams<{ url: string }>();
   const { width, height } = useWindowDimensions();
-  const { loading, error, fetch } = useAsyncFetch('movies');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
   const [movie, setMovie] = useState<any | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
@@ -61,18 +60,14 @@ export default function DetailsScreen() {
     const fetchMovie = async () => {
       try {
         if (url) {
-          const response = await fetchMovieDetails(url);
-
-          console.log('response', response);
-
-          setMovie(response);
-          const bookmarks = await SecureStore.getItemAsync('bookmarks');
-
-          if (bookmarks) {
-            setBookmarks([...JSON.parse(bookmarks)]);
-          }
-
-          setMovie(response);
+          // const response = []; // await fetchMovieDetails(url);
+          // console.log('response', response);
+          // setMovie(response);
+          // const bookmarks = await SecureStore.getItemAsync('bookmarks');
+          // if (bookmarks) {
+          //   setBookmarks([...JSON.parse(bookmarks)]);
+          // }
+          // setMovie(response);
         }
       } catch (error) {
         ToastAndroid.show('Помилка завантаження фільму', ToastAndroid.SHORT);

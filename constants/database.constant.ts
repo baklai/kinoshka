@@ -7,30 +7,19 @@ export const database = {
     {
       name: 'uakino.best',
       baseUrl: 'https://uakino.best',
+      searchUrl: 'https://uakino.best',
       categories: [
         {
           limit: 40,
           title: 'Найкращі фільми українською',
           source: 'https://uakino.best/filmy/best'
-        },
-        {
-          limit: 40,
-          title: 'Найкращі серіали українською',
-          source: 'https://uakino.best/seriesss/best'
-        },
-        {
-          limit: 40,
-          title: 'Найкраща анімація',
-          source: 'https://uakino.best/cartoon/best'
         }
       ],
       getMovieCards: async (baseUrl: string, source: string): Promise<MovieProps[]> => {
         try {
           const response = await fetch(source);
           const html = await response.text();
-
           const { document } = parseHTML(html);
-
           const items = document.querySelectorAll('div.movie-item.short-item');
 
           return Array.from(items).map((item, index) => {
@@ -45,15 +34,52 @@ export const database = {
             return { id, source, title, poster: `${baseUrl}${poster}`, quality, likes };
           });
         } catch (err) {
-          console.error('Ошибка при запросе или разборе:', err);
+          console.error('Error during request or parsing:', err);
           return [];
         }
       },
-      getMovieDetails: async (source: string): Promise<MovieProps | null> => {
+      searchMovieCards: async (
+        baseUrl: string,
+        searchUrl: string,
+        search: string
+      ): Promise<MovieProps[]> => {
+        try {
+          const params = new URLSearchParams({
+            do: 'search',
+            subaction: 'search',
+            story: search
+          });
+
+          const response = await fetch(`${searchUrl}?${params.toString()}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          });
+
+          const html = await response.text();
+          const { document } = parseHTML(html);
+          const items = document.querySelectorAll('div.movie-item.short-item');
+
+          return Array.from(items).map((item, index) => {
+            const id = `search-movies-${index}`;
+            const source = (item.querySelector('.full-movie') as HTMLAnchorElement)?.href || '';
+            const title = item.querySelector('.full-movie-title')?.textContent?.trim() || '';
+            const poster = (item.querySelector('img') as HTMLImageElement)?.src || '';
+            const likes =
+              item.querySelector('.related-item-rating.positive')?.textContent?.trim() || '';
+
+            return { id, source, title, poster: `${baseUrl}${poster}`, likes };
+          });
+        } catch (err) {
+          console.error('Error during request or parsing:', err);
+          return [];
+        }
+      },
+      getMovieDetails: async (baseUrl: string, source: string): Promise<MovieProps | null> => {
         try {
           const response = await fetch(source);
           const html = await response.text();
-
           const { document } = parseHTML(html);
 
           const getText = (selector: string): string =>
@@ -153,7 +179,7 @@ export const database = {
             episodes
           };
         } catch (err) {
-          console.error('Ошибка при запросе или разборе:', err);
+          console.error('Error during request or parsing:', err);
           return null;
         }
       }

@@ -34,7 +34,7 @@ export default function RootLayoutProvider() {
 
 function RootLayout() {
   const [datasource, setDatasource] = useState<AppContextType | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const { width, height } = useWindowDimensions();
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
@@ -44,18 +44,17 @@ function RootLayout() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const source = await SecureStore.getItemAsync('source');
         const currentSource = source
           ? database.sources.find(({ name }) => name === source)
           : database.sources[database.sources.length - 1];
 
-        console.log('currentSource', currentSource);
-
         if (currentSource) {
           setDatasource(currentSource);
         }
       } catch (err) {
-        console.error('API connection error:', err);
+        console.error('Context error:', err);
       } finally {
         setLoading(false);
       }
@@ -82,7 +81,6 @@ function RootLayout() {
         <>
           <AppContext.Provider value={datasource}>
             <Stack
-              initialRouteName="home"
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
@@ -93,7 +91,7 @@ function RootLayout() {
                 }
               }}
             >
-              <Stack.Screen name="home" />
+              <Stack.Screen name="index" />
               <Stack.Screen name="about" />
               <Stack.Screen name="search" />
               <Stack.Screen name="details" />

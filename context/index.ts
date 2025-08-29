@@ -10,15 +10,19 @@ export type CategoryType = {
 export type AppContextType = {
   name: string;
   baseUrl: string;
+  searchUrl: string;
   categories: CategoryType[];
   getMovieCards?: (baseUrl: string, source: string) => Promise<MovieProps[]>;
-  getMovieDetails?: (source: string) => Promise<MovieProps | null>;
+  searchMovieCards?: (baseUrl: string, searchUrl: string, search: string) => Promise<MovieProps[]>;
+  getMovieDetails?: (baseUrl: string, source: string) => Promise<MovieProps | null>;
 };
 
 export const AppContext = createContext<AppContextType>({
   name: '',
   baseUrl: '',
+  searchUrl: '',
   categories: [],
   getMovieCards: async () => [],
+  searchMovieCards: async () => [],
   getMovieDetails: async () => null
 });

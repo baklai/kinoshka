@@ -1,10 +1,13 @@
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { Link } from 'expo-router';
+import { Link, usePathname } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function NotFoundScreen() {
+  const pathname = usePathname();
+
+  console.log('pathname', pathname);
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Цього екрана не існує.</Text>

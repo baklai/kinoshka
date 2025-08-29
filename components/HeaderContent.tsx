@@ -14,7 +14,7 @@ const HeaderContent = (props: HeaderContentProps) => {
 
   const navTabs: { title: string; route: string }[] = [
     { title: 'Пошук', route: '/search' },
-    { title: 'Кіношка', route: '/home' },
+    { title: 'Кіношка', route: '/' },
     { title: 'Закладки', route: '/bookmarks' }
   ];
 

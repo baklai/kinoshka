@@ -1,9 +1,9 @@
 {
-  "name": "kinoshka-app",
+  "name": "kinoshka",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "private": true,
-  "description": "KinoshkaTV APP",
+  "description": "KinoshkaTV",
   "author": {
     "name": "Dmytro Baklai",
     "email": "d.n.baklai@gmail.com",
@@ -13,13 +13,13 @@
       "linkedin": "https://www.linkedin.com/in/baklai/"
     }
   },
-  "homepage": "https://github.com/baklai/kinoshka-app#readme",
+  "homepage": "https://github.com/baklai/kinoshka#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/baklai/kinoshka-app.git"
+    "url": "git+https://github.com/baklai/kinoshka.git"
   },
   "bugs": {
-    "url": "https://github.com/baklai/kinoshka-app/issues"
+    "url": "https://github.com/baklai/kinoshka/issues"
   },
   "keywords": [
     "nodejs",
@@ -66,7 +66,8 @@
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-video": "^6.16.1",
-    "react-native-web": "^0.20.0"
+    "react-native-web": "^0.20.0",
+    "expo-file-system": "~18.1.11"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
