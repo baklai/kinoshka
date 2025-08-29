@@ -1,19 +1,24 @@
+import { MovieProps } from '@/types/movie.type';
 import { createContext } from 'react';
 
-type AppContextType = {
-  api?: string;
-  version?: string;
-  datetime?: string;
-  countMovies?: number;
-  defaultGenres?: string[];
-  uniqueGenres?: string[];
+export type CategoryType = {
+  limit: number;
+  title: string;
+  source: string;
+};
+
+export type AppContextType = {
+  name: string;
+  baseUrl: string;
+  categories: CategoryType[];
+  getMovieCards?: (baseUrl: string, source: string) => Promise<MovieProps[]>;
+  getMovieDetails?: (source: string) => Promise<MovieProps | null>;
 };
 
 export const AppContext = createContext<AppContextType>({
-  api: '',
-  version: '',
-  datetime: '',
-  countMovies: 0,
-  defaultGenres: [],
-  uniqueGenres: []
+  name: '',
+  baseUrl: '',
+  categories: [],
+  getMovieCards: async () => [],
+  getMovieDetails: async () => null
 });

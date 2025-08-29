@@ -1,4 +1,3 @@
-import MoviesFlatList from '@/components/MoviesFlatList';
 import NotFoundView from '@/components/NotFoundView';
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
@@ -26,7 +25,8 @@ export default function BookmarksScreen() {
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
       <View style={styles.container}>
         {bookmarks?.length > 0 ? (
-          <MoviesFlatList title="Перелік закладок" filters={{ ids: bookmarks }} />
+          // <MoviesFlatList title="Перелік закладок" filters={{ ids: bookmarks }} />
+          <></>
         ) : (
           <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
         )}

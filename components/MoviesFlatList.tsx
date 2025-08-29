@@ -1,70 +1,53 @@
 import MovieCard from '@/components/MovieCard';
-import NotFoundView from '@/components/NotFoundView';
 import SkeletonView from '@/components/SkeletonView';
 import { AppTheme } from '@/constants/theme.constant';
-import { PAGE_LIMIT } from '@/constants/ui.constant';
-import { useAsyncFetch } from '@/hooks/useAsyncFetch';
+import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MovieFilterProps } from '@/types/filters.type';
 import { MovieProps } from '@/types/movie.type';
-import { MovieSortProps } from '@/types/sorts.type';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
 
 interface MoviesFlatListProps {
+  source: string;
   title?: string;
   limit?: number;
-  sort?: MovieSortProps;
-  filters?: MovieFilterProps;
 }
 
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({ title, limit = PAGE_LIMIT, sort, filters }: MoviesFlatListProps) => {
+const MoviesFlatList = ({ source, title, limit }: MoviesFlatListProps) => {
+  const { baseUrl, getMovieCards } = useAppContext();
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loadedPages, setLoadedPages] = useState(new Set<number>());
-  const { loading, error, fetch } = useAsyncFetch('movies');
 
   const fetchData = useCallback(async () => {
-    if (loading || !hasMore || loadedPages.has(page) || error) return;
-
     try {
-      const response = await fetch('', {
-        params: { page, limit, sort, filters }
-      });
+      if (getMovieCards) {
+        const response = await getMovieCards(baseUrl, source);
 
-      const newData: MovieProps[] = response.docs;
-
-      setData((prev: MovieProps[]) => {
-        const existingIds = new Set(prev.map(item => item.id));
-        const filtered = newData.filter(item => !existingIds.has(item.id));
-        return [...prev, ...filtered];
-      });
-
-      setHasMore(response.hasNextPage);
-
-      if (response.nextPage) {
-        setPage(response.nextPage);
+        setData((prev: MovieProps[]) => {
+          const existingIds = new Set(prev.map(item => item.id));
+          const filtered = response.filter((item: any) => !existingIds.has(item.id));
+          return [...prev, ...filtered];
+        });
       }
-
-      setLoadedPages(prev => new Set(prev).add(response.page));
     } catch (error) {
       console.error(error);
     }
-  }, [page, loading, hasMore, loadedPages, limit, sort, filters]);
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [sort, filters, limit]);
+  }, []);
 
   const handlePressSelectItem = useCallback((item: MovieProps) => {
     router.push({
       pathname: '/details',
-      params: { id: item.id }
+      params: { source: item.source }
     });
   }, []);
 
@@ -84,26 +67,26 @@ const MoviesFlatList = ({ title, limit = PAGE_LIMIT, sort, filters }: MoviesFlat
     []
   );
 
-  const renderEmpty = useCallback(() => {
-    if (loading) {
-      return (
-        <View style={styles.skeletonContainer}>
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <SkeletonView key={idx} />
-          ))}
-        </View>
-      );
-    }
+  // const renderEmpty = useCallback(() => {
+  //   if (loading) {
+  //     return (
+  //       <View style={styles.skeletonContainer}>
+  //         {Array.from({ length: 5 }).map((_, idx) => (
+  //           <SkeletonView key={idx} />
+  //         ))}
+  //       </View>
+  //     );
+  //   }
 
-    return (
-      <NotFoundView
-        icon="folder-open"
-        text="Не вдалося знайти відео"
-        size={64}
-        style={{ height: scaledPixels(259) }}
-      />
-    );
-  }, [loading]);
+  //   return (
+  //     <NotFoundView
+  //       icon="folder-open"
+  //       text="Не вдалося знайти відео"
+  //       size={64}
+  //       style={{ height: scaledPixels(259) }}
+  //     />
+  //   );
+  // }, [loading]);
 
   const Separator = useCallback(() => <View style={{ width: ITEM_SPACING }} />, []);
 
@@ -124,16 +107,18 @@ const MoviesFlatList = ({ title, limit = PAGE_LIMIT, sort, filters }: MoviesFlat
 
       <FlatList
         horizontal
-        data={loading && data.length === 0 ? Array(limit).fill({}) : data}
+        // data={loading && data.length === 0 ? Array(limit).fill({}) : data}
+        data={data}
         keyExtractor={keyExtractor}
-        renderItem={loading && data.length === 0 ? renderSkeletonItem : renderItem}
+        // renderItem={loading && data.length === 0 ? renderSkeletonItem : renderItem}
+        renderItem={renderItem}
         getItemLayout={getItemLayout}
         onEndReached={fetchData}
         onEndReachedThreshold={0.5}
         showsHorizontalScrollIndicator={Platform.OS === 'web'}
         showsVerticalScrollIndicator={Platform.OS === 'web'}
         ItemSeparatorComponent={Separator}
-        ListEmptyComponent={renderEmpty}
+        // ListEmptyComponent={renderEmpty}
         contentContainerStyle={{ flexGrow: 1 }}
         initialNumToRender={5}
         maxToRenderPerBatch={5}
@@ -152,7 +137,7 @@ const styles = StyleSheet.create({
     paddingVertical: scaledPixels(8)
   },
   headerText: {
-    color: AppTheme.colors.text,
+    color: AppTheme.colors.subtext,
     fontWeight: 'bold',
     letterSpacing: scaledPixels(1),
     fontSize: scaledPixels(22)

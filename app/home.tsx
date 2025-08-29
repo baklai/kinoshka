@@ -13,14 +13,14 @@ export default function IndexScreen() {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
-        {appContext?.defaultGenres &&
-          appContext.defaultGenres.map((item, idx) => {
+        {appContext?.baseUrl &&
+          appContext.categories.map(({ source, title, limit }, idx) => {
             return (
               <MoviesFlatList
                 key={`movie-flat-list-${idx}`}
-                title={item}
-                sort={{ year: 'desc' }}
-                filters={{ genres: [item] }}
+                title={title}
+                source={source}
+                limit={limit}
               />
             );
           })}

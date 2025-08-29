@@ -1,4 +1,3 @@
-import MoviesFlatList from '@/components/MoviesFlatList';
 import NotFoundView from '@/components/NotFoundView';
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
@@ -26,7 +25,8 @@ export default function HistoryScreen() {
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
       <View style={styles.container}>
         {history?.length > 0 ? (
-          <MoviesFlatList title="Історія перегляду" filters={{ ids: history }} />
+          // <MoviesFlatList title="Історія перегляду" filters={{ ids: history }} />
+          <></>
         ) : (
           <NotFoundView icon="folder-open" text="Історія перегляду порожня" />
         )}

@@ -1,5 +1,6 @@
 export interface MovieProps {
   id: string;
+  source: string;
   title: string;
   originalTitle?: string;
   description?: string;

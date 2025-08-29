@@ -1,12 +1,13 @@
 import AnimatedLoader from '@/components/AnimatedLoader';
 import HeaderContent from '@/components/HeaderContent';
 import NotFoundView from '@/components/NotFoundView';
+import { database } from '@/constants/database.constant';
 import { AppTheme } from '@/constants/theme.constant';
-import { AppContext } from '@/context';
-import { useAsyncFetch } from '@/hooks/useAsyncFetch';
+import { AppContext, AppContextType } from '@/context';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
@@ -32,8 +33,8 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
-  const [apiInfo, setApiInfo] = useState<Record<string, any>>({});
-  const { loading, error, fetch } = useAsyncFetch();
+  const [datasource, setDatasource] = useState<AppContextType | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const { width, height } = useWindowDimensions();
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
@@ -43,10 +44,20 @@ function RootLayout() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiInfo = await fetch();
-        setApiInfo(apiInfo);
+        const source = await SecureStore.getItemAsync('source');
+        const currentSource = source
+          ? database.sources.find(({ name }) => name === source)
+          : database.sources[database.sources.length - 1];
+
+        console.log('currentSource', currentSource);
+
+        if (currentSource) {
+          setDatasource(currentSource);
+        }
       } catch (err) {
         console.error('API connection error:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -65,11 +76,11 @@ function RootLayout() {
 
       {loading ? (
         <AnimatedLoader />
-      ) : error ? (
+      ) : !datasource ? (
         <NotFoundView icon="web-off" text="Не вдалося підключитися" />
       ) : (
         <>
-          <AppContext.Provider value={apiInfo}>
+          <AppContext.Provider value={datasource}>
             <Stack
               initialRouteName="home"
               screenOptions={{

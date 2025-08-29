@@ -5,7 +5,7 @@ import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAsyncFetch } from '@/hooks/useAsyncFetch';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MovieProps } from '@/types/movie.type';
+import { fetchMovieDetails } from '@/utils';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -24,10 +24,10 @@ import {
 const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { url } = useLocalSearchParams<{ url: string }>();
   const { width, height } = useWindowDimensions();
   const { loading, error, fetch } = useAsyncFetch('movies');
-  const [movie, setMovie] = useState<MovieProps | null>(null);
+  const [movie, setMovie] = useState<any | null>(null);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
@@ -35,10 +35,10 @@ export default function DetailsScreen() {
   }, [width, height]);
 
   const toggleBookmark = async () => {
-    const isBookmarked = bookmarks.includes(id);
+    const isBookmarked = bookmarks.includes(url);
     const updatedBookmarks = isBookmarked
-      ? bookmarks.filter(bookmark => bookmark !== id)
-      : [...bookmarks, id];
+      ? bookmarks.filter(bookmark => bookmark !== url)
+      : [...bookmarks, url];
 
     setBookmarks(updatedBookmarks);
     await SecureStore.setItemAsync('bookmarks', JSON.stringify(updatedBookmarks));
@@ -50,7 +50,7 @@ export default function DetailsScreen() {
     if (supported) {
       await Linking.openURL(vlcUrl);
       const history = await SecureStore.getItemAsync('history');
-      const updatedHistory = history ? new Set([...JSON.parse(history), id]) : [id];
+      const updatedHistory = history ? new Set([...JSON.parse(history), url]) : [url];
       await SecureStore.setItemAsync('history', JSON.stringify(updatedHistory));
     } else {
       ToastAndroid.show('VLC не встановлено або схема не підтримується', ToastAndroid.SHORT);
@@ -60,9 +60,12 @@ export default function DetailsScreen() {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        if (id) {
-          const response = await fetch(id, {});
+        if (url) {
+          const response = await fetchMovieDetails(url);
 
+          console.log('response', response);
+
+          setMovie(response);
           const bookmarks = await SecureStore.getItemAsync('bookmarks');
 
           if (bookmarks) {
@@ -78,7 +81,7 @@ export default function DetailsScreen() {
     };
 
     fetchMovie();
-  }, [id]);
+  }, [url]);
 
   return (
     <>
@@ -141,7 +144,7 @@ export default function DetailsScreen() {
                 <View style={styles.playButtonContent}>
                   <StyledIcon
                     icon="bookmark"
-                    color={bookmarks.includes(id) ? 'green' : AppTheme.colors.text}
+                    color={bookmarks.includes(url) ? 'green' : AppTheme.colors.text}
                   />
                 </View>
               </Pressable>
