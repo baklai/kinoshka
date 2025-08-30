@@ -13,12 +13,12 @@ interface MoviesFlatListProps {
   source: string;
   title?: string;
   limit?: number;
+  focused?: boolean;
 }
-
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({ source, title, limit = 10 }: MoviesFlatListProps) => {
+const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFlatListProps) => {
   const { baseUrl, getMovieCards } = useAppContext();
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -109,7 +109,9 @@ const MoviesFlatList = ({ source, title, limit = 10 }: MoviesFlatListProps) => {
     <View style={styles.container}>
       {title && (
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>{title}</Text>
+          <Text style={[styles.headerText, focused && { color: AppTheme.colors.text }]}>
+            {title}
+          </Text>
         </View>
       )}
 
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.subtext,
     fontWeight: 'bold',
     letterSpacing: scaledPixels(1),
-    fontSize: scaledPixels(22)
+    fontSize: scaledPixels(20)
   },
   skeletonContainer: {
     flexDirection: 'row',

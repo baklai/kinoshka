@@ -42,6 +42,9 @@ export const AppContextValue = {
   ],
   getMovieCards: async (baseUrl: string, source: string, page?: number): Promise<MovieProps[]> => {
     try {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`${source}/page/${page}/`);
+      }
       const response = page ? await fetch(`${source}/page/${page}/`) : await fetch(source);
       const html = await response.text();
       const { document } = parseHTML(html);
