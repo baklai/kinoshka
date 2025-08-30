@@ -1,4 +1,3 @@
-import MoviesFlatList from '@/components/MoviesFlatList';
 import SpeechButton from '@/components/SpeechButton';
 import { StyledIcon } from '@/components/StyledIcon';
 import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
@@ -227,7 +226,7 @@ export default function SearchScreen() {
       </View>
 
       <View style={{ flexDirection: 'row', marginVertical: scaledPixels(10) }}>
-        {query.length >= 3 && <MoviesFlatList filters={{ title: query }} />}
+        {/* {query.length >= 3 && <MoviesFlatList filters={{ title: query }} />} */}
       </View>
     </View>
   );

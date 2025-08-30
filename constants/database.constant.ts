@@ -1,4 +1,5 @@
-import { MovieProps } from '@/types/movie.type';
+import { EpisodeProps, MovieProps } from '@/types/movie.type';
+import { validUrl } from '@/utils';
 import { parseHTML } from 'linkedom';
 
 export const database = {
@@ -90,80 +91,72 @@ export const database = {
           const html = await response.text();
           const { document } = parseHTML(html);
 
-          const getText = (selector: string): string =>
-            document.querySelector(selector)?.textContent?.trim() || '';
+          const block = document.querySelector('.film-info');
+          if (!block) return null;
 
-          const getAttrText = (selector: string, attr: string): string =>
-            (document.querySelector(selector) as HTMLElement)?.getAttribute(attr)?.trim() || '';
+          const title = document.querySelector('span.solototle')?.textContent.trim() || null;
+          const originalTitle =
+            document.querySelector('span.origintitle')?.textContent.trim() || null;
+          const description =
+            document.querySelector('[itemprop="description"]')?.textContent.trim() || null;
 
-          const findFiDesc = (label: string): string => {
-            const items = Array.from(document.querySelectorAll('.fi-item'));
-            for (const item of items) {
-              const h2 = item.querySelector('h2');
-              if (h2 && h2.textContent?.includes(label)) {
-                return item.querySelector('.fi-desc')?.textContent?.trim() || '';
-              }
-            }
-            return '';
-          };
+          const poster = validUrl(
+            (document.querySelector('.film-poster a') as HTMLAnchorElement)?.getAttribute('href'),
+            baseUrl
+          );
 
-          const findFiArray = (label: string): string[] => {
-            const items = Array.from(document.querySelectorAll('.fi-item'));
-            for (const item of items) {
-              const h2 = item.querySelector('h2');
-              if (h2 && h2.textContent?.includes(label)) {
-                return Array.from(item.querySelectorAll('.fi-desc a')).map(
-                  el => el.textContent?.trim() || ''
-                );
-              }
-            }
-            return [];
-          };
-
-          const movieWrap = document.querySelector('div#dle-content');
-          if (!movieWrap) {
-            console.error('Элемент div#dle-content не найден');
-            return null;
-          }
-
-          const title = getText('span.solototle');
-          const originalTitle = getText('span.origintitle');
-          const description = getText('div.full-text.clearfix');
-
-          const posterEl = movieWrap.querySelector(
-            'div.film-poster img'
-          ) as HTMLImageElement | null;
-          const poster = posterEl ? new URL(posterEl.src, source).href : '';
-
-          const quality = findFiDesc('Якість');
-          const duration = findFiDesc('Тривалість');
-          const age = findFiDesc('Вік. рейтинг');
-          const year = findFiDesc('Рік виходу');
-
-          let imdb = '';
-          let votes = '';
-          const imdbText = findFiDesc('/');
-          if (imdbText.includes('/')) {
-            [imdb, votes] = imdbText.split('/').map(s => s.trim());
-          }
-
-          const likes = getText('span[data-likes-id]');
-          const dislikes = getText('span[data-dislikes-id]');
-          const countries = findFiArray('Країна');
-          const genres = findFiArray('Жанр');
-          const directors = findFiArray('Режисер');
-          const actors = findFiArray('Актори');
-
-          const iframeSrc = getAttrText('iframe', 'src');
-
-          const episodes: { title: string; source: string | null }[] = [];
+          const quality =
+            block.querySelector('.film-poster .full-quality')?.textContent.trim() || null;
+          const likes = block.querySelector('[data-likes-id]')?.textContent.trim() || null;
+          const dislikes = block.querySelector('[data-dislikes-id]')?.textContent.trim() || null;
+          const year =
+            block.querySelector('.film-info .fi-item:nth-child(2) .fi-desc')?.textContent.trim() ||
+            null;
+          const age =
+            block.querySelector('.film-info .fi-item:nth-child(3) .fi-desc')?.textContent.trim() ||
+            null;
+          const countries = Array.from(
+            block.querySelectorAll('.fi-item:nth-child(4) .fi-desc a')
+          ).map(a => a.textContent.trim());
+          const genres = Array.from(block.querySelectorAll("[itemprop='genre'] a")).map(a =>
+            a.textContent.trim()
+          );
+          const directors = Array.from(block.querySelectorAll('.fi-item .fi-label h2'))
+            .filter(el => el.textContent.includes('Режисер'))
+            .flatMap(el =>
+              Array.from(el?.parentElement?.nextElementSibling?.querySelectorAll('a') ?? []).map(
+                a => a.textContent.trim()
+              )
+            );
+          const actors = Array.from(block.querySelectorAll('.fi-item .fi-label h2'))
+            .filter(el => el.textContent.includes('Актори'))
+            .flatMap(el =>
+              Array.from(el?.parentElement?.nextElementSibling?.querySelectorAll('a') ?? []).map(
+                a => a.textContent.trim()
+              )
+            );
+          const duration =
+            Array.from(block.querySelectorAll('.fi-item .fi-label h2'))
+              .filter(el => el.textContent.includes('Тривалість'))
+              .map(el => el.parentElement?.nextElementSibling?.textContent.trim())[0] || null;
+          const imdb =
+            Array.from(block.querySelectorAll(".fi-item img[alt*='imdb']")).map(el =>
+              el?.parentElement?.nextElementSibling?.textContent.trim()
+            )[0] || null;
+          const iframeSrc = (document.querySelector('iframe') as HTMLElement)
+            ?.getAttribute('src')
+            ?.trim();
+          const episodes: EpisodeProps[] = [];
 
           if (iframeSrc) {
             const iframeResponse = await fetch(iframeSrc);
             const iframeHtml = await iframeResponse.text();
             const fileMatch = iframeHtml.match(/file\s*:\s*"([^"]+)"/);
             const source = fileMatch ? fileMatch[1] : null;
-            episodes.push({ title, source });
+
+            if (title && source) {
+              episodes.push({ title, source });
+            }
           }
 
           return {

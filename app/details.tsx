@@ -5,13 +5,14 @@ import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { MovieProps } from '@/types/movie.type';
+import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
+import * as Sharing from 'expo-sharing';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -49,16 +50,47 @@ export default function DetailsScreen() {
     await AsyncStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
   };
 
-  const openInVLC = async (url: string) => {
-    const vlcUrl = `vlc://${url}`;
-    const supported = await Linking.canOpenURL(vlcUrl);
-    if (supported) {
-      await Linking.openURL(vlcUrl);
-      const history = await AsyncStorage.getItem('history');
-      const updatedHistory = history ? new Set([...JSON.parse(history), url]) : [url];
-      await AsyncStorage.setItem('history', JSON.stringify(updatedHistory));
-    } else {
-      ToastAndroid.show('VLC не встановлено або схема не підтримується', ToastAndroid.SHORT);
+  const openPlaylistInVLC = async (videos: EpisodeProps[], playlistName: string) => {
+    try {
+      let m3uContent = '#EXTM3U\n';
+      for (const video of videos) {
+        m3uContent += `#EXTINF:-1,${video.title}\n${video.source}\n`;
+      }
+
+      const cacheDir = FileSystem.cacheDirectory!;
+      const files = await FileSystem.readDirectoryAsync(cacheDir);
+      for (const file of files) {
+        if (file.endsWith('.m3u8')) {
+          await FileSystem.deleteAsync(`${cacheDir}${file}`, { idempotent: true });
+        }
+      }
+
+      const fileUri = `${cacheDir}${playlistName.replace(/\s+/g, '_')}.m3u8`;
+      await FileSystem.writeAsStringAsync(fileUri, m3uContent, {
+        encoding: FileSystem.EncodingType.UTF8
+      });
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, { mimeType: 'application/x-mpegURL' });
+      } else {
+        ToastAndroid.show('Sharing не підтримується на цьому пристрої', ToastAndroid.SHORT);
+      }
+
+      const historyRaw = await AsyncStorage.getItem('history');
+      const history: string[] = historyRaw ? JSON.parse(historyRaw) : [];
+      let updated = false;
+      for (const video of videos) {
+        if (!history.includes(video.source)) {
+          history.push(video.source);
+          updated = true;
+        }
+      }
+      if (updated) {
+        await AsyncStorage.setItem('history', JSON.stringify(history));
+      }
+    } catch (e) {
+      console.error(e);
+      ToastAndroid.show('Не вдалося відкрити плейлист', ToastAndroid.SHORT);
     }
   };
 
@@ -94,7 +126,10 @@ export default function DetailsScreen() {
       ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (
-        <View style={[styles.container, orientation === 'portrait' && { flexDirection: 'column' }]}>
+        <View
+          style={[styles.container, orientation === 'portrait' && { flexDirection: 'column' }]}
+          hasTVPreferredFocus
+        >
           <View
             style={[
               styles.asideContainer,
@@ -113,7 +148,9 @@ export default function DetailsScreen() {
                 <Pressable
                   focusable
                   hasTVPreferredFocus
-                  onPress={() => openInVLC(movie?.episodes?.[0]?.source || '')}
+                  onPress={() =>
+                    openPlaylistInVLC(movie?.episodes, movie.originalTitle || movie.title)
+                  }
                   style={({ focused, pressed }) => [
                     styles.playButton,
                     { width: '80%', justifyContent: 'center' },
@@ -155,20 +192,20 @@ export default function DetailsScreen() {
             </View>
           </View>
 
-          <ScrollView
-            style={{ flex: 1 }}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-          >
-            <View style={styles.textContainer}>
-              {movie?.title && movie?.title?.length > 0 && (
-                <Text style={styles.headerTitle}>{movie.title}</Text>
-              )}
+          <View style={styles.textContainer}>
+            {movie?.title && movie?.title?.length > 0 && (
+              <Text style={styles.headerTitle}>{movie.title}</Text>
+            )}
 
-              {movie?.originalTitle && movie?.originalTitle?.length > 0 && (
-                <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
-              )}
+            {movie?.originalTitle && movie?.originalTitle?.length > 0 && (
+              <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
+            )}
 
+            <ScrollView
+              style={{ flex: 1 }}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+            >
               {movie?.imdb && movie?.imdb?.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
@@ -222,8 +259,8 @@ export default function DetailsScreen() {
               {movie?.description && movie?.description?.length > 0 && (
                 <Text style={styles.headerDescription}>{movie.description}</Text>
               )}
-            </View>
-          </ScrollView>
+            </ScrollView>
+          </View>
         </View>
       )}
     </>

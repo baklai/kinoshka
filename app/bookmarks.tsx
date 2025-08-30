@@ -2,7 +2,7 @@ import NotFoundView from '@/components/NotFoundView';
 import { MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TVFocusGuideView, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export default function BookmarksScreen() {
   const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
@@ -23,16 +23,15 @@ export default function BookmarksScreen() {
   }, []);
 
   return (
-    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
-      <View style={styles.container}>
-        {bookmarks?.length > 0 ? (
-          // <MoviesFlatList title="Перелік закладок" filters={{ ids: bookmarks }} />
-          <></>
-        ) : (
-          <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
-        )}
-      </View>
-    </TVFocusGuideView>
+    <View style={styles.container} hasTVPreferredFocus>
+      {bookmarks?.length > 0 ? (
+        // <MoviesFlatList title="Перелік закладок" filters={{ ids: bookmarks }} />
+
+        <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
+      ) : (
+        <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
+      )}
+    </View>
   );
 }
 

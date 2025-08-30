@@ -27,7 +27,7 @@ export default function HistoryScreen() {
       <View style={styles.container}>
         {history?.length > 0 ? (
           // <MoviesFlatList title="Історія перегляду" filters={{ ids: history }} />
-          <></>
+          <NotFoundView icon="folder-open" text="Історія перегляду порожня" />
         ) : (
           <NotFoundView icon="folder-open" text="Історія перегляду порожня" />
         )}

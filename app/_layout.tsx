@@ -71,8 +71,6 @@ function RootLayout() {
       ]}
       edges={orientation === 'portrait' ? ['top', 'bottom'] : []}
     >
-      <HeaderContent style={styles.header} />
-
       {loading ? (
         <AnimatedLoader />
       ) : !datasource ? (
@@ -82,7 +80,8 @@ function RootLayout() {
           <AppContext.Provider value={datasource}>
             <Stack
               screenOptions={{
-                headerShown: false,
+                header: () => <HeaderContent style={styles.header} />,
+                headerStyle: { backgroundColor: AppTheme.colors.background },
                 gestureEnabled: false,
                 headerBackVisible: false,
                 animation: 'fade_from_bottom',

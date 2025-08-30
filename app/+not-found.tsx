@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
 
   console.log('pathname', pathname);
   return (
-    <View style={styles.container}>
+    <View style={styles.container} hasTVPreferredFocus>
       <Text style={styles.text}>Цього екрана не існує.</Text>
       <Link href="/" style={styles.link}>
         <Text>Перейдіть на головний екран!</Text>

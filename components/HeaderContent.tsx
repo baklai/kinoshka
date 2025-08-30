@@ -3,14 +3,15 @@ import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router, usePathname } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import React, { ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, TVFocusGuideView, View, ViewProps } from 'react-native';
+import { Pressable, StyleSheet, Text, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
 
 const HeaderContent = (props: HeaderContentProps) => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const navTabs: { title: string; route: string }[] = [
     { title: 'Пошук', route: '/search' },
@@ -25,69 +26,49 @@ const HeaderContent = (props: HeaderContentProps) => {
   ];
 
   return (
-    <TVFocusGuideView trapFocusLeft trapFocusRight trapFocusUp>
-      <View style={[styles.container, props.style]}>
-        <View style={styles.section}>
-          {navTabs.map(({ title, route }, idx) => {
-            const isCurrentRoute = pathname === route;
-
-            return (
-              <Pressable
-                key={idx}
-                focusable
-                hasTVPreferredFocus={isCurrentRoute}
-                // onFocus={() => !isCurrentRoute && Platform.isTV && router.push(route)}
-                onPress={() => router.push(route)}
-                style={({ pressed }) => [pressed && { opacity: 0.7 }]}
-              >
-                {({ focused }) => (
-                  <Text
-                    style={[
-                      styles.label,
-                      focused && styles.underline,
-                      isCurrentRoute && styles.focused,
-                      isCurrentRoute &&
-                        !focused && [
-                          styles.underline,
-                          { color: AppTheme.colors.text, borderColor: AppTheme.colors.text }
-                        ],
-                      isCurrentRoute && { fontSize: scaledPixels(20) }
-                    ]}
-                  >
-                    {title.toUpperCase()}
-                  </Text>
-                )}
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <View style={styles.section}>
-          {navBtns.map(({ icon, route }, idx) => {
-            return (
-              <Pressable
-                key={idx}
-                focusable
-                onPress={() => router.push(route)}
-                style={({ focused, pressed }) => [
-                  styles.pressableIcon,
-                  focused && { backgroundColor: AppTheme.colors.surface },
-                  pressed && { opacity: 0.7 }
-                ]}
-              >
-                {({ focused }) => (
-                  <StyledIcon
-                    size="large"
-                    color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
-                    icon={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
-                  />
-                )}
-              </Pressable>
-            );
-          })}
-        </View>
+    <View style={[styles.container, props.style]} hasTVPreferredFocus={false}>
+      <View style={styles.section}>
+        {navTabs.map(({ title, route }, idx) => {
+          return (
+            <Pressable
+              key={idx}
+              onPress={() => router.push(route)}
+              style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+            >
+              {({ focused }) => (
+                <Text style={[styles.label, focused && styles.underlineFocused]}>
+                  {title.toUpperCase()}
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
       </View>
-    </TVFocusGuideView>
+
+      <View style={styles.section}>
+        {navBtns.map(({ icon, route }, idx) => {
+          return (
+            <Pressable
+              key={idx}
+              onPress={() => router.push(route)}
+              style={({ focused, pressed }) => [
+                styles.pressableIcon,
+                focused && { backgroundColor: AppTheme.colors.surface },
+                pressed && { opacity: 0.7 }
+              ]}
+            >
+              {({ focused }) => (
+                <StyledIcon
+                  size="large"
+                  color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                  icon={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
+                />
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
   );
 };
 
@@ -121,9 +102,11 @@ const styles = StyleSheet.create({
     paddingVertical: scaledPixels(6)
   },
 
-  underline: {
-    borderColor: AppTheme.colors.subtext,
+  underlineFocused: {
+    color: AppTheme.colors.primary,
+    borderColor: AppTheme.colors.primary,
     borderBottomWidth: scaledPixels(3),
+    fontSize: scaledPixels(20),
     alignSelf: 'flex-start'
   },
 
