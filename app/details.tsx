@@ -6,6 +6,7 @@ import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
+import { sleep } from '@/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
@@ -39,6 +40,7 @@ export default function DetailsScreen() {
 
   const openPlaylist = async (videos: EpisodeProps[], playlistName: string) => {
     try {
+      setLoading(true);
       let m3uContent = '#EXTM3U\n';
       for (const video of videos) {
         m3uContent += `#EXTINF:-1,${video.title}\n${video.source}\n`;
@@ -78,6 +80,9 @@ export default function DetailsScreen() {
     } catch (error) {
       console.error('Error opening:', error);
       ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
+    } finally {
+      await sleep(5000);
+      setLoading(false);
     }
   };
 
