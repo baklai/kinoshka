@@ -31,7 +31,7 @@ const MoviesFlatList = ({ source, title, limit = 10 }: MoviesFlatListProps) => {
 
     try {
       setLoading(true);
-      const response = await getMovieCards(baseUrl, `${source}/page/${page}/`);
+      const response = await getMovieCards(baseUrl, source, page);
 
       if (response.length < limit) {
         setHasMore(false);

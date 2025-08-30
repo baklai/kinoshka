@@ -14,7 +14,7 @@ export type AppContextType = {
   baseUrl: string;
   searchUrl: string;
   categories: CategoryType[];
-  getMovieCards: (baseUrl: string, source: string) => Promise<MovieProps[]>;
+  getMovieCards: (baseUrl: string, source: string, page?: number) => Promise<MovieProps[]>;
   searchMovieCards: (baseUrl: string, searchUrl: string, search: string) => Promise<MovieProps[]>;
   getMovieDetails: (baseUrl: string, source: string) => Promise<MovieProps | null>;
 };
@@ -40,9 +40,9 @@ export const AppContextValue = {
       source: 'https://uakino.best/cartoon/best'
     }
   ],
-  getMovieCards: async (baseUrl: string, source: string): Promise<MovieProps[]> => {
+  getMovieCards: async (baseUrl: string, source: string, page?: number): Promise<MovieProps[]> => {
     try {
-      const response = await fetch(source);
+      const response = page ? await fetch(`${source}/page/${page}/`) : await fetch(source);
       const html = await response.text();
       const { document } = parseHTML(html);
       const items = document.querySelectorAll('div.movie-item.short-item');
