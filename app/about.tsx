@@ -39,9 +39,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: scaledPixels(18),
-    fontWeight: 600,
-    color: AppTheme.colors.text,
-    maxWidth: scaledPixels(500),
+    color: AppTheme.colors.subtext,
+    maxWidth: scaledPixels(560),
     textAlign: 'center'
   }
 });
