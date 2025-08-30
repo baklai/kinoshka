@@ -1,6 +1,6 @@
-import AnimatedLoader from '@/components/AnimatedLoader';
 import NotFoundView from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
+import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -109,7 +109,7 @@ export default function DetailsScreen() {
   return (
     <>
       {loading ? (
-        <AnimatedLoader />
+        <StyledLoader />
       ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (

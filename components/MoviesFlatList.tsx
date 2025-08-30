@@ -5,8 +5,8 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import NotFoundView from './NotFoundView';
 
 interface MoviesFlatListProps {
@@ -18,7 +18,7 @@ interface MoviesFlatListProps {
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(24);
 
-const MoviesFlatList = ({ source, title, limit }: MoviesFlatListProps) => {
+const MoviesFlatList = ({ source, title, limit = 10 }: MoviesFlatListProps) => {
   const { baseUrl, getMovieCards } = useAppContext();
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -27,25 +27,30 @@ const MoviesFlatList = ({ source, title, limit }: MoviesFlatListProps) => {
   const [loadedPages, setLoadedPages] = useState(new Set<number>());
 
   const fetchData = useCallback(async () => {
+    if (loading || !hasMore || loadedPages.has(page)) return;
+
     try {
       setLoading(true);
-      const response = await getMovieCards(baseUrl, source);
+      const response = await getMovieCards(baseUrl, `${source}/page/${page}/`);
+
+      if (response.length < limit) {
+        setHasMore(false);
+      }
 
       setData((prev: MovieProps[]) => {
         const existingIds = new Set(prev.map((item: MovieProps) => item.source));
         const filtered = response.filter((item: MovieProps) => !existingIds.has(item.source));
         return [...prev, ...filtered];
       });
+
+      setLoadedPages(prev => new Set(prev).add(page));
+      setPage(prev => prev + 1);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  }, [page, loading, hasMore, loadedPages]);
 
   const handlePressSelectItem = useCallback((item: MovieProps) => {
     router.push({
@@ -116,8 +121,8 @@ const MoviesFlatList = ({ source, title, limit }: MoviesFlatListProps) => {
         getItemLayout={getItemLayout}
         onEndReached={fetchData}
         onEndReachedThreshold={0.5}
-        showsHorizontalScrollIndicator={Platform.OS === 'web'}
-        showsVerticalScrollIndicator={Platform.OS === 'web'}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={{ flexGrow: 1 }}

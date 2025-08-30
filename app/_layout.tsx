@@ -1,11 +1,9 @@
-import AnimatedLoader from '@/components/AnimatedLoader';
 import HeaderContent from '@/components/HeaderContent';
-import NotFoundView from '@/components/NotFoundView';
-import { database } from '@/constants/database.constant';
+import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
-import { AppContext, AppContextType } from '@/context';
+import { AppContext, AppContextValue } from '@/context';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sleep } from '@/utils';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -33,7 +31,6 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
-  const [datasource, setDatasource] = useState<AppContextType | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { width, height } = useWindowDimensions();
 
@@ -45,16 +42,9 @@ function RootLayout() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const source = await AsyncStorage.getItem('source');
-        const currentSource = source
-          ? database.sources.find(({ name }) => name === source)
-          : database.sources[database.sources.length - 1];
-
-        if (currentSource) {
-          setDatasource(currentSource);
-        }
+        await sleep(3000);
       } catch (err) {
-        console.error('Context error:', err);
+        console.error('Application error:', err);
       } finally {
         setLoading(false);
       }
@@ -72,12 +62,10 @@ function RootLayout() {
       edges={orientation === 'portrait' ? ['top', 'bottom'] : []}
     >
       {loading ? (
-        <AnimatedLoader />
-      ) : !datasource ? (
-        <NotFoundView icon="web-off" text="Не вдалося підключитися" />
+        <StyledLoader />
       ) : (
         <>
-          <AppContext.Provider value={datasource}>
+          <AppContext.Provider value={AppContextValue}>
             <Stack
               screenOptions={{
                 header: () => <HeaderContent style={styles.header} />,

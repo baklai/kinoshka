@@ -5,7 +5,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 
 const animation = [0.2, 0.3, 0.4, 0.1, 0.2, 0.3, 0, 0.1, 0.2];
 
-const AnimatedDotsLoader = () => {
+export const StyledLoader = () => {
   const animatedValues = useRef(animation.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
@@ -69,5 +69,3 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.primary
   }
 });
-
-export default AnimatedDotsLoader;
