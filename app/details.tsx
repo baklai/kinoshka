@@ -11,31 +11,18 @@ import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  useWindowDimensions,
-  View
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
-  const { width, height } = useWindowDimensions();
   const { baseUrl, getMovieDetails } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
   const [movie, setMovie] = useState<any | null>(null);
   const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const orientation = useMemo<'portrait' | 'landscape'>(() => {
-    return height >= width ? 'portrait' : 'landscape';
-  }, [width, height]);
 
   const toggleBookmark = async () => {
     const isBookmarkCkech = bookmarks.some((bookmark: MovieProps) => bookmark.source === source);
@@ -50,7 +37,7 @@ export default function DetailsScreen() {
     await AsyncStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
   };
 
-  const openPlaylistInVLC = async (videos: EpisodeProps[], playlistName: string) => {
+  const openPlaylist = async (videos: EpisodeProps[], playlistName: string) => {
     try {
       let m3uContent = '#EXTM3U\n';
       for (const video of videos) {
@@ -126,16 +113,8 @@ export default function DetailsScreen() {
       ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (
-        <View
-          style={[styles.container, orientation === 'portrait' && { flexDirection: 'column' }]}
-          hasTVPreferredFocus
-        >
-          <View
-            style={[
-              styles.asideContainer,
-              { width: orientation === 'portrait' ? width : scaledPixels(400) }
-            ]}
-          >
+        <View style={styles.container} hasTVPreferredFocus>
+          <View style={styles.asideContainer}>
             <Image
               style={styles.headerImage}
               source={movie?.poster}
@@ -143,63 +122,58 @@ export default function DetailsScreen() {
               contentFit="cover"
               transition={1000}
             />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-              {Array.isArray(movie?.episodes) && movie.episodes.length > 0 && (
-                <Pressable
-                  focusable
-                  hasTVPreferredFocus
-                  onPress={() =>
-                    openPlaylistInVLC(movie?.episodes, movie.originalTitle || movie.title)
-                  }
-                  style={({ focused, pressed }) => [
-                    styles.playButton,
-                    { width: '80%', justifyContent: 'center' },
-                    focused && { backgroundColor: AppTheme.colors.primary },
-                    pressed && { opacity: 0.7 }
-                  ]}
-                >
-                  <View style={styles.playButtonContent}>
-                    <StyledIcon icon="play-circle-outline" />
-                    <Text style={styles.playButtonText}>Дивитись відео</Text>
-                  </View>
-                </Pressable>
-              )}
+
+            {Array.isArray(movie?.episodes) && movie.episodes.length > 0 && (
+              <Pressable
+                focusable
+                hasTVPreferredFocus
+                onPress={() => openPlaylist(movie?.episodes, movie.originalTitle || movie.title)}
+                style={({ focused, pressed }) => [
+                  styles.playButton,
+                  focused && { backgroundColor: AppTheme.colors.primary },
+                  pressed && { opacity: 0.7 }
+                ]}
+              >
+                <StyledIcon icon="play-circle-outline" />
+                <Text style={styles.playButtonText}>Дивитись відео</Text>
+              </Pressable>
+            )}
+          </View>
+
+          <View style={styles.textContainer}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+              <View style={{ width: scaledPixels(40) }} />
+
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                {movie?.title?.length > 0 && <Text style={styles.headerTitle}>{movie.title}</Text>}
+                {movie?.originalTitle?.length > 0 && (
+                  <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
+                )}
+              </View>
 
               <Pressable
                 focusable
                 onPress={toggleBookmark}
                 style={({ focused, pressed }) => [
                   {
-                    backgroundColor: AppTheme.colors.muted,
-                    borderRadius: scaledPixels(6),
-                    paddingHorizontal: scaledPixels(12),
+                    aspectRatio: 1,
+                    width: scaledPixels(48),
+                    height: scaledPixels(48),
+                    borderRadius: '50%',
+                    alignItems: 'center',
                     justifyContent: 'center'
                   },
-
-                  focused && {
-                    backgroundColor: AppTheme.colors.primary
-                  },
+                  focused && { backgroundColor: AppTheme.colors.muted },
                   pressed && { opacity: 0.7 }
                 ]}
               >
-                <View style={styles.playButtonContent}>
-                  <StyledIcon
-                    icon="bookmark"
-                    color={isBookmarked ? 'green' : AppTheme.colors.text}
-                  />
-                </View>
+                <StyledIcon
+                  icon="bookmark"
+                  size="large"
+                  color={isBookmarked ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                />
               </Pressable>
             </View>
-          </View>
-
-          <View style={styles.textContainer}>
-            {movie?.title && movie?.title?.length > 0 && (
-              <Text style={styles.headerTitle}>{movie.title}</Text>
-            )}
-
-            {movie?.originalTitle && movie?.originalTitle?.length > 0 && (
-              <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
-            )}
 
             <ScrollView
               style={{ flex: 1 }}
@@ -274,9 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   asideContainer: {
-    alignItems: 'center',
-    gap: scaledPixels(15),
-    maxWidth: scaledPixels(181 * 2)
+    justifyContent: 'space-around'
   },
   textContainer: {
     flexDirection: 'column',
@@ -309,8 +281,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap'
   },
   headerImage: {
-    width: '100%',
-    height: '80%',
+    height: '85%',
+    aspectRatio: 2 / 3,
     borderRadius: scaledPixels(8)
   },
   headerButtonContainer: {
@@ -318,11 +290,11 @@ const styles = StyleSheet.create({
     marginVertical: scaledPixels(12)
   },
   playButton: {
+    height: '8%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: AppTheme.colors.muted,
-    paddingHorizontal: scaledPixels(24),
-    paddingVertical: scaledPixels(8),
     borderRadius: scaledPixels(6)
   },
   playButtonContent: {
