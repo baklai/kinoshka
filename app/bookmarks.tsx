@@ -14,8 +14,8 @@ export default function BookmarksScreen() {
         if (data) {
           setBookmarks([...JSON.parse(data)]);
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error('Bookmarks error:', error);
       }
     };
 

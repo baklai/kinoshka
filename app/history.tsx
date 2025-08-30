@@ -14,8 +14,8 @@ export default function HistoryScreen() {
         if (data) {
           setHistory([...JSON.parse(data)]);
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error('History error:', error);
       }
     };
 

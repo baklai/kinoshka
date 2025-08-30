@@ -46,7 +46,7 @@ const MoviesFlatList = ({ source, title, limit = 10 }: MoviesFlatListProps) => {
       setLoadedPages(prev => new Set(prev).add(page));
       setPage(prev => prev + 1);
     } catch (error) {
-      console.error(error);
+      console.error('Fetch error:', error);
     } finally {
       setLoading(false);
     }

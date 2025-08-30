@@ -9,8 +9,8 @@ import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
+import * as IntentLauncher from 'expo-intent-launcher';
 import { useLocalSearchParams } from 'expo-router';
-import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
@@ -45,23 +45,23 @@ export default function DetailsScreen() {
       }
 
       const cacheDir = FileSystem.cacheDirectory!;
-      const files = await FileSystem.readDirectoryAsync(cacheDir);
-      for (const file of files) {
-        if (file.endsWith('.m3u8')) {
-          await FileSystem.deleteAsync(`${cacheDir}${file}`, { idempotent: true });
-        }
-      }
-
-      const fileUri = `${cacheDir}${playlistName.replace(/\s+/g, '_')}.m3u8`;
+      const fileUri = `${cacheDir}${playlistName.replace(/\s+/g, '_')}.m3u`;
       await FileSystem.writeAsStringAsync(fileUri, m3uContent, {
         encoding: FileSystem.EncodingType.UTF8
       });
 
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri, { mimeType: 'application/x-mpegURL' });
-      } else {
-        ToastAndroid.show('Sharing не підтримується на цьому пристрої', ToastAndroid.SHORT);
-      }
+      const contentUri = await FileSystem.getContentUriAsync(fileUri);
+
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+        data: contentUri,
+        type: 'application/vnd.apple.mpegurl',
+        flags: 1,
+        extra: {
+          'android.intent.extra.INITIAL_INTENTS': []
+        }
+      });
+
+      ToastAndroid.show(`${playlistName} відкрито`, ToastAndroid.SHORT);
 
       const historyRaw = await AsyncStorage.getItem('history');
       const history: string[] = historyRaw ? JSON.parse(historyRaw) : [];
@@ -75,9 +75,9 @@ export default function DetailsScreen() {
       if (updated) {
         await AsyncStorage.setItem('history', JSON.stringify(history));
       }
-    } catch (e) {
-      console.error(e);
-      ToastAndroid.show('Не вдалося відкрити плейлист', ToastAndroid.SHORT);
+    } catch (error) {
+      console.error('Error opening:', error);
+      ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
     }
   };
 
@@ -104,7 +104,7 @@ export default function DetailsScreen() {
     };
 
     fetchMovie();
-  }, [source]);
+  }, []);
 
   return (
     <>
