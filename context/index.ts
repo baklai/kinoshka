@@ -48,7 +48,7 @@ export const AppContextValue = {
   getMovieCards: async (baseUrl: string, source: string, page?: number): Promise<MovieProps[]> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.info(`${source}/page/${page}/`);
+        console.info(`${new Date()} - ${source}/page/${page}/`);
       }
       const response = page ? await fetch(`${source}/page/${page}/`) : await fetch(source);
       const html = await response.text();
@@ -174,6 +174,58 @@ export const AppContextValue = {
 
         if (title && source) {
           episodes.push({ title, source });
+        }
+      }
+
+      if (episodes.length === 0) {
+        const id = source?.match(/\/[^\/]+\/(\d+)-/)?.[1];
+
+        if (id) {
+          const response = await fetch(
+            `https://uakino.best/engine/ajax/playlists.php?news_id=${id}&xfield=playlist`,
+            {
+              method: 'GET',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                Accept: 'application/json, text/javascript, */*; q=0.01',
+                Referer: source
+              }
+            }
+          );
+          const jsonData = await response.json();
+
+          const { document } = parseHTML(jsonData.response);
+
+          const firstLiItem = document
+            .querySelector('.playlists-items li[data-file]')
+            ?.getAttribute('data-voice');
+
+          const templateEpisodes = await Promise.all(
+            Array.from(
+              document.querySelectorAll(`.playlists-items li[data-voice="${firstLiItem}"]`)
+            ).map(async item => {
+              const href = item?.getAttribute('data-file');
+
+              if (href) {
+                const file = (await fetch(href).then(r => r.text())).match(
+                  /file\s*:\s*"([^"]+)"/
+                )?.[1];
+
+                return {
+                  title: item?.textContent?.trim() || '',
+                  source: file || ''
+                };
+              }
+
+              return null;
+            })
+          );
+
+          const validEpisodes = templateEpisodes.filter(
+            (item): item is EpisodeProps => item !== null
+          );
+
+          episodes.push(...validEpisodes);
         }
       }
 
