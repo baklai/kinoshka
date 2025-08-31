@@ -9,6 +9,9 @@ const GITHUB_REPO = process.env.EXPO_PUBLIC_GITHUB_REPO;
 export function useAutoUpdate() {
   const startUpdateCheck = async () => {
     try {
+      if (process.env.NODE_ENV === 'development') {
+        return;
+      }
       await checkForUpdate();
     } catch (error) {
       console.log('Error checking for updates:', error);
