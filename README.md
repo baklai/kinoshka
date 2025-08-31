@@ -1,5 +1,10 @@
 # KinoshkaTV
 
+Додаток надає можливість швидко знаходити, на публічних ресурсах, популярні відеофільми,
+мультфільми, кіношоу, серіали та інший відеоконтент у хорошій якості. Все відео в додатку
+програвається з відкритих ресурсів. Автори додатку не несуть відповідальності за данні
+ролики, ніяк не пов'язані з розміщенням та розповсюдженням відеоматеріалів.
+
 ## Передумови
 
 - Git - [Завантажте та встановіть Git](https://git-scm.com/downloads).
@@ -31,16 +36,6 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
 ## Learn more
 
