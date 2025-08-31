@@ -17,6 +17,7 @@ export type AppContextType = {
   getMovieCards: (baseUrl: string, source: string, page?: number) => Promise<MovieProps[]>;
   searchMovieCards: (baseUrl: string, searchUrl: string, search: string) => Promise<MovieProps[]>;
   getMovieDetails: (baseUrl: string, source: string) => Promise<MovieProps | null>;
+  getMovieEpisodes: (baseUrl: string, source: string) => Promise<EpisodeProps[]>;
 };
 
 export const AppContextValue = {
@@ -177,58 +178,6 @@ export const AppContextValue = {
         }
       }
 
-      if (episodes.length === 0) {
-        const id = source?.match(/\/[^\/]+\/(\d+)-/)?.[1];
-
-        if (id) {
-          const response = await fetch(
-            `https://uakino.best/engine/ajax/playlists.php?news_id=${id}&xfield=playlist`,
-            {
-              method: 'GET',
-              headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                Accept: 'application/json, text/javascript, */*; q=0.01',
-                Referer: source
-              }
-            }
-          );
-          const jsonData = await response.json();
-
-          const { document } = parseHTML(jsonData.response);
-
-          const firstLiItem = document
-            .querySelector('.playlists-items li[data-file]')
-            ?.getAttribute('data-voice');
-
-          const templateEpisodes = await Promise.all(
-            Array.from(
-              document.querySelectorAll(`.playlists-items li[data-voice="${firstLiItem}"]`)
-            ).map(async item => {
-              const href = item?.getAttribute('data-file');
-
-              if (href) {
-                const file = (await fetch(href).then(r => r.text())).match(
-                  /file\s*:\s*"([^"]+)"/
-                )?.[1];
-
-                return {
-                  title: item?.textContent?.trim() || '',
-                  source: file || ''
-                };
-              }
-
-              return null;
-            })
-          );
-
-          const validEpisodes = templateEpisodes.filter(
-            (item): item is EpisodeProps => item !== null
-          );
-
-          episodes.push(...validEpisodes);
-        }
-      }
-
       return {
         source,
         title,
@@ -252,6 +201,64 @@ export const AppContextValue = {
       console.error('Error during request or parsing:', err);
       return null;
     }
+  },
+  getMovieEpisodes: async (baseUrl: string, source: string): Promise<EpisodeProps[]> => {
+    const episodes: EpisodeProps[] = [];
+    try {
+      const id = source?.match(/\/[^\/]+\/(\d+)-/)?.[1];
+
+      if (id) {
+        const response = await fetch(
+          `https://uakino.best/engine/ajax/playlists.php?news_id=${id}&xfield=playlist`,
+          {
+            method: 'GET',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              Accept: 'application/json, text/javascript, */*; q=0.01',
+              Referer: source
+            }
+          }
+        );
+        const jsonData = await response.json();
+
+        const { document } = parseHTML(jsonData.response);
+
+        const firstLiItem = document
+          .querySelector('.playlists-items li[data-file]')
+          ?.getAttribute('data-voice');
+
+        const templateEpisodes = await Promise.all(
+          Array.from(
+            document.querySelectorAll(`.playlists-items li[data-voice="${firstLiItem}"]`)
+          ).map(async item => {
+            const href = item?.getAttribute('data-file');
+
+            if (href) {
+              const file = (await fetch(href).then(r => r.text())).match(
+                /file\s*:\s*"([^"]+)"/
+              )?.[1];
+
+              return {
+                title: item?.textContent?.trim() || '',
+                source: file || ''
+              };
+            }
+
+            return null;
+          })
+        );
+
+        const validEpisodes = templateEpisodes.filter(
+          (item): item is EpisodeProps => item !== null
+        );
+
+        episodes.push(...validEpisodes);
+      }
+    } catch (error) {
+      console.error('Error during request or parsing episodes:', error);
+    } finally {
+      return episodes;
+    }
   }
 };
 
@@ -262,5 +269,6 @@ export const AppContext = createContext<AppContextType>({
   categories: [],
   getMovieCards: async () => [],
   searchMovieCards: async () => [],
-  getMovieDetails: async () => null
+  getMovieDetails: async () => null,
+  getMovieEpisodes: async () => []
 });

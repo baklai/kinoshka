@@ -18,7 +18,7 @@ import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'rea
 const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
-  const { baseUrl, getMovieDetails } = useAppContext();
+  const { baseUrl, getMovieDetails, getMovieEpisodes } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
   const [movie, setMovie] = useState<any | null>(null);
   const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
@@ -41,6 +41,13 @@ export default function DetailsScreen() {
   const openPlaylist = async (videos: EpisodeProps[], playlistName: string) => {
     try {
       setLoading(true);
+
+      if (videos?.length === 0) {
+        const episodes = await getMovieEpisodes(baseUrl, source);
+
+        videos.push(...episodes);
+      }
+
       let m3uContent = '#EXTM3U\n';
       for (const video of videos) {
         m3uContent += `#EXTINF:-1,${video.title}\n${video.source}\n`;
@@ -81,7 +88,7 @@ export default function DetailsScreen() {
       console.error('Error opening:', error);
       ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
     } finally {
-      await sleep(5000);
+      await sleep(3000);
       setLoading(false);
     }
   };
@@ -128,21 +135,19 @@ export default function DetailsScreen() {
               transition={1000}
             />
 
-            {Array.isArray(movie?.episodes) && movie.episodes.length > 0 && (
-              <Pressable
-                focusable
-                hasTVPreferredFocus
-                onPress={() => openPlaylist(movie?.episodes, movie.originalTitle || movie.title)}
-                style={({ focused, pressed }) => [
-                  styles.playButton,
-                  focused && { backgroundColor: AppTheme.colors.primary },
-                  pressed && { opacity: 0.7 }
-                ]}
-              >
-                <StyledIcon icon="play-circle-outline" />
-                <Text style={styles.playButtonText}>Дивитись відео</Text>
-              </Pressable>
-            )}
+            <Pressable
+              focusable
+              hasTVPreferredFocus
+              onPress={() => openPlaylist(movie?.episodes, movie.originalTitle || movie.title)}
+              style={({ focused, pressed }) => [
+                styles.playButton,
+                focused && { backgroundColor: AppTheme.colors.primary },
+                pressed && { opacity: 0.7 }
+              ]}
+            >
+              <StyledIcon icon="play-circle-outline" />
+              <Text style={styles.playButtonText}>Дивитись відео</Text>
+            </Pressable>
           </View>
 
           <View style={styles.textContainer}>
