@@ -53,15 +53,16 @@ export function useAutoUpdate() {
       const fileUri = `${FileSystem.documentDirectory}app-latest.apk`;
       const { uri } = await FileSystem.downloadAsync(url, fileUri);
 
-      IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: uri,
-        flags: 1,
+      const contentUri = await FileSystem.getContentUriAsync(uri);
+
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+        data: contentUri,
+        flags: 3,
         type: 'application/vnd.android.package-archive'
       });
     } catch (error) {
       console.error('Error downloading and installing APK:', error);
     }
   };
-
   return { startUpdateCheck };
 }
