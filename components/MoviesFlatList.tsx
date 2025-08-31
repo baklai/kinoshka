@@ -15,8 +15,9 @@ interface MoviesFlatListProps {
   limit?: number;
   focused?: boolean;
 }
+
 const ITEM_WIDTH = scaledPixels(181);
-const ITEM_SPACING = scaledPixels(24);
+const ITEM_SPACING = scaledPixels(26);
 
 const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFlatListProps) => {
   const { baseUrl, getMovieCards } = useAppContext();
@@ -127,7 +128,11 @@ const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFl
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={renderEmpty}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: ITEM_SPACING,
+          paddingVertical: ITEM_SPACING
+        }}
         initialNumToRender={5}
         maxToRenderPerBatch={5}
         windowSize={5}

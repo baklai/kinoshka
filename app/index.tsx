@@ -1,6 +1,5 @@
 import MoviesFlatList from '@/components/MoviesFlatList';
 import { AppContext } from '@/context';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, TVFocusGuideView, View } from 'react-native';
 
@@ -21,7 +20,7 @@ export default function IndexScreen() {
             return (
               <View
                 key={`movie-flat-list-${idx}`}
-                style={{ marginVertical: scaledPixels(6) }}
+                hasTVPreferredFocus={idx === 0}
                 onFocus={() => setFocusedIndex(idx)}
                 onBlur={() => setFocusedIndex(null)}
               >

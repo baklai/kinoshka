@@ -21,8 +21,8 @@ export default function MovieCard(props: MovieCardProps) {
       style={({ pressed }) => [pressed && { opacity: 0.7 }]}
     >
       {({ focused }) => (
-        <Animated.View style={{ transform: [{ scale: focused ? 1 : 1 }] }}>
-          <View style={[styles.imageWrapper, { overflow: 'hidden' }]}>
+        <Animated.View style={[styles.container, { transform: [{ scale: focused ? 1.08 : 1 }] }]}>
+          <View style={styles.imageWrapper}>
             <Image
               style={styles.image}
               source={poster}
@@ -37,16 +37,17 @@ export default function MovieCard(props: MovieCardProps) {
                   <Text style={styles.ratingText}>{imdb || likes}</Text>
                 </View>
               ) : (
-                <View></View>
+                <View />
               )}
 
-              <View style={styles.quality}>
-                <Text style={styles.qualityText}>{quality}</Text>
-              </View>
+              {quality && (
+                <View style={styles.quality}>
+                  <Text style={styles.qualityText}>{quality}</Text>
+                </View>
+              )}
             </View>
 
             {focused && <View style={styles.overlay} />}
-
             {focused && <View style={styles.borderOverlay} />}
           </View>
 
@@ -70,13 +71,15 @@ export default function MovieCard(props: MovieCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center'
+    alignItems: 'center',
+    borderRadius: scaledPixels(6)
   },
   imageWrapper: {
     width: scaledPixels(181),
     height: scaledPixels(259),
-    overflow: 'hidden',
-    position: 'relative'
+    position: 'relative',
+    borderRadius: scaledPixels(6),
+    overflow: 'visible'
   },
   image: {
     ...StyleSheet.absoluteFillObject,

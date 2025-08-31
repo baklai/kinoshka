@@ -2,7 +2,7 @@ import NotFoundView from '@/components/NotFoundView';
 import { MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TVFocusGuideView, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export default function HistoryScreen() {
   const [history, setHistory] = useState<MovieProps[]>([]);
@@ -23,7 +23,7 @@ export default function HistoryScreen() {
   }, []);
 
   return (
-    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
+    <View style={{ flex: 1 }} hasTVPreferredFocus>
       <View style={styles.container}>
         {history?.length > 0 ? (
           // <MoviesFlatList title="Історія перегляду" filters={{ ids: history }} />
@@ -32,7 +32,7 @@ export default function HistoryScreen() {
           <NotFoundView icon="folder-open" text="Історія перегляду порожня" />
         )}
       </View>
-    </TVFocusGuideView>
+    </View>
   );
 }
 

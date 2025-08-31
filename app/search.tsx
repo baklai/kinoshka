@@ -1,12 +1,19 @@
+import MovieCard from '@/components/MovieCard';
+import NotFoundView from '@/components/NotFoundView';
+import SkeletonView from '@/components/SkeletonView';
 import SpeechButton from '@/components/SpeechButton';
 import { StyledIcon } from '@/components/StyledIcon';
 import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
 import { AppTheme } from '@/constants/theme.constant';
+import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import { MovieProps } from '@/types/movie.type';
 import { transpose } from '@/utils';
 import * as Localization from 'expo-localization';
-import React, { useMemo, useState } from 'react';
+import { router } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,9 +23,11 @@ import {
   View
 } from 'react-native';
 
+const ITEM_WIDTH = scaledPixels(181);
+const ITEM_SPACING = scaledPixels(24);
+
 export default function SearchScreen() {
   const { width, height } = useWindowDimensions();
-
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([
     'Дулітл',
@@ -48,10 +57,58 @@ export default function SearchScreen() {
 
     return mapLang(systemLang);
   });
+  const { baseUrl, searchUrl, searchMovieCards } = useAppContext();
+  const [data, setData] = useState<MovieProps[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
     return height >= width ? 'portrait' : 'landscape';
   }, [width, height]);
+
+  const handlePressSelectItem = useCallback((item: MovieProps) => {
+    router.push({
+      pathname: '/details',
+      params: { source: item.source }
+    });
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: MovieProps }) => (
+      <MovieCard {...item} handlePress={() => handlePressSelectItem(item)} />
+    ),
+    [handlePressSelectItem]
+  );
+
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: ITEM_WIDTH + ITEM_SPACING,
+      offset: (ITEM_WIDTH + ITEM_SPACING) * index,
+      index
+    }),
+    []
+  );
+
+  const renderEmpty = useCallback(() => {
+    if (!loading && data.length === 0) {
+      return (
+        <NotFoundView
+          icon="folder-open"
+          text="Не вдалося знайти відео"
+          size={64}
+          style={{ height: scaledPixels(259) }}
+        />
+      );
+    }
+  }, []);
+
+  const Separator = useCallback(() => <View style={{ width: ITEM_SPACING }} />, []);
+
+  const renderSkeletonItem = useCallback(() => <SkeletonView />, []);
+
+  const keyExtractor = useCallback(
+    (item: MovieProps, index: number) => String(item.source || index),
+    []
+  );
 
   const toggleLang = () => {
     if (lang === 'UA') setLang('RU');
@@ -71,12 +128,58 @@ export default function SearchScreen() {
     ToastAndroid.show('Голосовий пошук ще не реалізовано!', ToastAndroid.SHORT);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (loading || query.length < 3) return;
+
+      try {
+        setLoading(true);
+
+        const response = await searchMovieCards(baseUrl, searchUrl, query);
+
+        setData(response);
+      } catch (error) {
+        console.error('Fetch error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [query]);
+
   return (
     <View style={styles.container}>
       <View style={styles.searchSection}>
         <SpeechButton onPress={handleVoiceSearch} />
         <View style={styles.searchSectionInput}>
           <Text style={styles.searchSectionInputText}>{query || 'Пошук...'}</Text>
+
+          {query.length > 0 && (
+            <Pressable
+              onPress={() => setQuery('')}
+              style={({ focused, pressed }) => [
+                {
+                  aspectRatio: 1,
+                  width: scaledPixels(32),
+                  height: scaledPixels(32),
+                  borderRadius: '50%',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                },
+                focused && { backgroundColor: AppTheme.colors.muted },
+                pressed && { opacity: 0.7 }
+              ]}
+            >
+              {({ focused }) => (
+                <StyledIcon
+                  size="small"
+                  color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+                  icon="close"
+                />
+              )}
+            </Pressable>
+          )}
         </View>
       </View>
 
@@ -225,8 +328,28 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <View style={{ flexDirection: 'row', marginVertical: scaledPixels(10) }}>
-        {/* {query.length >= 3 && <MoviesFlatList filters={{ title: query }} />} */}
+      <View style={{ marginVertical: scaledPixels(20) }}>
+        <FlatList
+          horizontal
+          data={loading ? Array(10).fill({}) : data}
+          keyExtractor={keyExtractor}
+          renderItem={loading ? renderSkeletonItem : renderItem}
+          getItemLayout={getItemLayout}
+          onEndReachedThreshold={0.5}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={Separator}
+          ListEmptyComponent={renderEmpty}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: ITEM_SPACING,
+            paddingVertical: ITEM_SPACING
+          }}
+          initialNumToRender={5}
+          maxToRenderPerBatch={5}
+          windowSize={5}
+          removeClippedSubviews
+        />
       </View>
     </View>
   );
@@ -310,5 +433,10 @@ const styles = StyleSheet.create({
   },
   focusedKey: {
     backgroundColor: AppTheme.colors.text
+  },
+  skeletonContainer: {
+    flexDirection: 'row',
+    gap: ITEM_SPACING,
+    paddingHorizontal: ITEM_SPACING
   }
 });

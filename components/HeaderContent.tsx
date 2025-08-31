@@ -2,9 +2,8 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
-import React, { ComponentProps } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
@@ -61,7 +60,7 @@ const HeaderContent = (props: HeaderContentProps) => {
                 <StyledIcon
                   size="large"
                   color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
-                  icon={icon as ComponentProps<typeof MaterialCommunityIcons>['name']}
+                  icon={icon as IconType}
                 />
               )}
             </Pressable>

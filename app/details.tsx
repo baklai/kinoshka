@@ -112,13 +112,13 @@ export default function DetailsScreen() {
   }, []);
 
   return (
-    <>
+    <View style={{ flex: 1 }} hasTVPreferredFocus>
       {loading ? (
         <StyledLoader />
       ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (
-        <View style={styles.container} hasTVPreferredFocus>
+        <View style={styles.container}>
           <View style={styles.asideContainer}>
             <Image
               style={styles.headerImage}
@@ -242,7 +242,7 @@ export default function DetailsScreen() {
           </View>
         </View>
       )}
-    </>
+    </View>
   );
 }
 

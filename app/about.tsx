@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export default function AboutScreen() {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} hasTVPreferredFocus>
       <Image
         source={require('@/assets/images/adaptive-icon.png')}
         style={{ width: 200, height: 200 }}

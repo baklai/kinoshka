@@ -25,25 +25,30 @@ export const AppContextValue = {
   searchUrl: 'https://uakino.best',
   categories: [
     {
+      limit: 40,
+      title: 'Фільми - дивляться наживо',
+      source: 'https://uakino.best/filmy/online'
+    },
+    {
       limit: 10,
       title: 'Найкращі фільми українською',
       source: 'https://uakino.best/filmy/best'
     },
     {
       limit: 10,
-      title: 'Найкращі серіали українською',
-      source: 'https://uakino.best/seriesss/best'
+      title: 'Найкраща анімація українською',
+      source: 'https://uakino.best/cartoon/best'
     },
     {
       limit: 10,
-      title: 'Найкраща анімація українською',
-      source: 'https://uakino.best/cartoon/best'
+      title: 'Найкращі серіали українською',
+      source: 'https://uakino.best/seriesss/best'
     }
   ],
   getMovieCards: async (baseUrl: string, source: string, page?: number): Promise<MovieProps[]> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`${source}/page/${page}/`);
+        console.info(`${source}/page/${page}/`);
       }
       const response = page ? await fetch(`${source}/page/${page}/`) : await fetch(source);
       const html = await response.text();
@@ -89,13 +94,11 @@ export const AppContextValue = {
       const items = document.querySelectorAll('div.movie-item.short-item');
 
       return Array.from(items).map(item => {
-        const source = (item.querySelector('.full-movie') as HTMLAnchorElement)?.href || '';
-        const title = item.querySelector('.full-movie-title')?.textContent?.trim() || '';
+        const source = (item.querySelector('.movie-title') as HTMLAnchorElement)?.href || '';
+        const title = item.querySelector('.movie-title')?.textContent?.trim() || '';
         const poster = (item.querySelector('img') as HTMLImageElement)?.src || '';
-        const likes =
-          item.querySelector('.related-item-rating.positive')?.textContent?.trim() || '';
 
-        return { source, title, poster: `${baseUrl}${poster}`, likes };
+        return { source, title, poster: `${baseUrl}${poster}` };
       });
     } catch (err) {
       console.error('Error during request or parsing:', err);
