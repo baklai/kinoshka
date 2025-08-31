@@ -129,23 +129,22 @@ export default function SearchScreen() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (loading || query.length < 3) return;
+    if (query.length < 3) return;
 
+    const handler = setTimeout(async () => {
       try {
+        setData([]);
         setLoading(true);
-
         const response = await searchMovieCards(baseUrl, searchUrl, query);
-
         setData(response);
       } catch (error) {
         console.error('Fetch error:', error);
       } finally {
         setLoading(false);
       }
-    };
+    }, 5000);
 
-    fetchData();
+    return () => clearTimeout(handler);
   }, [query]);
 
   return (
@@ -328,29 +327,27 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <View style={{ marginVertical: scaledPixels(20) }}>
-        <FlatList
-          horizontal
-          data={loading ? Array(10).fill({}) : data}
-          keyExtractor={keyExtractor}
-          renderItem={loading ? renderSkeletonItem : renderItem}
-          getItemLayout={getItemLayout}
-          onEndReachedThreshold={0.5}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={Separator}
-          ListEmptyComponent={renderEmpty}
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingHorizontal: ITEM_SPACING,
-            paddingVertical: ITEM_SPACING
-          }}
-          initialNumToRender={5}
-          maxToRenderPerBatch={5}
-          windowSize={5}
-          removeClippedSubviews
-        />
-      </View>
+      <FlatList
+        horizontal
+        data={loading ? Array(10).fill({}) : data}
+        keyExtractor={keyExtractor}
+        renderItem={loading ? renderSkeletonItem : renderItem}
+        getItemLayout={getItemLayout}
+        onEndReachedThreshold={0.5}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={Separator}
+        ListEmptyComponent={renderEmpty}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: ITEM_SPACING,
+          paddingVertical: ITEM_SPACING
+        }}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews
+      />
     </View>
   );
 }

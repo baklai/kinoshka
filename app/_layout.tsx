@@ -2,8 +2,8 @@ import HeaderContent from '@/components/HeaderContent';
 import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
 import { AppContext, AppContextValue } from '@/context';
+import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { sleep } from '@/utils';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -31,6 +31,7 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
+  const { startUpdateCheck } = useAutoUpdate();
   const [loading, setLoading] = useState<boolean>(false);
   const { width, height } = useWindowDimensions();
 
@@ -42,7 +43,7 @@ function RootLayout() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        await sleep(3000);
+        startUpdateCheck();
       } catch (err) {
         console.error('Application error:', err);
       } finally {

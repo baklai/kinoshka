@@ -107,8 +107,6 @@
       "typedRoutes": true
     },
     "newArchEnabled": true,
-    "extra": {
-      "router": {}
-    }
+    "extra": {}
   }
 }

@@ -47,10 +47,11 @@ export const AppContextValue = {
     }
   ],
   getMovieCards: async (baseUrl: string, source: string, page?: number): Promise<MovieProps[]> => {
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`${new Date()} [GET CARDS] ${source}/page/${page}/`);
+    }
+
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.info(`${new Date()} - ${source}/page/${page}/`);
-      }
       const response = page ? await fetch(`${source}/page/${page}/`) : await fetch(source);
       const html = await response.text();
       const { document } = parseHTML(html);
@@ -76,6 +77,10 @@ export const AppContextValue = {
     searchUrl: string,
     search: string
   ): Promise<MovieProps[]> => {
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`${new Date()} [POST SEARCH] ${searchUrl} : ${search}`);
+    }
+
     try {
       const params = new URLSearchParams({
         do: 'search',
@@ -107,6 +112,10 @@ export const AppContextValue = {
     }
   },
   getMovieDetails: async (baseUrl: string, source: string): Promise<MovieProps | null> => {
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`${new Date()} [GET DETAILS] ${source}`);
+    }
+
     try {
       const response = await fetch(source);
       const html = await response.text();
@@ -203,7 +212,12 @@ export const AppContextValue = {
     }
   },
   getMovieEpisodes: async (baseUrl: string, source: string): Promise<EpisodeProps[]> => {
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`${new Date()} [GET EPISODES] ${source}`);
+    }
+
     const episodes: EpisodeProps[] = [];
+
     try {
       const id = source?.match(/\/[^\/]+\/(\d+)-/)?.[1];
 

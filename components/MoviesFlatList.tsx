@@ -133,9 +133,9 @@ const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFl
           paddingHorizontal: ITEM_SPACING,
           paddingVertical: ITEM_SPACING
         }}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-        windowSize={5}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6}
+        windowSize={6}
         removeClippedSubviews
       />
     </View>
