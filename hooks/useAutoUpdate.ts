@@ -1,7 +1,7 @@
 import * as Application from 'expo-application';
 import * as FileSystem from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, ToastAndroid } from 'react-native';
 
 const GITHUB_OWNER = process.env.EXPO_PUBLIC_GITHUB_OWNER;
 const GITHUB_REPO = process.env.EXPO_PUBLIC_GITHUB_REPO;
@@ -38,10 +38,29 @@ export function useAutoUpdate() {
       const apkUrl = apkAsset.browser_download_url;
 
       if (Platform.OS === 'android' && `v${currentVersion}` !== latestVersion) {
-        Alert.alert('Доступна нова версія', 'Бажаєте завантажити та встановити оновлення?', [
-          { text: 'Скасувати', style: 'cancel' },
-          { text: 'Завантажити', onPress: () => downloadAndInstallApk(apkUrl) }
-        ]);
+        Alert.alert(
+          'Доступна нова версія',
+          'Бажаєте завантажити та встановити оновлення?',
+          [
+            {
+              text: 'Скасувати',
+              onPress: () =>
+                ToastAndroid.show(
+                  'Завантаження та встановлення оновлення відхилено',
+                  ToastAndroid.SHORT
+                )
+            },
+            { text: 'Завантажити', onPress: () => downloadAndInstallApk(apkUrl) }
+          ],
+          {
+            cancelable: true,
+            onDismiss: () =>
+              ToastAndroid.show(
+                'Завантаження та встановлення оновлення відхилено',
+                ToastAndroid.SHORT
+              )
+          }
+        );
       }
     } catch (error) {
       console.error('Error checking GitHub release:', error);
@@ -50,15 +69,17 @@ export function useAutoUpdate() {
 
   const downloadAndInstallApk = async (url: string) => {
     try {
+      ToastAndroid.show('Завантаження та встановлення оновлення розпочато', ToastAndroid.SHORT);
+
       const fileUri = `${FileSystem.documentDirectory}app-latest.apk`;
       const { uri } = await FileSystem.downloadAsync(url, fileUri);
 
       const contentUri = await FileSystem.getContentUriAsync(uri);
 
-      await IntentLauncher.startActivityAsync('android.intent.action.INSTALL_PACKAGE', {
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
         data: contentUri,
         type: 'application/vnd.android.package-archive',
-        flags: 1
+        flags: 3
       });
     } catch (error) {
       console.error('Error downloading and installing APK:', error);
