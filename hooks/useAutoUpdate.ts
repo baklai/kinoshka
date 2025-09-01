@@ -55,10 +55,10 @@ export function useAutoUpdate() {
 
       const contentUri = await FileSystem.getContentUriAsync(uri);
 
-      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+      await IntentLauncher.startActivityAsync('android.intent.action.INSTALL_PACKAGE', {
         data: contentUri,
-        flags: 3,
-        type: 'application/vnd.android.package-archive'
+        type: 'application/vnd.android.package-archive',
+        flags: 1
       });
     } catch (error) {
       console.error('Error downloading and installing APK:', error);
