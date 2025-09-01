@@ -95,6 +95,20 @@ export const MoviesFlatList = ({
     []
   );
 
+  const renderItem = useCallback(
+    ({ item }: { item: MovieProps }) => <MovieCard {...item} onPress={handlePressSelectItem} />,
+    [handlePressSelectItem]
+  );
+
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: ITEM_WIDTH + ITEM_SPACING,
+      offset: (ITEM_WIDTH + ITEM_SPACING) * index,
+      index
+    }),
+    []
+  );
+
   return (
     <View style={styles.container}>
       {title && (
@@ -108,24 +122,18 @@ export const MoviesFlatList = ({
       <FlatList
         horizontal
         data={loading && data.length === 0 ? Array(limit).fill({}) : data}
-        keyExtractor={(item, idx) => item.source || String(idx)}
-        renderItem={({ item }) =>
-          loading && !item.source ? (
-            <SkeletonView />
-          ) : (
-            <MovieCard {...item} onPress={handlePressSelectItem} />
-          )
-        }
-        getItemLayout={(_, index) => ({
-          length: ITEM_WIDTH + ITEM_SPACING,
-          offset: (ITEM_WIDTH + ITEM_SPACING) * index,
-          index
-        })}
+        keyExtractor={keyExtractor}
+        renderItem={loading && data.length === 0 ? renderSkeletonItem : renderItem}
+        getItemLayout={getItemLayout}
         onEndReached={fetchData}
         onEndReachedThreshold={0.8}
         showsHorizontalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ width: ITEM_SPACING }} />}
-        contentContainerStyle={{ paddingHorizontal: ITEM_SPACING, paddingVertical: ITEM_SPACING }}
+        ItemSeparatorComponent={Separator}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: ITEM_SPACING,
+          paddingVertical: ITEM_SPACING
+        }}
         initialNumToRender={6}
         maxToRenderPerBatch={6}
         windowSize={6}
