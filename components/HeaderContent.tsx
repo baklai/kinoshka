@@ -2,14 +2,13 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
-import { usePathname, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View, ViewProps } from 'react-native';
+import { Alert, BackHandler, Pressable, StyleSheet, Text, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
 
 const HeaderContent = (props: HeaderContentProps) => {
-  const pathname = usePathname();
   const router = useRouter();
 
   const navTabs: { title: string; route: string }[] = [
@@ -18,10 +17,23 @@ const HeaderContent = (props: HeaderContentProps) => {
     { title: 'Закладки', route: '/bookmarks' }
   ];
 
-  const navBtns: { icon: IconType; route: string }[] = [
+  const navBtns: { icon: IconType; route: string; onPress?: () => void }[] = [
     { icon: 'history', route: '/history' },
     { icon: 'information-outline', route: '/about' },
-    { icon: 'cog-outline', route: '/options' }
+    { icon: 'cog-outline', route: '/options' },
+    {
+      icon: 'exit-to-app',
+      route: '/exit',
+      onPress: () => {
+        Alert.alert('Зачекай!', 'Ви впевнені, що хочете вийти?', [
+          {
+            text: 'Скасувати',
+            onPress: () => null
+          },
+          { text: 'Так', onPress: () => BackHandler.exitApp() }
+        ]);
+      }
+    }
   ];
 
   return (
@@ -45,11 +57,11 @@ const HeaderContent = (props: HeaderContentProps) => {
       </View>
 
       <View style={styles.section}>
-        {navBtns.map(({ icon, route }, idx) => {
+        {navBtns.map(({ icon, route, onPress }, idx) => {
           return (
             <Pressable
               key={idx}
-              onPress={() => router.push(route)}
+              onPress={() => (onPress ? onPress() : router.push(route))}
               style={({ focused, pressed }) => [
                 styles.pressableIcon,
                 focused && { backgroundColor: AppTheme.colors.surface },
