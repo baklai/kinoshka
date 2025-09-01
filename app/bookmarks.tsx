@@ -1,4 +1,4 @@
-import NotFoundView from '@/components/NotFoundView';
+import { NotFoundView } from '@/components/NotFoundView';
 import { MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
@@ -25,8 +25,6 @@ export default function BookmarksScreen() {
   return (
     <View style={styles.container} hasTVPreferredFocus>
       {bookmarks?.length > 0 ? (
-        // <MoviesFlatList title="Перелік закладок" filters={{ ids: bookmarks }} />
-
         <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
       ) : (
         <NotFoundView icon="folder-open" text="Перелік закладок порожній" />

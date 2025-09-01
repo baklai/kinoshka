@@ -8,7 +8,7 @@ import { Alert, BackHandler, Pressable, StyleSheet, Text, View, ViewProps } from
 
 interface HeaderContentProps extends ViewProps {}
 
-const HeaderContent = (props: HeaderContentProps) => {
+export const HeaderContent = (props: HeaderContentProps) => {
   const router = useRouter();
 
   const navTabs: { title: string; route: string }[] = [
@@ -132,5 +132,3 @@ const styles = StyleSheet.create({
     borderColor: AppTheme.colors.text
   }
 });
-
-export default HeaderContent;

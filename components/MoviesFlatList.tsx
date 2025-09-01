@@ -1,5 +1,6 @@
-import MovieCard from '@/components/MovieCard';
-import SkeletonView from '@/components/SkeletonView';
+import { MovieCard } from '@/components/MovieCard';
+import { NotFoundView } from '@/components/NotFoundView';
+import { SkeletonView } from '@/components/SkeletonView';
 import { AppTheme } from '@/constants/theme.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
@@ -7,7 +8,6 @@ import { MovieProps } from '@/types/movie.type';
 import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import NotFoundView from './NotFoundView';
 
 interface MoviesFlatListProps {
   source: string;
@@ -19,7 +19,12 @@ interface MoviesFlatListProps {
 const ITEM_WIDTH = scaledPixels(181);
 const ITEM_SPACING = scaledPixels(26);
 
-const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFlatListProps) => {
+export const MoviesFlatList = ({
+  source,
+  title,
+  limit = 10,
+  focused = false
+}: MoviesFlatListProps) => {
   const { baseUrl, getMovieCards } = useAppContext();
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -53,28 +58,12 @@ const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFl
     }
   }, [page, loading, hasMore, loadedPages]);
 
-  const handlePressSelectItem = useCallback((item: MovieProps) => {
+  const handlePressSelectItem = useCallback((source: string) => {
     router.push({
       pathname: '/details',
-      params: { source: item.source }
+      params: { source }
     });
   }, []);
-
-  const renderItem = useCallback(
-    ({ item }: { item: MovieProps }) => (
-      <MovieCard {...item} handlePress={() => handlePressSelectItem(item)} />
-    ),
-    [handlePressSelectItem]
-  );
-
-  const getItemLayout = useCallback(
-    (_: any, index: number) => ({
-      length: ITEM_WIDTH + ITEM_SPACING,
-      offset: (ITEM_WIDTH + ITEM_SPACING) * index,
-      index
-    }),
-    []
-  );
 
   const renderEmpty = useCallback(() => {
     if (loading) {
@@ -119,20 +108,24 @@ const MoviesFlatList = ({ source, title, limit = 10, focused = false }: MoviesFl
       <FlatList
         horizontal
         data={loading && data.length === 0 ? Array(limit).fill({}) : data}
-        keyExtractor={keyExtractor}
-        renderItem={loading && data.length === 0 ? renderSkeletonItem : renderItem}
-        getItemLayout={getItemLayout}
+        keyExtractor={(item, idx) => item.source || String(idx)}
+        renderItem={({ item }) =>
+          loading && !item.source ? (
+            <SkeletonView />
+          ) : (
+            <MovieCard {...item} onPress={handlePressSelectItem} />
+          )
+        }
+        getItemLayout={(_, index) => ({
+          length: ITEM_WIDTH + ITEM_SPACING,
+          offset: (ITEM_WIDTH + ITEM_SPACING) * index,
+          index
+        })}
         onEndReached={fetchData}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.8}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={Separator}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingHorizontal: ITEM_SPACING,
-          paddingVertical: ITEM_SPACING
-        }}
+        ItemSeparatorComponent={() => <View style={{ width: ITEM_SPACING }} />}
+        contentContainerStyle={{ paddingHorizontal: ITEM_SPACING, paddingVertical: ITEM_SPACING }}
         initialNumToRender={6}
         maxToRenderPerBatch={6}
         windowSize={6}
@@ -161,5 +154,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: ITEM_SPACING
   }
 });
-
-export default MoviesFlatList;

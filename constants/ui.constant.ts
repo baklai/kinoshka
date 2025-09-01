@@ -54,5 +54,3 @@ export const THEME_COLORS = {
   focus: '#3EA6FF',
   muted: '#272727'
 };
-
-export const PAGE_LIMIT: number = 10;

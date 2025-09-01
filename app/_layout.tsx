@@ -1,4 +1,4 @@
-import HeaderContent from '@/components/HeaderContent';
+import { HeaderContent } from '@/components/HeaderContent';
 import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
 import { AppContext, AppContextValue } from '@/context';

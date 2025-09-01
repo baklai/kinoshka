@@ -8,7 +8,7 @@ interface SpeechButtonProps {
   onPress?: () => void;
 }
 
-export default function SpeechButton({ onPress }: SpeechButtonProps) {
+export const SpeechButton = ({ onPress }: SpeechButtonProps) => {
   return (
     <Pressable
       focusable
@@ -24,7 +24,7 @@ export default function SpeechButton({ onPress }: SpeechButtonProps) {
       )}
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

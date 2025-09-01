@@ -1,7 +1,7 @@
-import MovieCard from '@/components/MovieCard';
-import NotFoundView from '@/components/NotFoundView';
-import SkeletonView from '@/components/SkeletonView';
-import SpeechButton from '@/components/SpeechButton';
+import { MovieCard } from '@/components/MovieCard';
+import { NotFoundView } from '@/components/NotFoundView';
+import { SkeletonView } from '@/components/SkeletonView';
+import { SpeechButton } from '@/components/SpeechButton';
 import { StyledIcon } from '@/components/StyledIcon';
 import { KEYBOARD, LanguageCode } from '@/constants/keyboard.constant';
 import { AppTheme } from '@/constants/theme.constant';
@@ -65,17 +65,15 @@ export default function SearchScreen() {
     return height >= width ? 'portrait' : 'landscape';
   }, [width, height]);
 
-  const handlePressSelectItem = useCallback((item: MovieProps) => {
+  const handlePressSelectItem = useCallback((source: string) => {
     router.push({
       pathname: '/details',
-      params: { source: item.source }
+      params: { source }
     });
   }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: MovieProps }) => (
-      <MovieCard {...item} handlePress={() => handlePressSelectItem(item)} />
-    ),
+    ({ item }: { item: MovieProps }) => <MovieCard {...item} onPress={handlePressSelectItem} />,
     [handlePressSelectItem]
   );
 

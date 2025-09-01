@@ -1,4 +1,4 @@
-import MoviesFlatList from '@/components/MoviesFlatList';
+import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { AppContext } from '@/context';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { LayoutChangeEvent, ScrollView, StyleSheet, TVFocusGuideView, View } from 'react-native';

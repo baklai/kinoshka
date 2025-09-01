@@ -1,11 +1,11 @@
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, StyleSheet, View, ViewProps } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-const SkeletonView = () => {
+export const SkeletonView = ({ style }: ViewProps) => {
   const shimmerAnim = useRef(new Animated.Value(-1)).current;
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const SkeletonView = () => {
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style && style]}>
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
@@ -54,5 +54,3 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   }
 });
-
-export default SkeletonView;

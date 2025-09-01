@@ -13,7 +13,7 @@ type NotFoundProps = {
   style?: ViewStyle;
 };
 
-const NotFoundView = ({
+export const NotFoundView = ({
   icon,
   text,
   color = AppTheme.colors.subtext,
@@ -38,5 +38,3 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.subtext
   }
 });
-
-export default NotFoundView;

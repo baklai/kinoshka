@@ -1,4 +1,4 @@
-import NotFoundView from '@/components/NotFoundView';
+import { NotFoundView } from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';

@@ -1,4 +1,4 @@
-import NotFoundView from '@/components/NotFoundView';
+import { NotFoundView } from '@/components/NotFoundView';
 import { MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
@@ -26,7 +26,6 @@ export default function HistoryScreen() {
     <View style={{ flex: 1 }} hasTVPreferredFocus>
       <View style={styles.container}>
         {history?.length > 0 ? (
-          // <MoviesFlatList title="Історія перегляду" filters={{ ids: history }} />
           <NotFoundView icon="folder-open" text="Історія перегляду порожня" />
         ) : (
           <NotFoundView icon="folder-open" text="Історія перегляду порожня" />
