@@ -1,15 +1,33 @@
 import * as Application from 'expo-application';
-import * as FileSystem from 'expo-file-system';
-import * as IntentLauncher from 'expo-intent-launcher';
 import { Alert, Platform, ToastAndroid } from 'react-native';
+import { AppUpdate } from 'react-native-update-in-app';
 
 const GITHUB_OWNER = process.env.EXPO_PUBLIC_GITHUB_OWNER;
 const GITHUB_REPO = process.env.EXPO_PUBLIC_GITHUB_REPO;
+
+AppUpdate.onDownloadProgress(event => {
+  if (event.status === 'start') {
+    ToastAndroid.show('Завантаження почалось', ToastAndroid.SHORT);
+  }
+
+  if (event.status === 'end') {
+    ToastAndroid.show('Завантаження закінчилось', ToastAndroid.SHORT);
+    AppUpdate.installApp(event.apkFileName);
+  }
+
+  if (event.status === 'error') {
+    ToastAndroid.show(event.errorMessage, ToastAndroid.SHORT);
+    console.error('Error:', event.errorMessage);
+  }
+});
 
 export function useAutoUpdate() {
   const startUpdateCheck = async () => {
     try {
       if (process.env.NODE_ENV === 'development') {
+        return;
+      }
+      if (Platform.OS === 'ios') {
         return;
       }
       await checkForUpdate();
@@ -50,7 +68,7 @@ export function useAutoUpdate() {
                   ToastAndroid.SHORT
                 )
             },
-            { text: 'Завантажити', onPress: () => downloadAndInstallApk(apkUrl) }
+            { text: 'Завантажити', onPress: () => AppUpdate.downloadApp(apkUrl) }
           ],
           {
             cancelable: true,
@@ -67,23 +85,5 @@ export function useAutoUpdate() {
     }
   };
 
-  const downloadAndInstallApk = async (url: string) => {
-    try {
-      ToastAndroid.show('Завантаження та встановлення оновлення розпочато', ToastAndroid.SHORT);
-
-      const fileUri = `${FileSystem.documentDirectory}app-latest.apk`;
-      const { uri } = await FileSystem.downloadAsync(url, fileUri);
-
-      const contentUri = await FileSystem.getContentUriAsync(uri);
-
-      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: contentUri,
-        type: 'application/vnd.android.package-archive',
-        flags: 3
-      });
-    } catch (error) {
-      console.error('Error downloading and installing APK:', error);
-    }
-  };
   return { startUpdateCheck };
 }
