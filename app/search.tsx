@@ -227,6 +227,7 @@ export default function SearchScreen() {
             styles.keyboardSection,
             orientation === 'portrait' && { alignItems: 'center', justifyContent: 'center' }
           ]}
+          hasTVPreferredFocus
         >
           {transpose(KEYBOARD[lang]).map((row, rowIndex) => (
             <View key={rowIndex} style={styles.keyboardRow}>

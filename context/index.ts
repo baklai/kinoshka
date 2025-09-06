@@ -4,7 +4,6 @@ import { parseHTML } from 'linkedom';
 import { createContext } from 'react';
 
 export type CategoryType = {
-  limit: number;
   title: string;
   source: string;
 };
@@ -26,24 +25,40 @@ export const AppContextValue = {
   searchUrl: 'https://uakino.best',
   categories: [
     {
-      limit: 40,
-      title: 'Фільми - дивляться наживо',
+      title: 'Фільми - останні додані',
+      source: 'https://uakino.best/filmy'
+    },
+    {
+      title: 'Фільми - дивляться зараз',
       source: 'https://uakino.best/filmy/online'
     },
     {
-      limit: 10,
       title: 'Найкращі фільми українською',
       source: 'https://uakino.best/filmy/best'
     },
     {
-      limit: 10,
-      title: 'Найкраща анімація українською',
-      source: 'https://uakino.best/cartoon/best'
+      title: 'Серіали - останні додані',
+      source: 'https://uakino.best/seriesss'
     },
     {
-      limit: 10,
+      title: 'Серіали - дивляться зараз',
+      source: 'https://uakino.best/seriesss/online'
+    },
+    {
       title: 'Найкращі серіали українською',
       source: 'https://uakino.best/seriesss/best'
+    },
+    {
+      title: 'Мультфільми - останні додані',
+      source: 'https://uakino.best/cartoon'
+    },
+    {
+      title: 'Мультфільми - дивляться зараз',
+      source: 'https://uakino.best/cartoon/online'
+    },
+    {
+      title: 'Найкращі мультфільми українською',
+      source: 'https://uakino.best/cartoon/best'
     }
   ],
   getMovieCards: async (baseUrl: string, source: string, page?: number): Promise<MovieProps[]> => {

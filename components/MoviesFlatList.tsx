@@ -1,36 +1,46 @@
 import { MovieCard } from '@/components/MovieCard';
 import { NotFoundView } from '@/components/NotFoundView';
 import { SkeletonView } from '@/components/SkeletonView';
-import { AppTheme } from '@/constants/theme.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { FlatList, Platform, StyleSheet, useWindowDimensions } from 'react-native';
 
 interface MoviesFlatListProps {
   source: string;
   title?: string;
-  limit?: number;
-  focused?: boolean;
 }
 
-const ITEM_WIDTH = scaledPixels(181);
-const ITEM_SPACING = scaledPixels(26);
+const ITEM_SPACING = 14;
+const POSTER_RATIO = 3 / 2;
 
-export const MoviesFlatList = ({
-  source,
-  title,
-  limit = 10,
-  focused = false
-}: MoviesFlatListProps) => {
+export const MoviesFlatList = ({ source }: MoviesFlatListProps) => {
+  const { width, height } = useWindowDimensions();
   const { baseUrl, getMovieCards } = useAppContext();
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loadedPages, setLoadedPages] = useState(new Set<number>());
+
+  const NUM_COLUMNS = useMemo(() => (Platform.isTV ? 5 : width > height ? 4 : 2), [width, height]);
+
+  const ITEM_WIDTH = useMemo(
+    () => (width - ITEM_SPACING * (NUM_COLUMNS + 1)) / NUM_COLUMNS,
+    [width, NUM_COLUMNS]
+  );
+
+  const ITEM_HEIGHT = useMemo(() => ITEM_WIDTH * POSTER_RATIO, [ITEM_WIDTH]);
+
+  const skeletonData = useMemo(
+    () =>
+      Array.from({ length: NUM_COLUMNS * 2 }).map(
+        (_, i) => ({ source: `skeleton-${i}` }) as MovieProps
+      ),
+    []
+  );
 
   const fetchData = useCallback(async () => {
     if (loading || !hasMore || loadedPages.has(page)) return;
@@ -39,7 +49,7 @@ export const MoviesFlatList = ({
       setLoading(true);
       const response = await getMovieCards(baseUrl, source, page);
 
-      if (response.length < limit) {
+      if (response.length === 0) {
         setHasMore(false);
       }
 
@@ -66,16 +76,6 @@ export const MoviesFlatList = ({
   }, []);
 
   const renderEmpty = useCallback(() => {
-    if (loading) {
-      return (
-        <View style={styles.skeletonContainer}>
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <SkeletonView key={idx} />
-          ))}
-        </View>
-      );
-    }
-
     return (
       <NotFoundView
         icon="folder-open"
@@ -84,11 +84,7 @@ export const MoviesFlatList = ({
         style={{ height: scaledPixels(259) }}
       />
     );
-  }, [loading]);
-
-  const Separator = useCallback(() => <View style={{ width: ITEM_SPACING }} />, []);
-
-  const renderSkeletonItem = useCallback(() => <SkeletonView />, []);
+  }, []);
 
   const keyExtractor = useCallback(
     (item: MovieProps, index: number) => String(item.source || index),
@@ -96,50 +92,56 @@ export const MoviesFlatList = ({
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: MovieProps }) => <MovieCard {...item} onPress={handlePressSelectItem} />,
+    ({ item }: { item: MovieProps }) => (
+      <MovieCard
+        {...item}
+        style={{
+          width: ITEM_WIDTH,
+          height: ITEM_HEIGHT,
+          marginBottom: ITEM_SPACING
+        }}
+        onPress={handlePressSelectItem}
+      />
+    ),
     [handlePressSelectItem]
   );
 
-  const getItemLayout = useCallback(
-    (_: any, index: number) => ({
-      length: ITEM_WIDTH + ITEM_SPACING,
-      offset: (ITEM_WIDTH + ITEM_SPACING) * index,
-      index
-    }),
+  const renderSceleton = useCallback(
+    () => (
+      <SkeletonView
+        style={{
+          width: ITEM_WIDTH,
+          height: ITEM_HEIGHT,
+          marginBottom: ITEM_SPACING
+        }}
+      />
+    ),
     []
   );
 
   return (
-    <View style={styles.container}>
-      {title && (
-        <View style={styles.headerContainer}>
-          <Text style={[styles.headerText, focused && { color: AppTheme.colors.text }]}>
-            {title}
-          </Text>
-        </View>
-      )}
-
-      <FlatList
-        horizontal
-        data={loading && data.length === 0 ? Array(limit).fill({}) : data}
-        keyExtractor={keyExtractor}
-        renderItem={loading && data.length === 0 ? renderSkeletonItem : renderItem}
-        getItemLayout={getItemLayout}
-        onEndReached={fetchData}
-        onEndReachedThreshold={0.8}
-        showsHorizontalScrollIndicator={false}
-        ItemSeparatorComponent={Separator}
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingHorizontal: ITEM_SPACING,
-          paddingVertical: ITEM_SPACING
-        }}
-        initialNumToRender={6}
-        maxToRenderPerBatch={6}
-        windowSize={6}
-        removeClippedSubviews
-      />
-    </View>
+    <FlatList
+      key={NUM_COLUMNS}
+      data={loading && data.length === 0 ? skeletonData : data}
+      keyExtractor={keyExtractor}
+      renderItem={loading && data.length === 0 ? renderSceleton : renderItem}
+      numColumns={NUM_COLUMNS}
+      onEndReached={fetchData}
+      onEndReachedThreshold={0.8}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      ListEmptyComponent={renderEmpty}
+      contentContainerStyle={{
+        flexGrow: 1
+      }}
+      columnWrapperStyle={{
+        justifyContent: 'space-between'
+      }}
+      initialNumToRender={8}
+      maxToRenderPerBatch={8}
+      windowSize={8}
+      removeClippedSubviews
+    />
   );
 };
 
@@ -147,17 +149,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  headerContainer: {
-    paddingVertical: scaledPixels(8)
-  },
-  headerText: {
-    color: AppTheme.colors.subtext,
-    fontWeight: 'bold',
-    letterSpacing: scaledPixels(1),
-    fontSize: scaledPixels(20)
-  },
   skeletonContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: ITEM_SPACING,
     paddingHorizontal: ITEM_SPACING
   }

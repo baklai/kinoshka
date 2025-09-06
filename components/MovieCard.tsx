@@ -4,11 +4,11 @@ import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 interface MovieCardProps extends MovieProps {
+  style?: ViewStyle;
   onPress: (source: string) => void;
 }
 
@@ -19,113 +19,72 @@ export const MovieCard = ({
   imdb,
   likes,
   quality,
+  style,
   onPress
 }: MovieCardProps) => {
-  const scale = useRef(new Animated.Value(1)).current;
-  const glowOpacity = useRef(new Animated.Value(0)).current;
-
   return (
     <Pressable
       focusable
       onPress={() => onPress && onPress(source)}
-      style={({ pressed }) => [pressed && { opacity: 0.7 }]}
+      style={({ focused, pressed }) => [
+        style && style,
+        focused && { opacity: 0.5 },
+        pressed && { opacity: 0.7 }
+      ]}
     >
-      {({ focused }) => {
-        useEffect(() => {
-          Animated.parallel([
-            Animated.timing(scale, {
-              toValue: focused ? 1.08 : 1,
-              duration: 200,
-              useNativeDriver: true
-            }),
-            Animated.timing(glowOpacity, {
-              toValue: focused ? 1 : 0,
-              duration: 200,
-              useNativeDriver: false
-            })
-          ]).start();
-        }, [focused]);
+      {({ focused }) => (
+        <>
+          <View style={styles.container}>
+            {focused && <View style={styles.borderOverlay} />}
 
-        return (
-          <Animated.View style={[styles.container, { transform: [{ scale }] }]}>
-            <View style={styles.imageWrapper}>
-              <Animated.View
-                style={[
-                  StyleSheet.absoluteFillObject,
-                  styles.glowWrapper,
-                  { opacity: glowOpacity }
-                ]}
-              >
-                <LinearGradient
-                  colors={[AppTheme.colors.primary + '80', 'transparent']}
-                  style={StyleSheet.absoluteFillObject}
-                />
-              </Animated.View>
+            <Image
+              style={styles.image}
+              source={poster}
+              placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
+              contentFit="cover"
+              transition={300}
+            />
 
-              {focused && <View style={styles.borderOverlay} />}
+            <View style={styles.overlayTop}>
+              {imdb || likes ? (
+                <View style={styles.rating}>
+                  <Text style={styles.ratingText}>{imdb || likes}</Text>
+                </View>
+              ) : (
+                <View />
+              )}
 
-              <Image
-                style={styles.image}
-                source={poster}
-                placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
-                contentFit="cover"
-                transition={300}
-              />
-
-              <View style={styles.overlayTop}>
-                {imdb || likes ? (
-                  <View style={styles.rating}>
-                    <Text style={styles.ratingText}>{imdb || likes}</Text>
-                  </View>
-                ) : (
-                  <View />
-                )}
-
-                {quality && (
-                  <View style={styles.quality}>
-                    <Text style={styles.qualityText}>{quality}</Text>
-                  </View>
-                )}
-              </View>
-
-              {focused && <View style={styles.overlay} />}
+              {quality && (
+                <View style={styles.quality}>
+                  <Text style={styles.qualityText}>{quality}</Text>
+                </View>
+              )}
             </View>
+          </View>
 
-            <View style={styles.overlayBottom}>
-              <Text style={styles.title}>{title}</Text>
-            </View>
+          <View style={styles.overlayBottom}>
+            <Text style={styles.title}>{title}</Text>
+          </View>
 
-            {focused && (
-              <StyledIcon
-                icon="play-circle"
-                size="xlarge"
-                color={AppTheme.colors.primary}
-                style={styles.playIcon}
-              />
-            )}
-          </Animated.View>
-        );
-      }}
+          {focused && (
+            <StyledIcon
+              icon="play-circle"
+              size="xlarge"
+              color={AppTheme.colors.primary}
+              style={styles.playIcon}
+            />
+          )}
+        </>
+      )}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    borderRadius: scaledPixels(6),
-    overflow: 'visible'
-  },
-  imageWrapper: {
-    width: scaledPixels(181),
-    height: scaledPixels(259),
-    position: 'relative',
-    borderRadius: scaledPixels(6),
-    overflow: 'hidden'
-  },
-  glowWrapper: {
-    borderRadius: scaledPixels(6),
-    ...StyleSheet.absoluteFillObject
+    width: '100%',
+    height: '100%',
+    borderRadius: scaledPixels(6)
   },
   borderOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -208,9 +167,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: scaledPixels(2),
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.6)'
   }
 });

@@ -94,6 +94,7 @@
       "package": "com.anonymous.KinoshkaTV"
     },
     "ios": {
+      "requireFullScreen": true,
       "splash": {
         "image": "./assets/images/splash.png"
       }

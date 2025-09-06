@@ -1,4 +1,4 @@
-import { HeaderContent } from '@/components/HeaderContent';
+import { StackHeader } from '@/components/StackHeader';
 import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
 import { AppContext, AppContextValue } from '@/context';
@@ -31,9 +31,9 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
+  const { width, height } = useWindowDimensions();
   const { startUpdateCheck } = useAutoUpdate();
   const [loading, setLoading] = useState<boolean>(false);
-  const { width, height } = useWindowDimensions();
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
     return height >= width ? 'portrait' : 'landscape';
@@ -69,7 +69,7 @@ function RootLayout() {
           <AppContext.Provider value={AppContextValue}>
             <Stack
               screenOptions={{
-                header: () => <HeaderContent style={styles.header} />,
+                header: () => <StackHeader style={styles.header} />,
                 headerStyle: { backgroundColor: AppTheme.colors.background },
                 gestureEnabled: false,
                 headerBackVisible: false,
@@ -91,7 +91,7 @@ function RootLayout() {
           </AppContext.Provider>
         </>
       )}
-      <StatusBar hidden />
+      <StatusBar hidden style="dark" />
     </SafeAreaView>
   );
 }

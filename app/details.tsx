@@ -12,18 +12,31 @@ import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  useWindowDimensions,
+  View
+} from 'react-native';
 
 const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
+  const { width, height } = useWindowDimensions();
   const { baseUrl, getMovieDetails, getMovieEpisodes } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
   const [movie, setMovie] = useState<any | null>(null);
   const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const orientation = useMemo<'portrait' | 'landscape'>(() => {
+    return height >= width ? 'portrait' : 'landscape';
+  }, [width, height]);
 
   const toggleBookmark = async () => {
     const isBookmarkCkech = bookmarks.some((bookmark: MovieProps) => bookmark.source === source);
@@ -125,10 +138,20 @@ export default function DetailsScreen() {
       ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (
-        <View style={styles.container}>
+        <View
+          style={[
+            styles.container,
+            orientation === 'landscape' && { flexDirection: 'row' },
+            orientation === 'portrait' && { flexDirection: 'column' }
+          ]}
+        >
           <View style={styles.asideContainer}>
             <Image
-              style={styles.headerImage}
+              style={[
+                styles.headerImage,
+                orientation === 'landscape' && { height: '85%' },
+                orientation === 'portrait' && { width: '100%' }
+              ]}
               source={movie?.poster}
               placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
               contentFit="cover"
@@ -254,8 +277,7 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: scaledPixels(20),
-    flexDirection: 'row'
+    gap: scaledPixels(20)
   },
   asideContainer: {
     justifyContent: 'space-around'
@@ -291,7 +313,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap'
   },
   headerImage: {
-    height: '85%',
     aspectRatio: 2 / 3,
     borderRadius: scaledPixels(8)
   },
