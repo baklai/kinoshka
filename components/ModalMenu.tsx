@@ -126,7 +126,10 @@ export const ModalMenu = ({ visible, toggle }: ModalContentProps) => {
                 animated: true
               });
             }}
-            onPress={() => item?.onPress?.()}
+            onPress={() => {
+              toggle(false);
+              item?.onPress?.();
+            }}
             style={({ focused, pressed }) => [styles.pressable]}
           >
             {item.icon && <StyledIcon color={AppTheme.colors.text} icon={item.icon} />}
