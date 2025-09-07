@@ -38,8 +38,10 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx}\"",
+    "release": "node scripts/release.js",
     "prebuild": "cross-env EXPO_TV=1 expo prebuild --clean",
-    "release": "cd android && gradlew assembleRelease"
+    "build:debug": "cd android && gradlew assembleDebug",
+    "build:release": "cd android && gradlew assembleRelease"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
