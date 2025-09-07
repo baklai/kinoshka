@@ -2,14 +2,13 @@ import { ModalMenu } from '@/components/ModalMenu';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View, ViewProps } from 'react-native';
+import { Pressable, StyleSheet, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
 
 export const StackHeader = (props: HeaderContentProps) => {
-  const { title } = useLocalSearchParams<{ title: string }>();
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -25,20 +24,18 @@ export const StackHeader = (props: HeaderContentProps) => {
             onPress={toggleModal}
             style={({ focused, pressed }) => [
               styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.surface },
+              focused && { backgroundColor: AppTheme.colors.primary },
               pressed && { opacity: 0.7 }
             ]}
           >
             {({ focused }) => (
               <StyledIcon
                 size="large"
-                color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
                 icon="menu"
               />
             )}
           </Pressable>
-
-          {title && <Text style={{ color: AppTheme.colors.text }}>{title}</Text>}
         </View>
 
         <View style={styles.section}>
@@ -46,14 +43,14 @@ export const StackHeader = (props: HeaderContentProps) => {
             onPress={() => router.push('/search')}
             style={({ focused, pressed }) => [
               styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.surface },
+              focused && { backgroundColor: AppTheme.colors.primary },
               pressed && { opacity: 0.7 }
             ]}
           >
             {({ focused }) => (
               <StyledIcon
                 size="large"
-                color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
                 icon="magnify"
               />
             )}
@@ -63,14 +60,14 @@ export const StackHeader = (props: HeaderContentProps) => {
             onPress={() => router.push('/history')}
             style={({ focused, pressed }) => [
               styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.surface },
+              focused && { backgroundColor: AppTheme.colors.primary },
               pressed && { opacity: 0.7 }
             ]}
           >
             {({ focused }) => (
               <StyledIcon
                 size="large"
-                color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
                 icon="history"
               />
             )}
@@ -80,14 +77,14 @@ export const StackHeader = (props: HeaderContentProps) => {
             onPress={() => router.push('/bookmarks')}
             style={({ focused, pressed }) => [
               styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.surface },
+              focused && { backgroundColor: AppTheme.colors.primary },
               pressed && { opacity: 0.7 }
             ]}
           >
             {({ focused }) => (
               <StyledIcon
                 size="large"
-                color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
                 icon="bookmark"
               />
             )}
@@ -97,14 +94,14 @@ export const StackHeader = (props: HeaderContentProps) => {
             onPress={() => router.push('/options')}
             style={({ focused, pressed }) => [
               styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.surface },
+              focused && { backgroundColor: AppTheme.colors.primary },
               pressed && { opacity: 0.7 }
             ]}
           >
             {({ focused }) => (
               <StyledIcon
                 size="large"
-                color={focused ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
                 icon="cog-outline"
               />
             )}
