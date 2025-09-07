@@ -19,6 +19,7 @@ import { AppContext } from '@/context';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
 import { StyledIcon } from './StyledIcon';
+import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 
 interface ModalContentProps {
   visible: boolean;
@@ -36,6 +37,7 @@ const ITEM_HEIGHT = 60;
 
 export const ModalMenu = ({ visible, toggle }: ModalContentProps) => {
   const appContext = useContext(AppContext);
+  const { startUpdateCheck } = useAutoUpdate();
   const { height } = useWindowDimensions();
   const scrollY = useSharedValue(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -74,6 +76,11 @@ export const ModalMenu = ({ visible, toggle }: ModalContentProps) => {
           icon: 'cog-outline',
           title: 'Налаштування',
           onPress: () => router.push('/options')
+        },
+        {
+          icon: 'update',
+          title: 'Перевірити оновлення',
+          onPress: () => startUpdateCheck()
         },
         {
           icon: 'exit-to-app',

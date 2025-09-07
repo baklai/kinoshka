@@ -25,7 +25,7 @@ export const MoviesFlatList = ({ source }: MoviesFlatListProps) => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loadedPages, setLoadedPages] = useState(new Set<number>());
 
-  const NUM_COLUMNS = useMemo(() => (Platform.isTV ? 5 : width > height ? 4 : 2), [width, height]);
+  const NUM_COLUMNS = useMemo(() => (Platform.isTV ? 6 : width > height ? 4 : 2), [width, height]);
 
   const ITEM_WIDTH = useMemo(
     () => (width - ITEM_SPACING * (NUM_COLUMNS + 1)) / NUM_COLUMNS,
