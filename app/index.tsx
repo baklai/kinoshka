@@ -1,20 +1,26 @@
 import { MoviesFlatList } from '@/components/MoviesFlatList';
-import { AppContext } from '@/context';
+import { useAppContext } from '@/hooks/useAppContext';
+import { MovieProps } from '@/types/movie.type';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useContext } from 'react';
-import { StyleSheet, TVFocusGuideView, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, TVFocusGuideView } from 'react-native';
 
 export default function IndexScreen() {
-  const { source, title } = useLocalSearchParams<{ source: string; title: string }>();
-  const appContext = useContext(AppContext);
+  const { source } = useLocalSearchParams<{ source: string }>();
 
-  const [category] = appContext.categories;
+  const { baseUrl, categories, getMovieCards } = useAppContext();
+
+  const fetchData = async (page: number): Promise<MovieProps[]> => {
+    const fetchSource = source || categories[Math.floor(Math.random() * categories.length)].source;
+
+    if (!fetchSource) return [];
+
+    return await getMovieCards(baseUrl, fetchSource, page);
+  };
 
   return (
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
-      <View style={{ flex: 1 }}>
-        <MoviesFlatList source={source || category.source} title={title || category.title} />
-      </View>
+      <MoviesFlatList onFetch={fetchData} />
     </TVFocusGuideView>
   );
 }

@@ -1,7 +1,6 @@
 import { MovieCard } from '@/components/MovieCard';
 import { NotFoundView } from '@/components/NotFoundView';
 import { SkeletonView } from '@/components/SkeletonView';
-import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { router } from 'expo-router';
@@ -9,16 +8,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Platform, StyleSheet, useWindowDimensions } from 'react-native';
 
 interface MoviesFlatListProps {
-  source: string;
-  title?: string;
+  onFetch: (page: number) => Promise<MovieProps[]>;
 }
 
 const ITEM_SPACING = 14;
 const POSTER_RATIO = 3 / 2;
 
-export const MoviesFlatList = ({ source }: MoviesFlatListProps) => {
+export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
   const { width, height } = useWindowDimensions();
-  const { baseUrl, getMovieCards } = useAppContext();
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
@@ -47,9 +44,9 @@ export const MoviesFlatList = ({ source }: MoviesFlatListProps) => {
 
     try {
       setLoading(true);
-      const response = await getMovieCards(baseUrl, source, page);
+      const response = await onFetch(page);
 
-      if (response.length === 0) {
+      if (response?.length === 0) {
         setHasMore(false);
       }
 
@@ -62,6 +59,7 @@ export const MoviesFlatList = ({ source }: MoviesFlatListProps) => {
       setLoadedPages(prev => new Set(prev).add(page));
       setPage(prev => prev + 1);
     } catch (error) {
+      setHasMore(false);
       console.error('Fetch error:', error);
     } finally {
       setLoading(false);
@@ -81,7 +79,7 @@ export const MoviesFlatList = ({ source }: MoviesFlatListProps) => {
         icon="folder-open"
         text="Не вдалося знайти відео"
         size={64}
-        style={{ height: scaledPixels(259) }}
+        style={{ flex: 1, height: scaledPixels(259) }}
       />
     );
   }, []);
