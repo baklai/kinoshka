@@ -25,30 +25,53 @@ import {
 
 const Separator = () => <View style={styles.separator} />;
 
+const MAX_HISTORY_LENGTH = 24;
+
 export default function DetailsScreen() {
   const { width, height } = useWindowDimensions();
   const { baseUrl, getMovieDetails, getMovieEpisodes } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
   const [movie, setMovie] = useState<any | null>(null);
   const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const orientation = useMemo<'portrait' | 'landscape'>(() => {
     return height >= width ? 'portrait' : 'landscape';
   }, [width, height]);
 
+  const isBookmarked = useMemo(
+    () => bookmarks.some((bookmark: MovieProps) => bookmark.source === source),
+    [bookmarks]
+  );
+
   const toggleBookmark = async () => {
     const isBookmarkCkech = bookmarks.some((bookmark: MovieProps) => bookmark.source === source);
 
-    setIsBookmarked(isBookmarkCkech);
-
     const updatedBookmarks = isBookmarkCkech
       ? bookmarks.filter((bookmark: MovieProps) => bookmark.source !== source)
-      : [...bookmarks, movie];
+      : [...bookmarks, { source: movie.source, poster: movie.poster, title: movie.title }];
 
     setBookmarks(updatedBookmarks);
     await AsyncStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
+  };
+
+  const addToHistory = async (movie: MovieProps) => {
+    try {
+      const data = await AsyncStorage.getItem('history');
+      let history: MovieProps[] = data ? JSON.parse(data) : [];
+
+      history = history.filter(item => item.source !== movie.source);
+
+      history.unshift({ source: movie.source, poster: movie.poster, title: movie.title });
+
+      if (history.length > MAX_HISTORY_LENGTH) {
+        history = history.slice(0, MAX_HISTORY_LENGTH);
+      }
+
+      await AsyncStorage.setItem('history', JSON.stringify(history));
+    } catch (error) {
+      console.error('Failed to add to history:', error);
+    }
   };
 
   const openPlaylist = async (videos: EpisodeProps[], playlistName: string) => {
@@ -83,20 +106,7 @@ export default function DetailsScreen() {
         }
       });
 
-      ToastAndroid.show(`${playlistName} відкрито`, ToastAndroid.SHORT);
-
-      // const historyRaw = await AsyncStorage.getItem('history');
-      // const history: string[] = historyRaw ? JSON.parse(historyRaw) : [];
-      // let updated = false;
-      // for (const video of videos) {
-      //   if (!history.some((item: MovieProps) => video.source === item.source)) {
-      //     history.push(video.source);
-      //     updated = true;
-      //   }
-      // }
-      // if (updated) {
-      //   await AsyncStorage.setItem('history', JSON.stringify(history));
-      // }
+      ToastAndroid.show(`${playlistName} відкривається`, ToastAndroid.SHORT);
     } catch (error) {
       console.error('Error opening:', error);
       ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
@@ -164,7 +174,10 @@ export default function DetailsScreen() {
             <Pressable
               focusable
               hasTVPreferredFocus
-              onPress={() => openPlaylist(movie?.episodes, movie.originalTitle || movie.title)}
+              onPress={() => {
+                addToHistory(movie);
+                openPlaylist(movie?.episodes, movie.originalTitle || movie.title);
+              }}
               style={({ focused, pressed }) => [
                 styles.playButton,
                 focused && { backgroundColor: AppTheme.colors.primary },
