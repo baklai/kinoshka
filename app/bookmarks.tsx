@@ -1,34 +1,27 @@
-import { NotFoundView } from '@/components/NotFoundView';
+import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 export default function BookmarksScreen() {
-  const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await AsyncStorage.getItem('bookmarks');
-        if (data) {
-          setBookmarks([...JSON.parse(data)]);
-        }
-      } catch (error) {
-        console.error('Bookmarks error:', error);
+  const loadData = async (page: number): Promise<MovieProps[]> => {
+    try {
+      const data = await AsyncStorage.getItem('bookmarks');
+      if (data) {
+        return [...JSON.parse(data)];
+      } else {
+        return [];
       }
-    };
-
-    loadData();
-  }, []);
+    } catch (error) {
+      console.error('Bookmarks error:', error);
+      return [];
+    }
+  };
 
   return (
     <View style={styles.container} hasTVPreferredFocus>
-      {bookmarks?.length > 0 ? (
-        <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
-      ) : (
-        <NotFoundView icon="folder-open" text="Перелік закладок порожній" />
-      )}
+      <MoviesFlatList onFetch={loadData} />
     </View>
   );
 }

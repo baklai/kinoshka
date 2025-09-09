@@ -186,46 +186,50 @@ export default function SearchScreen() {
           orientation === 'portrait' && { flex: 1, flexDirection: 'column' }
         ]}
       >
-        <View style={[styles.suggestionSection, { maxHeight: scaledPixels(240) }]}>
-          <ScrollView
-            style={{ flex: 1 }}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-          >
-            {suggestions.map((item, idx) => {
-              return (
-                <Pressable
-                  key={`suggestions-${idx}`}
-                  style={({ focused, pressed }) => [
-                    styles.suggestionItem,
-                    orientation === 'portrait' && { alignSelf: 'auto' },
-                    pressed && { opacity: 0.7 },
-                    focused && { backgroundColor: AppTheme.colors.primary }
-                  ]}
-                  onPress={() => setQuery(item)}
-                >
-                  {({ focused }) => (
-                    <>
-                      <StyledIcon icon="history" />
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={[styles.suggestionText, focused && { fontWeight: 'bold' }]}
-                      >
-                        {item}
-                      </Text>
-                    </>
-                  )}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </View>
+        <ScrollView
+          style={[
+            { flex: 1, maxHeight: scaledPixels(240) },
+            orientation === 'portrait' && { marginBottom: 50 }
+          ]}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          {suggestions.map((item, idx) => {
+            return (
+              <Pressable
+                key={`suggestions-${idx}`}
+                style={({ focused, pressed }) => [
+                  styles.suggestionItem,
+                  orientation === 'portrait' && { alignSelf: 'auto' },
+                  pressed && { opacity: 0.7 },
+                  focused && { backgroundColor: AppTheme.colors.primary }
+                ]}
+                onPress={() => setQuery(item)}
+              >
+                {({ focused }) => (
+                  <>
+                    <StyledIcon icon="history" />
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={[styles.suggestionText, focused && { fontWeight: 'bold' }]}
+                    >
+                      {item}
+                    </Text>
+                  </>
+                )}
+              </Pressable>
+            );
+          })}
+        </ScrollView>
 
         <View
           style={[
             styles.keyboardSection,
-            orientation === 'portrait' && { alignItems: 'center', justifyContent: 'center' }
+            orientation === 'portrait' && {
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }
           ]}
           hasTVPreferredFocus
         >

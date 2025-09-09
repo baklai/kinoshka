@@ -9,6 +9,12 @@
     "scheme": "kinoshka",
     "plugins": [
       [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ],
+      [
         "@react-native-tvos/config-tv",
         {
           "isTV": true,

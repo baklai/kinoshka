@@ -79,7 +79,7 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
         icon="folder-open"
         text="Не вдалося знайти відео"
         size={64}
-        style={{ flex: 1, height: scaledPixels(259) }}
+        style={{ height: scaledPixels(259) }}
       />
     );
   }, []);
@@ -129,9 +129,7 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={renderEmpty}
-      contentContainerStyle={{
-        flexGrow: 1
-      }}
+      contentContainerStyle={[{ flexGrow: 1 }, !loading && data.length === 0 && { height: '100%' }]}
       columnWrapperStyle={{
         justifyContent: 'space-between'
       }}
@@ -146,11 +144,5 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
-  },
-  skeletonContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: ITEM_SPACING,
-    paddingHorizontal: ITEM_SPACING
   }
 });

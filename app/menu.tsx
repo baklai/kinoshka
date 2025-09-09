@@ -1,11 +1,15 @@
+import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
+import { AppContext } from '@/context';
+import { useAutoUpdate } from '@/hooks/useAutoUpdate';
+import { scaledPixels } from '@/hooks/useScaledPixels';
+import { IconType } from '@/types/icons.type';
 import { router } from 'expo-router';
 import React, { useContext, useMemo, useRef } from 'react';
 import {
   Alert,
   BackHandler,
-  Modal,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,18 +17,6 @@ import {
   useWindowDimensions
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
-
-import { AppTheme } from '@/constants/theme.constant';
-import { AppContext } from '@/context';
-import { scaledPixels } from '@/hooks/useScaledPixels';
-import { IconType } from '@/types/icons.type';
-import { StyledIcon } from './StyledIcon';
-import { useAutoUpdate } from '@/hooks/useAutoUpdate';
-
-interface ModalContentProps {
-  visible: boolean;
-  toggle: (value: boolean) => void;
-}
 
 interface NavMenuItem {
   icon?: IconType;
@@ -35,7 +27,7 @@ interface NavMenuItem {
 
 const ITEM_HEIGHT = 60;
 
-export const ModalMenu = ({ visible, toggle }: ModalContentProps) => {
+export default function ModalMenu() {
   const appContext = useContext(AppContext);
   const { startUpdateCheck } = useAutoUpdate();
   const { height } = useWindowDimensions();
@@ -134,7 +126,6 @@ export const ModalMenu = ({ visible, toggle }: ModalContentProps) => {
               });
             }}
             onPress={() => {
-              toggle(false);
               item?.onPress?.();
             }}
             style={({ focused, pressed }) => [styles.pressable]}
@@ -148,46 +139,28 @@ export const ModalMenu = ({ visible, toggle }: ModalContentProps) => {
   });
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        paddingHorizontal: scaledPixels(20),
-        backgroundColor: AppTheme.colors.background
-      }}
-    >
-      <Modal
-        transparent
-        animationType="fade"
-        visible={visible}
-        statusBarTranslucent={true}
-        onRequestClose={() => toggle(false)}
+    <View style={styles.container} hasTVPreferredFocus>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingVertical: (height - ITEM_HEIGHT) / 2
+        }}
+        onScroll={e => {
+          scrollY.value = e.nativeEvent.contentOffset.y;
+        }}
       >
-        <View style={styles.container}>
-          <ScrollView
-            ref={scrollRef}
-            showsVerticalScrollIndicator={false}
-            scrollEventThrottle={16}
-            contentContainerStyle={{
-              paddingVertical: (height - ITEM_HEIGHT) / 2
-            }}
-            onScroll={e => {
-              scrollY.value = e.nativeEvent.contentOffset.y;
-            }}
-          >
-            {navMenuList.map((item: any, index: number) => (
-              <AnimatedItem key={`nav-item-${index}`} item={item} index={index} />
-            ))}
-          </ScrollView>
-        </View>
-      </Modal>
-    </SafeAreaView>
+        {navMenuList.map((item: any, index: number) => (
+          <AnimatedItem key={`nav-item-${index}`} item={item} index={index} />
+        ))}
+      </ScrollView>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
     justifyContent: 'center',
     alignItems: 'center'
   },

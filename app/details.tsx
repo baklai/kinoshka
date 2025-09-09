@@ -85,23 +85,23 @@ export default function DetailsScreen() {
 
       ToastAndroid.show(`${playlistName} відкрито`, ToastAndroid.SHORT);
 
-      const historyRaw = await AsyncStorage.getItem('history');
-      const history: string[] = historyRaw ? JSON.parse(historyRaw) : [];
-      let updated = false;
-      for (const video of videos) {
-        if (!history.includes(video.source)) {
-          history.push(video.source);
-          updated = true;
-        }
-      }
-      if (updated) {
-        await AsyncStorage.setItem('history', JSON.stringify(history));
-      }
+      // const historyRaw = await AsyncStorage.getItem('history');
+      // const history: string[] = historyRaw ? JSON.parse(historyRaw) : [];
+      // let updated = false;
+      // for (const video of videos) {
+      //   if (!history.some((item: MovieProps) => video.source === item.source)) {
+      //     history.push(video.source);
+      //     updated = true;
+      //   }
+      // }
+      // if (updated) {
+      //   await AsyncStorage.setItem('history', JSON.stringify(history));
+      // }
     } catch (error) {
       console.error('Error opening:', error);
       ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
     } finally {
-      await sleep(3000);
+      await sleep(5000);
       setLoading(false);
     }
   };
@@ -138,12 +138,15 @@ export default function DetailsScreen() {
       ) : !movie ? (
         <NotFoundView icon="movie-off-outline" text="Відео не знайдено" />
       ) : (
-        <View
-          style={[
-            styles.container,
-            orientation === 'landscape' && { flexDirection: 'row' },
-            orientation === 'portrait' && { flexDirection: 'column' }
+        <ScrollView
+          contentContainerStyle={[
+            orientation === 'landscape' && styles.container,
+            orientation === 'landscape'
+              ? { flexDirection: 'row' }
+              : { flexDirection: 'column', alignItems: 'flex-start' }
           ]}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
         >
           <View style={styles.asideContainer}>
             <Image
@@ -208,11 +211,7 @@ export default function DetailsScreen() {
               </Pressable>
             </View>
 
-            <ScrollView
-              style={{ flex: 1 }}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-            >
+            <View style={{ flex: 1 }}>
               {movie?.imdb && movie?.imdb?.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
@@ -266,9 +265,9 @@ export default function DetailsScreen() {
               {movie?.description && movie?.description?.length > 0 && (
                 <Text style={styles.headerDescription}>{movie.description}</Text>
               )}
-            </ScrollView>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       )}
     </View>
   );

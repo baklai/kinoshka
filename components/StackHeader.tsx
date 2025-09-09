@@ -1,116 +1,106 @@
-import { ModalMenu } from '@/components/ModalMenu';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, View, ViewProps } from 'react-native';
 
 interface HeaderContentProps extends ViewProps {}
 
 export const StackHeader = (props: HeaderContentProps) => {
   const router = useRouter();
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
 
   return (
-    <>
-      <View style={[styles.container, props.style]} hasTVPreferredFocus={false}>
-        <View style={styles.section}>
-          <Pressable
-            onPress={toggleModal}
-            style={({ focused, pressed }) => [
-              styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.primary },
-              pressed && { opacity: 0.7 }
-            ]}
-          >
-            {({ focused }) => (
-              <StyledIcon
-                size="large"
-                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
-                icon="menu"
-              />
-            )}
-          </Pressable>
-        </View>
-
-        <View style={styles.section}>
-          <Pressable
-            onPress={() => router.push('/search')}
-            style={({ focused, pressed }) => [
-              styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.primary },
-              pressed && { opacity: 0.7 }
-            ]}
-          >
-            {({ focused }) => (
-              <StyledIcon
-                size="large"
-                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
-                icon="magnify"
-              />
-            )}
-          </Pressable>
-
-          <Pressable
-            onPress={() => router.push('/history')}
-            style={({ focused, pressed }) => [
-              styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.primary },
-              pressed && { opacity: 0.7 }
-            ]}
-          >
-            {({ focused }) => (
-              <StyledIcon
-                size="large"
-                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
-                icon="history"
-              />
-            )}
-          </Pressable>
-
-          <Pressable
-            onPress={() => router.push('/bookmarks')}
-            style={({ focused, pressed }) => [
-              styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.primary },
-              pressed && { opacity: 0.7 }
-            ]}
-          >
-            {({ focused }) => (
-              <StyledIcon
-                size="large"
-                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
-                icon="bookmark"
-              />
-            )}
-          </Pressable>
-
-          <Pressable
-            onPress={() => router.push('/options')}
-            style={({ focused, pressed }) => [
-              styles.pressableIcon,
-              focused && { backgroundColor: AppTheme.colors.primary },
-              pressed && { opacity: 0.7 }
-            ]}
-          >
-            {({ focused }) => (
-              <StyledIcon
-                size="large"
-                color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
-                icon="cog-outline"
-              />
-            )}
-          </Pressable>
-        </View>
+    <View style={[styles.container, props.style]} hasTVPreferredFocus={false}>
+      <View style={styles.section}>
+        <Pressable
+          onPress={() => router.push('/menu')}
+          style={({ focused, pressed }) => [
+            styles.pressableIcon,
+            focused && { backgroundColor: AppTheme.colors.primary },
+            pressed && { opacity: 0.7 }
+          ]}
+        >
+          {({ focused }) => (
+            <StyledIcon
+              size="large"
+              color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+              icon="menu"
+            />
+          )}
+        </Pressable>
       </View>
 
-      <ModalMenu visible={modalVisible} toggle={setModalVisible} />
-    </>
+      <View style={styles.section}>
+        <Pressable
+          onPress={() => router.push('/search')}
+          style={({ focused, pressed }) => [
+            styles.pressableIcon,
+            focused && { backgroundColor: AppTheme.colors.primary },
+            pressed && { opacity: 0.7 }
+          ]}
+        >
+          {({ focused }) => (
+            <StyledIcon
+              size="large"
+              color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+              icon="magnify"
+            />
+          )}
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/history')}
+          style={({ focused, pressed }) => [
+            styles.pressableIcon,
+            focused && { backgroundColor: AppTheme.colors.primary },
+            pressed && { opacity: 0.7 }
+          ]}
+        >
+          {({ focused }) => (
+            <StyledIcon
+              size="large"
+              color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+              icon="history"
+            />
+          )}
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/bookmarks')}
+          style={({ focused, pressed }) => [
+            styles.pressableIcon,
+            focused && { backgroundColor: AppTheme.colors.primary },
+            pressed && { opacity: 0.7 }
+          ]}
+        >
+          {({ focused }) => (
+            <StyledIcon
+              size="large"
+              color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+              icon="bookmark"
+            />
+          )}
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/options')}
+          style={({ focused, pressed }) => [
+            styles.pressableIcon,
+            focused && { backgroundColor: AppTheme.colors.primary },
+            pressed && { opacity: 0.7 }
+          ]}
+        >
+          {({ focused }) => (
+            <StyledIcon
+              size="large"
+              color={focused ? AppTheme.colors.text : AppTheme.colors.subtext}
+              icon="cog-outline"
+            />
+          )}
+        </Pressable>
+      </View>
+    </View>
   );
 };
 
