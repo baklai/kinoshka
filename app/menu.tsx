@@ -19,7 +19,7 @@ import {
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 interface NavMenuItem {
-  icon?: IconType;
+  icon?: string;
   title?: string;
   separator?: boolean;
   onPress?: () => void;
@@ -34,7 +34,7 @@ export default function ModalMenu() {
   const scrollY = useSharedValue(0);
   const scrollRef = useRef<ScrollView>(null);
 
-  const navMenuList = useMemo(() => {
+  const navMenuList: NavMenuItem[] = useMemo(() => {
     return [
       ...appContext.categories.map(item => {
         return {
@@ -122,7 +122,7 @@ export default function ModalMenu() {
             item.separator && { height: scaledPixels(1), opacity: 0.3 }
           ]}
         >
-          {item.icon && <StyledIcon color={AppTheme.colors.text} icon={item.icon} />}
+          {item.icon && <StyledIcon color={AppTheme.colors.text} icon={item.icon as IconType} />}
           {item.title && <Text style={styles.text}>{item.title}</Text>}
         </Pressable>
       </Animated.View>
@@ -149,7 +149,7 @@ export default function ModalMenu() {
           scrollY.value = e.nativeEvent.contentOffset.y;
         }}
       >
-        {navMenuList.map((item: any, index: number) => (
+        {navMenuList.map((item: NavMenuItem, index: number) => (
           <AnimatedItem key={`nav-item-${index}`} item={item} index={index} />
         ))}
       </ScrollView>
