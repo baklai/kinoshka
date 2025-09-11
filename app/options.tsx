@@ -1,86 +1,45 @@
-import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
-import { router } from 'expo-router';
+import { AccordionSection, StyledAccordion } from '@/components/StyledAccordion';
+import { IconType } from '@/types/icons.type';
 import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TVFocusGuideView, View } from 'react-native';
 
-const settingsData = [
-  { id: '1', icon: 'videocam', title: 'Відео', subtitle: 'Налаштування плеєра та джерел відео' },
-  { id: '3', icon: 'movie', title: 'Каталог', subtitle: 'Налаштування каталогу фільмів/серіалів' },
-  { id: '4', icon: 'style', title: 'Вигляд та поведінка', subtitle: 'Тема, сортування' },
+const sections: AccordionSection[] = [
   {
-    id: '5',
-    icon: 'save',
+    icon: 'video' as IconType,
+    title: 'Відео',
+    subtitle: 'Налаштування плеєра та джерел відео',
+    content: <View></View>
+  },
+  {
+    icon: 'movie-roll' as IconType,
+    title: 'Каталог',
+    subtitle: 'Налаштування каталогу фільмів/серіалів',
+    content: <View></View>
+  },
+  {
+    icon: 'theme-light-dark' as IconType,
+    title: 'Вигляд та поведінка',
+    subtitle: 'Тема, сортування',
+    content: <View></View>
+  },
+  {
+    icon: 'content-save' as IconType,
     title: 'Збережені дані',
-    subtitle: 'Керування збереженими даними (історія, кеш, закладки)'
-  },
-  {
-    id: '6',
-    icon: 'person',
-    title: 'Профілі',
-    subtitle: 'Налаштування профілів сторонніх ресурсів'
-  },
-  { id: '7', icon: 'block', title: 'Блокування', subtitle: '' }
+    subtitle: 'Керування збереженими даними (історія, кеш, закладки)',
+    content: <View></View>
+  }
 ];
 
 export default function OptionsScreen() {
-  const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      activeOpacity={0.5}
-      style={styles.item}
-      onPress={() => router.push('/options')}
-    >
-      <StyledIcon
-        icon="cog-outline"
-        size="large"
-        color={AppTheme.colors.text}
-        style={styles.icon}
-      />
-      <View style={styles.textBlock}>
-        <Text style={styles.title}>{item.title}</Text>
-        {item.subtitle ? <Text style={styles.subtitle}>{item.subtitle}</Text> : null}
-      </View>
-    </TouchableOpacity>
-  );
   return (
-    <View style={styles.container}>
-      <FlatList data={settingsData} renderItem={renderItem} keyExtractor={item => item.id} />
-    </View>
+    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
+      <StyledAccordion sections={sections} />
+    </TVFocusGuideView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: scaledPixels(10)
-  },
   container: {
-    flex: 1,
-    padding: scaledPixels(10)
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: scaledPixels(12),
-    borderBottomWidth: scaledPixels(0.5),
-    borderBottomColor: AppTheme.colors.border
-  },
-  icon: {
-    marginRight: scaledPixels(15)
-  },
-  textBlock: {
     flex: 1
-  },
-  title: {
-    color: AppTheme.colors.text,
-    fontSize: scaledPixels(16),
-    fontWeight: '600'
-  },
-  subtitle: {
-    color: AppTheme.colors.subtext,
-    fontSize: scaledPixels(13),
-    marginTop: scaledPixels(2)
   }
 });
