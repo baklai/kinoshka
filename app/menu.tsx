@@ -75,6 +75,11 @@ export default function MenuScreen() {
           onPress: () => startUpdateCheck()
         },
         {
+          icon: 'information-outline',
+          title: 'Про додаток',
+          onPress: () => router.push('/about')
+        },
+        {
           icon: 'exit-to-app',
           title: 'Вихід',
           onPress: () => {

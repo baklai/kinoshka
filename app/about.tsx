@@ -1,10 +1,15 @@
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
+import * as Application from 'expo-application';
 import { Image } from 'expo-image';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function AboutScreen() {
+  const currentVersion = useMemo(() => {
+    return Application.nativeApplicationVersion || '0.0.0';
+  }, [Application]);
+
   return (
     <View style={styles.container} hasTVPreferredFocus>
       <Image
@@ -19,22 +24,18 @@ export default function AboutScreen() {
         програвається з відкритих ресурсів. Автори додатку не несуть відповідальності за данні
         ролики, ніяк не пов'язані з розміщенням та розповсюдженням відеоматеріалів.
       </Text>
+
+      <Text style={styles.text}>Поточна версія v{currentVersion}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: scaledPixels(10)
-  },
   container: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: scaledPixels(6),
     gap: scaledPixels(6)
   },
   text: {
