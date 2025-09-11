@@ -142,7 +142,7 @@ export default function DetailsScreen() {
   }, []);
 
   return (
-    <View style={{ flex: 1 }} hasTVPreferredFocus>
+    <View style={{ flex: 1 }} hasTVPreferredFocus key={source}>
       {loading ? (
         <StyledLoader />
       ) : !movie ? (

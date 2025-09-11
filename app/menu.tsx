@@ -12,8 +12,8 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  TVFocusGuideView,
   Text,
-  View,
   useWindowDimensions
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
@@ -83,7 +83,13 @@ export default function ModalMenu() {
                 text: 'Скасувати',
                 onPress: () => null
               },
-              { text: 'Так', onPress: () => BackHandler.exitApp() }
+              {
+                text: 'Так',
+                onPress: () => {
+                  router.back();
+                  BackHandler.exitApp();
+                }
+              }
             ]);
           }
         }
@@ -101,45 +107,37 @@ export default function ModalMenu() {
 
     return (
       <Animated.View style={[styles.item, animatedStyle]}>
-        {item.separator ? (
-          <View
-            onFocus={() => {
-              scrollRef.current?.scrollTo({
-                y: index * ITEM_HEIGHT,
-                animated: true
-              });
-            }}
-            style={{
-              height: scaledPixels(1),
-              backgroundColor: AppTheme.colors.primary
-            }}
-          >
-            <Text style={styles.text}>separator - separator - separator</Text>
-          </View>
-        ) : (
-          <Pressable
-            focusable
-            onFocus={() => {
-              scrollRef.current?.scrollTo({
-                y: index * ITEM_HEIGHT,
-                animated: true
-              });
-            }}
-            onPress={() => {
-              item?.onPress?.();
-            }}
-            style={({ focused, pressed }) => [styles.pressable]}
-          >
-            {item.icon && <StyledIcon color={AppTheme.colors.text} icon={item.icon} />}
-            <Text style={styles.text}>{item.title}</Text>
-          </Pressable>
-        )}
+        <Pressable
+          focusable
+          onFocus={() => {
+            scrollRef.current?.scrollTo({
+              y: index * ITEM_HEIGHT,
+              animated: true
+            });
+          }}
+          onPress={item?.onPress}
+          style={({ focused }) => [
+            styles.pressable,
+            focused && { opacity: 0.85 },
+            item.separator && { height: scaledPixels(1), opacity: 0.3 }
+          ]}
+        >
+          {item.icon && <StyledIcon color={AppTheme.colors.text} icon={item.icon} />}
+          {item.title && <Text style={styles.text}>{item.title}</Text>}
+        </Pressable>
       </Animated.View>
     );
   });
 
   return (
-    <View style={styles.container} hasTVPreferredFocus>
+    <TVFocusGuideView
+      style={styles.container}
+      trapFocusLeft
+      trapFocusRight
+      trapFocusDown
+      trapFocusUp
+      hasTVPreferredFocus
+    >
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -155,7 +153,7 @@ export default function ModalMenu() {
           <AnimatedItem key={`nav-item-${index}`} item={item} index={index} />
         ))}
       </ScrollView>
-    </View>
+    </TVFocusGuideView>
   );
 }
 
