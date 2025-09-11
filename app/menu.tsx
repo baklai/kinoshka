@@ -27,7 +27,7 @@ interface NavMenuItem {
 
 const ITEM_HEIGHT = 60;
 
-export default function ModalMenu() {
+export default function MenuScreen() {
   const appContext = useContext(AppContext);
   const { startUpdateCheck } = useAutoUpdate();
   const { height } = useWindowDimensions();
@@ -109,6 +109,7 @@ export default function ModalMenu() {
       <Animated.View style={[styles.item, animatedStyle]}>
         <Pressable
           focusable
+          hasTVPreferredFocus={index === 0}
           onFocus={() => {
             scrollRef.current?.scrollTo({
               y: index * ITEM_HEIGHT,
