@@ -18,7 +18,7 @@ if (!version) {
   process.exit(1);
 }
 
-const apkPath = path.join(
+const originalApkPath = path.join(
   __dirname,
   '..',
   'android',
@@ -30,15 +30,28 @@ const apkPath = path.join(
   'app-release.apk'
 );
 
-if (!fs.existsSync(apkPath)) {
-  console.error(`❌ APK not found in path: ${apkPath}`);
+if (!fs.existsSync(originalApkPath)) {
+  console.error(`❌ APK not found in path: ${originalApkPath}`);
   process.exit(1);
 }
 
-let releaseNotes = '';
+const customApkName = `${appName.toLowerCase()}-${version}.apk`;
+const customApkPath = path.join(
+  __dirname,
+  '..',
+  'android',
+  'app',
+  'build',
+  'outputs',
+  'apk',
+  'release',
+  customApkName
+);
+
+fs.copyFileSync(originalApkPath, customApkPath);
 
 try {
-  releaseNotes = fs.readFileSync(path.join(__dirname, 'README.md'), 'utf-8');
+  fs.readFileSync(path.join(__dirname, 'README.md'), 'utf-8');
 } catch (err) {
   console.warn('⚠️ README.md not found!');
   process.exit(1);
@@ -49,7 +62,7 @@ try {
   execSync(`git push origin ${version}`, { stdio: 'inherit' });
 
   execSync(
-    `gh release create ${version} ${apkPath} --title "${appName} ${version}" --notes "${releaseNotes}"`,
+    `gh release create ${version} ${customApkPath} --title "${appName} ${version}" --notes-file "${path.join(__dirname, 'README.md')}"`,
     { stdio: 'inherit' }
   );
 
