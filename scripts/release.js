@@ -49,7 +49,7 @@ try {
   execSync(`git push origin ${version}`, { stdio: 'inherit' });
 
   execSync(
-    `gh release create ${version} ${apkPath} --title "${appName} ${version}" --notes "${releaseNotes.replace(/\n/g, '\\n')}"`,
+    `gh release create ${version} ${apkPath} --title "${appName} ${version}" --notes "${releaseNotes}"`,
     { stdio: 'inherit' }
   );
 
