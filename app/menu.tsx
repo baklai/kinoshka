@@ -40,7 +40,7 @@ export default function MenuScreen() {
         return {
           title: item.title,
           onPress: () => {
-            router.push({
+            router.replace({
               pathname: '/',
               params: { title: item.title, source: item.source }
             });
@@ -52,32 +52,35 @@ export default function MenuScreen() {
         {
           icon: 'magnify',
           title: 'Пошук',
-          onPress: () => router.push('/search')
+          onPress: () => router.replace('/search')
         },
         {
           icon: 'history',
           title: 'Історія',
-          onPress: () => router.push('/history')
+          onPress: () => router.replace('/history')
         },
         {
           icon: 'bookmark',
           title: 'Закладки',
-          onPress: () => router.push('/bookmarks')
+          onPress: () => router.replace('/bookmarks')
         },
         {
           icon: 'cog-outline',
           title: 'Налаштування',
-          onPress: () => router.push('/options')
+          onPress: () => router.replace('/options')
         },
         {
           icon: 'update',
           title: 'Перевірити оновлення',
-          onPress: () => startUpdateCheck()
+          onPress: () => {
+            router.back();
+            startUpdateCheck();
+          }
         },
         {
           icon: 'information-outline',
           title: 'Про додаток',
-          onPress: () => router.push('/about')
+          onPress: () => router.replace('/about')
         },
         {
           icon: 'exit-to-app',

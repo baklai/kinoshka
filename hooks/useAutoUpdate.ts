@@ -1,5 +1,5 @@
 import * as Application from 'expo-application';
-import { Alert, Platform, ToastAndroid } from 'react-native';
+import { Alert, Linking, Platform, ToastAndroid } from 'react-native';
 import { AppUpdate } from 'react-native-update-in-app';
 
 const GITHUB_OWNER = process.env.EXPO_PUBLIC_GITHUB_OWNER;
@@ -12,7 +12,19 @@ AppUpdate.onDownloadProgress(event => {
 
   if (event.status === 'end') {
     ToastAndroid.show('Завантаження закінчилось', ToastAndroid.SHORT);
-    AppUpdate.installApp(event.apkFileName);
+    try {
+      AppUpdate.installApp(event.apkFileName);
+    } catch (e) {
+      console.error('Install error:', e);
+      Alert.alert(
+        'Не вдалось встановити',
+        'Схоже, що потрібно надати дозвіл на установку APK. Відкрийте налаштування та дозвольте установку з цього джерела.',
+        [
+          { text: 'Скасувати', style: 'cancel' },
+          { text: 'Відкрити налаштування', onPress: () => Linking.openSettings() }
+        ]
+      );
+    }
   }
 
   if (event.status === 'error') {
@@ -24,12 +36,9 @@ AppUpdate.onDownloadProgress(event => {
 export function useAutoUpdate() {
   const startUpdateCheck = async () => {
     try {
-      if (process.env.NODE_ENV === 'development') {
-        return;
-      }
-      if (Platform.OS === 'ios') {
-        return;
-      }
+      if (process.env.NODE_ENV === 'development') return;
+      if (Platform.OS === 'ios') return;
+
       await checkForUpdate();
     } catch (error) {
       console.log('Error checking for updates:', error);
@@ -68,7 +77,24 @@ export function useAutoUpdate() {
                   ToastAndroid.SHORT
                 )
             },
-            { text: 'Завантажити', onPress: () => AppUpdate.downloadApp(apkUrl) }
+            {
+              text: 'Завантажити',
+              onPress: async () => {
+                try {
+                  AppUpdate.downloadApp(apkUrl);
+                } catch (e) {
+                  console.error('Download error:', e);
+                  Alert.alert(
+                    'Не вдалося завантажити',
+                    'Переконайтесь, що у додатку є дозвіл на установку APK.',
+                    [
+                      { text: 'Скасувати', style: 'cancel' },
+                      { text: 'Відкрити налаштування', onPress: () => Linking.openSettings() }
+                    ]
+                  );
+                }
+              }
+            }
           ],
           {
             cancelable: true,
