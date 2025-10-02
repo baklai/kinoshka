@@ -1,9 +1,6 @@
 # KinoshkaTV
 
-## Change your mind for the breakup
-
-- Git - [Please install Git](https://git-scm.com/downloads).
-- Node.js - [Download and install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+The app allows users to quickly find popular movies, cartoons, shows, TV series, and other video content in good quality on public resources.
 
 ## Project variables
 
