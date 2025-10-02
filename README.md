@@ -2,9 +2,7 @@
 
 The app allows users to quickly find popular movies, cartoons, shows, TV series, and other video content in good quality on public resources.
 
-<p align="center">
-  <img src="preview.png" alt="KinoshkaTV"/>
-</p>
+<img src="preview.png" alt="KinoshkaTV"/>
 
 ## Project variables
 
