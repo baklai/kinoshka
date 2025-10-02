@@ -2,7 +2,7 @@
 
 The app allows users to quickly find popular movies, cartoons, shows, TV series, and other video content in good quality on public resources.
 
-## Project variables
+### Project variables
 
 | Key                        | Comment          |
 | -------------------------- | ---------------- |
@@ -10,7 +10,7 @@ The app allows users to quickly find popular movies, cartoons, shows, TV series,
 | `EXPO_PUBLIC_GITHUB_OWNER` | GitHub Owner     |
 | `EXPO_PUBLIC_GITHUB_REPO`  | GitHub Repo      |
 
-## Get started
+### Get started
 
 1. Install dependencies
 
@@ -33,7 +33,7 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Learn more
+### Learn more
 
 To learn more about developing your project with Expo, look at the following resources:
 
