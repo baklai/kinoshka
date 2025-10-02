@@ -3,27 +3,13 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState<string>('');
+  const [isFocused, setIsFocused] = useState(true);
   const { baseUrl, searchUrl, searchMovieCards } = useAppContext();
-
-  // useEffect(() => {
-  //   if (query.length < 3) return;
-
-  //   const handler = setTimeout(async () => {
-  //     try {
-  //       const response = await searchMovieCards(baseUrl, searchUrl, query);
-  //     } catch (error) {
-  //       console.error('Fetch error:', error);
-  //     }
-  //   }, 5000);
-
-  //   return () => clearTimeout(handler);
-  // }, [query]);
 
   const fetchData = useCallback(
     async (page: number) => {
@@ -38,16 +24,15 @@ export default function SearchScreen() {
     [query, baseUrl, searchMovieCards]
   );
 
-  useFocusEffect(() => {
-    return () => {
-      Keyboard.dismiss();
-    };
-  });
-
   return (
-    <View style={styles.container}>
+    <View style={styles.container} hasTVPreferredFocus>
       <View style={styles.searchSection}>
-        <View style={styles.searchSectionInput}>
+        <View
+          style={[
+            styles.searchSectionInput,
+            isFocused && { borderWidth: scaledPixels(3), borderColor: AppTheme.colors.primary }
+          ]}
+        >
           <StyledIcon icon="magnify" size="normal" color={AppTheme.colors.subtext} />
           <TextInput
             autoFocus
@@ -61,6 +46,8 @@ export default function SearchScreen() {
             onChangeText={setQuery}
             value={query}
             placeholder="Пошук відео..."
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
           />
 
           {query.length > 0 && (
@@ -92,7 +79,9 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <MoviesFlatList onFetch={fetchData} />
+      <View style={styles.container}>
+        <MoviesFlatList onFetch={fetchData} key={query} />
+      </View>
     </View>
   );
 }
@@ -105,13 +94,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingBottom: scaledPixels(12),
     marginVertical: scaledPixels(10)
   },
   searchSectionInput: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    height: scaledPixels(48),
     borderRadius: scaledPixels(48),
     marginLeft: scaledPixels(10),
     paddingHorizontal: scaledPixels(20),
