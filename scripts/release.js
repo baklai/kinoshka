@@ -3,7 +3,6 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const appConfigJSON = fs.readFileSync(path.join(__dirname, '..', 'app.json'), 'utf-8');
-
 const appConfig = JSON.parse(appConfigJSON);
 
 const appName = appConfig?.expo?.name || 'KinoshkaTV';
@@ -58,16 +57,27 @@ try {
 }
 
 try {
-  execSync(`git tag -a ${version} -m "Release ${version}"`, { stdio: 'inherit' });
-  execSync(`git push origin ${version}`, { stdio: 'inherit' });
+  execSync(`gh release view ${version}`, { stdio: 'ignore' });
+
+  console.log(`ℹ️ Release ${version} already exists, uploading new APK...`);
+  execSync(`gh release upload ${version} ${customApkPath} --clobber`, { stdio: 'inherit' });
+
+  console.log(`✅ APK for ${appName} ${version} has been updated!`);
+} catch {
+  console.log(`ℹ️ Release ${version} not found, creating a new one...`);
+
+  try {
+    execSync(`git rev-parse ${version}`, { stdio: 'ignore' });
+    console.log(`ℹ️ Git tag ${version} already exists, skipping tag creation.`);
+  } catch {
+    execSync(`git tag -a ${version} -m "Release ${version}"`, { stdio: 'inherit' });
+    execSync(`git push origin ${version}`, { stdio: 'inherit' });
+  }
 
   execSync(
     `gh release create ${version} ${customApkPath} --title "${appName} ${version}" --notes-file "${path.join(__dirname, 'README.md')}"`,
     { stdio: 'inherit' }
   );
 
-  console.log(`✅ Release ${appName} ${version} created and APK uploaded!`);
-} catch (err) {
-  console.error('❌ Error creating release:', err.message);
-  process.exit(1);
+  console.log(`✅ New release ${appName} ${version} created and APK uploaded!`);
 }
