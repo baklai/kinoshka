@@ -194,7 +194,9 @@ export const AppContextValue = {
       if (iframeSrc) {
         const iframeResponse = await fetch(iframeSrc);
         const iframeHtml = await iframeResponse.text();
-        const fileMatch = iframeHtml.match(/file\s*:\s*"([^"]+)"/);
+
+        const fileMatch = iframeHtml.match(/file\s*:\s*['"]([^'"]+)['"]/);
+
         const source = fileMatch ? fileMatch[1] : null;
 
         if (title && source) {
@@ -264,7 +266,7 @@ export const AppContextValue = {
 
             if (href) {
               const file = (await fetch(href).then(r => r.text())).match(
-                /file\s*:\s*"([^"]+)"/
+                /file\s*:\s*['"]([^'"]+)['"]/
               )?.[1];
 
               return {

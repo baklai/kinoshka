@@ -41,7 +41,7 @@ export function useAutoUpdate() {
 
       await checkForUpdate();
     } catch (error) {
-      console.log('Error checking for updates:', error);
+      console.error('Error checking for updates:', error);
     }
   };
 
