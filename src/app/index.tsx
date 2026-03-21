@@ -19,11 +19,11 @@ export default function IndexScreen() {
       try {
         return await getMovieCards(baseUrl, fetchSource, page);
       } catch (error) {
-        console.error('Ошибка загрузки фильмов:', error);
+        console.error('Помилка завантаження фільмів:', error);
         return [];
       }
     },
-    [source, baseUrl, getMovieCards]
+    [fetchSource, baseUrl, getMovieCards] // fix: було [source, ...], має бути [fetchSource, ...]
   );
 
   return (

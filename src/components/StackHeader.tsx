@@ -111,30 +111,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: AppTheme.colors.background
   },
-
   section: {
     gap: scaledPixels(20),
     flexDirection: 'row',
     alignItems: 'center'
   },
-
   pressableIcon: {
     aspectRatio: 1,
     width: scaledPixels(48),
     height: scaledPixels(48),
-    borderRadius: '50%',
+    borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center'
-  },
-
-  focused: {
-    color: AppTheme.colors.primary,
-    borderColor: AppTheme.colors.primary,
-    fontWeight: 'bold'
-  },
-
-  pressed: {
-    color: AppTheme.colors.text,
-    borderColor: AppTheme.colors.text
   }
 });

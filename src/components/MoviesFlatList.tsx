@@ -4,8 +4,8 @@ import { SkeletonView } from '@/components/SkeletonView';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 import { router } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, Platform, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, Platform, useWindowDimensions } from 'react-native';
 
 interface MoviesFlatListProps {
   onFetch: (page: number) => Promise<MovieProps[]>;
@@ -31,12 +31,13 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
 
   const ITEM_HEIGHT = useMemo(() => ITEM_WIDTH * POSTER_RATIO, [ITEM_WIDTH]);
 
+  // fix: додано NUM_COLUMNS до залежностей
   const skeletonData = useMemo(
     () =>
       Array.from({ length: NUM_COLUMNS * 2 }).map(
         (_, i) => ({ source: `skeleton-${i}` }) as MovieProps
       ),
-    []
+    [NUM_COLUMNS]
   );
 
   const fetchData = useCallback(async () => {
@@ -64,7 +65,12 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore, loadedPages]);
+  }, [page, loading, hasMore, loadedPages, onFetch]);
+
+  // Автоматичне завантаження першої сторінки при монтуванні
+  useEffect(() => {
+    fetchData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePressSelectItem = useCallback((source: string) => {
     router.push({
@@ -74,6 +80,7 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
   }, []);
 
   const renderEmpty = useCallback(() => {
+    if (loading) return null;
     return (
       <NotFoundView
         icon="folder-open"
@@ -82,7 +89,7 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
         style={{ height: scaledPixels(259) }}
       />
     );
-  }, []);
+  }, [loading]);
 
   const keyExtractor = useCallback(
     (item: MovieProps, index: number) => String(item.source || index),
@@ -101,10 +108,11 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
         onPress={handlePressSelectItem}
       />
     ),
-    [handlePressSelectItem]
+    [ITEM_WIDTH, ITEM_HEIGHT, handlePressSelectItem]
   );
 
-  const renderSceleton = useCallback(
+  // fix: додано ITEM_WIDTH, ITEM_HEIGHT до залежностей
+  const renderSkeleton = useCallback(
     () => (
       <SkeletonView
         style={{
@@ -114,25 +122,28 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
         }}
       />
     ),
-    []
+    [ITEM_WIDTH, ITEM_HEIGHT]
   );
+
+  const isInitialLoading = loading && data.length === 0;
 
   return (
     <FlatList
       key={NUM_COLUMNS}
-      data={loading && data.length === 0 ? skeletonData : data}
+      data={isInitialLoading ? skeletonData : data}
       keyExtractor={keyExtractor}
-      renderItem={loading && data.length === 0 ? renderSceleton : renderItem}
+      renderItem={isInitialLoading ? renderSkeleton : renderItem}
       numColumns={NUM_COLUMNS}
       onEndReached={fetchData}
       onEndReachedThreshold={0.8}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={renderEmpty}
-      contentContainerStyle={[{ flexGrow: 1 }, !loading && data.length === 0 && { height: '100%' }]}
-      columnWrapperStyle={{
-        justifyContent: 'space-between'
-      }}
+      contentContainerStyle={[
+        { flexGrow: 1 },
+        !isInitialLoading && data.length === 0 && { height: '100%' }
+      ]}
+      columnWrapperStyle={{ justifyContent: 'space-between' }}
       initialNumToRender={8}
       maxToRenderPerBatch={8}
       windowSize={8}
@@ -140,9 +151,3 @@ export const MoviesFlatList = ({ onFetch }: MoviesFlatListProps) => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});

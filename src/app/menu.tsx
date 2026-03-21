@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-interface NavMenuItem {
+export interface NavMenuItem {
   icon?: string;
   title?: string;
   separator?: boolean;
@@ -27,85 +27,17 @@ interface NavMenuItem {
 
 const ITEM_HEIGHT = 60;
 
-export default function MenuScreen() {
-  const appContext = useContext(AppContext);
-  const { startUpdateCheck } = useAutoUpdate();
-  const { height } = useWindowDimensions();
-  const scrollY = useSharedValue(0);
-  const scrollRef = useRef<ScrollView>(null);
-
-  const navMenuList: NavMenuItem[] = useMemo(() => {
-    return [
-      ...appContext.categories.map(item => {
-        return {
-          title: item.title,
-          onPress: () => {
-            router.replace({
-              pathname: '/',
-              params: { title: item.title, source: item.source }
-            });
-          }
-        };
-      }),
-      ...[
-        { separator: true },
-        {
-          icon: 'magnify',
-          title: 'Пошук',
-          onPress: () => router.replace('/search')
-        },
-        {
-          icon: 'history',
-          title: 'Історія',
-          onPress: () => router.replace('/history')
-        },
-        {
-          icon: 'bookmark',
-          title: 'Закладки',
-          onPress: () => router.replace('/bookmarks')
-        },
-        {
-          icon: 'cog-outline',
-          title: 'Налаштування',
-          onPress: () => router.replace('/options')
-        },
-        {
-          icon: 'update',
-          title: 'Перевірити оновлення',
-          onPress: () => {
-            router.back();
-            startUpdateCheck();
-          }
-        },
-        {
-          icon: 'information-outline',
-          title: 'Про додаток',
-          onPress: () => router.replace('/about')
-        },
-        {
-          icon: 'exit-to-app',
-          title: 'Вихід',
-          onPress: () => {
-            Alert.alert('Зачекай!', 'Ви впевнені, що хочете вийти?', [
-              {
-                text: 'Скасувати',
-                onPress: () => null
-              },
-              {
-                text: 'Так',
-                onPress: () => {
-                  router.back();
-                  BackHandler.exitApp();
-                }
-              }
-            ]);
-          }
-        }
-      ]
-    ];
-  }, [appContext]);
-
-  const AnimatedItem = React.memo(({ item, index }: { item: NavMenuItem; index: number }) => {
+// Винесено за межі MenuScreen, щоб React.memo справді зберігав референс
+const AnimatedItem = React.memo(
+  ({
+    item,
+    index,
+    scrollY
+  }: {
+    item: NavMenuItem;
+    index: number;
+    scrollY: ReturnType<typeof useSharedValue<number>>;
+  }) => {
     const animatedStyle = useAnimatedStyle(() => {
       const position = (index * ITEM_HEIGHT - scrollY.value) / ITEM_HEIGHT;
       const scale = interpolate(position, [-1, 0, 1], [0.9, 1, 0.9]);
@@ -118,12 +50,6 @@ export default function MenuScreen() {
         <Pressable
           focusable
           hasTVPreferredFocus={index === 0}
-          onFocus={() => {
-            scrollRef.current?.scrollTo({
-              y: index * ITEM_HEIGHT,
-              animated: true
-            });
-          }}
           onPress={item?.onPress}
           style={({ focused }) => [
             styles.pressable,
@@ -136,7 +62,79 @@ export default function MenuScreen() {
         </Pressable>
       </Animated.View>
     );
-  });
+  }
+);
+
+export default function MenuScreen() {
+  const appContext = useContext(AppContext);
+  const { startUpdateCheck } = useAutoUpdate();
+  const { height } = useWindowDimensions();
+  const scrollY = useSharedValue(0);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const navMenuList: NavMenuItem[] = useMemo(() => {
+    return [
+      ...appContext.categories.map(item => ({
+        title: item.title,
+        onPress: () => {
+          router.replace({
+            pathname: '/',
+            params: { title: item.title, source: item.source }
+          });
+        }
+      })),
+      { separator: true },
+      {
+        icon: 'magnify',
+        title: 'Пошук',
+        onPress: () => router.replace('/search')
+      },
+      {
+        icon: 'history',
+        title: 'Історія',
+        onPress: () => router.replace('/history')
+      },
+      {
+        icon: 'bookmark',
+        title: 'Закладки',
+        onPress: () => router.replace('/bookmarks')
+      },
+      {
+        icon: 'cog-outline',
+        title: 'Налаштування',
+        onPress: () => router.replace('/options')
+      },
+      {
+        icon: 'update',
+        title: 'Перевірити оновлення',
+        onPress: () => {
+          router.back();
+          startUpdateCheck();
+        }
+      },
+      {
+        icon: 'information-outline',
+        title: 'Про додаток',
+        onPress: () => router.replace('/about')
+      },
+      {
+        icon: 'exit-to-app',
+        title: 'Вихід',
+        onPress: () => {
+          Alert.alert('Зачекай!', 'Ви впевнені, що хочете вийти?', [
+            { text: 'Скасувати', onPress: () => null },
+            {
+              text: 'Так',
+              onPress: () => {
+                router.back();
+                BackHandler.exitApp();
+              }
+            }
+          ]);
+        }
+      }
+    ];
+  }, [appContext, startUpdateCheck]);
 
   return (
     <TVFocusGuideView
@@ -151,15 +149,13 @@ export default function MenuScreen() {
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingVertical: (height - ITEM_HEIGHT) / 2
-        }}
+        contentContainerStyle={{ paddingVertical: (height - ITEM_HEIGHT) / 2 }}
         onScroll={e => {
           scrollY.value = e.nativeEvent.contentOffset.y;
         }}
       >
         {navMenuList.map((item: NavMenuItem, index: number) => (
-          <AnimatedItem key={`nav-item-${index}`} item={item} index={index} />
+          <AnimatedItem key={`nav-item-${index}`} item={item} index={index} scrollY={scrollY} />
         ))}
       </ScrollView>
     </TVFocusGuideView>

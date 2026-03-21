@@ -1,23 +1,19 @@
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { MovieProps } from '@/types/movie.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export default function HistoryScreen() {
-  const loadData = async (page: number): Promise<MovieProps[]> => {
+export default function BookmarksScreen() {
+  const loadData = useCallback(async (_page: number): Promise<MovieProps[]> => {
     try {
-      const data = await AsyncStorage.getItem('history');
-      if (data) {
-        return [...JSON.parse(data)];
-      } else {
-        return [];
-      }
+      const data = await AsyncStorage.getItem('bookmarks');
+      return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('History error:', error);
+      console.error('Bookmarks error:', error);
       return [];
     }
-  };
+  }, []);
 
   return (
     <View style={styles.container} hasTVPreferredFocus>

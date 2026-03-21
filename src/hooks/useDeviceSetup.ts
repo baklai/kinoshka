@@ -10,13 +10,17 @@ export function useDeviceSetup() {
 
   useEffect(() => {
     const prepare = async () => {
-      if (
-        Platform.isTV ||
-        Platform.isTVOS ||
-        Device.deviceType === Device.DeviceType.TABLET ||
-        Device.deviceType === Device.DeviceType.DESKTOP
-      ) {
+      const isTV = Platform.isTV || Platform.isTVOS;
+      const isTablet =
+        !isTV &&
+        (Device.deviceType === Device.DeviceType.TABLET ||
+          Device.deviceType === Device.DeviceType.DESKTOP);
+
+      if (isTV) {
         setDeviceKind('tv');
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+      } else if (isTablet) {
+        setDeviceKind('tablet');
         await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
       } else {
         setDeviceKind('phone');

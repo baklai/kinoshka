@@ -5,12 +5,13 @@ import { AppTheme } from '@/constants/theme.constant';
 import { AppContext, AppContextValue } from '@/context';
 import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
+import { useOrientation } from '@/hooks/useOrientation';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -33,17 +34,13 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
-  const { width, height } = useWindowDimensions();
+  const orientation = useOrientation();
   const { startUpdateCheck } = useAutoUpdate();
   const deviceKind = useDeviceSetup();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const orientation = useMemo<'portrait' | 'landscape'>(() => {
-    return height >= width ? 'portrait' : 'landscape';
-  }, [width, height]);
-
   useEffect(() => {
-    const fetchData = async () => {
+    const init = async () => {
       try {
         setLoading(true);
         startUpdateCheck();
@@ -54,61 +51,57 @@ function RootLayout() {
       }
     };
 
-    fetchData();
+    init();
   }, []);
 
   return (
     <SafeAreaView
       style={[
         styles.container,
-        orientation === 'landscape' && { paddingHorizontal: scaledPixels(40) }
+        orientation === 'landscape' && styles.containerLandscape
       ]}
       edges={orientation === 'portrait' ? ['top', 'bottom'] : []}
     >
       {loading ? (
         <StyledLoader />
       ) : (
-        <>
-          <AppContext.Provider value={AppContextValue}>
-            <Stack
-              screenOptions={{
-                header: () =>
-                  deviceKind === 'tv' || deviceKind === 'tablet' ? (
-                    <StackHeader style={styles.header} />
-                  ) : null,
-                headerStyle: { backgroundColor: AppTheme.colors.background },
-                gestureEnabled: false,
-                headerBackVisible: false,
-                animation: 'fade_from_bottom',
-                contentStyle: {
-                  backgroundColor: AppTheme.colors.background
-                }
+        <AppContext.Provider value={AppContextValue}>
+          <Stack
+            screenOptions={{
+              header: () =>
+                deviceKind === 'tv' || deviceKind === 'tablet' ? (
+                  <StackHeader style={styles.header} />
+                ) : null,
+              headerStyle: { backgroundColor: AppTheme.colors.background },
+              gestureEnabled: false,
+              headerBackVisible: false,
+              animation: 'fade_from_bottom',
+              contentStyle: { backgroundColor: AppTheme.colors.background }
+            }}
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen
+              name="menu"
+              options={{
+                headerShown: false,
+                presentation: 'transparentModal',
+                animation: 'fade',
+                contentStyle: { backgroundColor: 'rgba(15, 15, 15, 0.9)' }
               }}
-            >
-              <Stack.Screen name="index" />
-              <Stack.Screen
-                name="menu"
-                options={{
-                  headerShown: false,
-                  presentation: 'transparentModal',
-                  animation: 'fade',
-                  contentStyle: { backgroundColor: 'rgba(15, 15, 15, 0.9)' }
-                }}
-              />
-              <Stack.Screen name="about" />
-              <Stack.Screen name="search" />
-              <Stack.Screen name="details" />
-              <Stack.Screen name="bookmarks" />
-              <Stack.Screen name="history" />
-              <Stack.Screen name="options" />
-              <Stack.Screen name="+not-found" />
-            </Stack>
+            />
+            <Stack.Screen name="about" />
+            <Stack.Screen name="search" />
+            <Stack.Screen name="details" />
+            <Stack.Screen name="bookmarks" />
+            <Stack.Screen name="history" />
+            <Stack.Screen name="options" />
+            <Stack.Screen name="+not-found" />
+          </Stack>
 
-            {deviceKind === 'phone' && <StackTabs />}
+          {deviceKind === 'phone' && <StackTabs />}
 
-            <StatusBar hidden={deviceKind === 'tv' || deviceKind === 'tablet'} style="auto" />
-          </AppContext.Provider>
-        </>
+          <StatusBar hidden={deviceKind === 'tv' || deviceKind === 'tablet'} style="auto" />
+        </AppContext.Provider>
       )}
     </SafeAreaView>
   );
@@ -119,6 +112,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: scaledPixels(20),
     backgroundColor: AppTheme.colors.background
+  },
+  containerLandscape: {
+    paddingHorizontal: scaledPixels(40)
   },
   header: {
     marginVertical: scaledPixels(20)

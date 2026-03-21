@@ -4,6 +4,7 @@ import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useOrientation } from '@/hooks/useOrientation';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { sleep } from '@/utils';
@@ -19,7 +20,6 @@ import {
   StyleSheet,
   Text,
   ToastAndroid,
-  useWindowDimensions,
   View
 } from 'react-native';
 
@@ -28,26 +28,23 @@ const Separator = () => <View style={styles.separator} />;
 const MAX_HISTORY_LENGTH = 24;
 
 export default function DetailsScreen() {
-  const { width, height } = useWindowDimensions();
+  const orientation = useOrientation();
   const { baseUrl, getMovieDetails, getMovieEpisodes } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
-  const [movie, setMovie] = useState<any | null>(null);
+
+  const [movie, setMovie] = useState<MovieProps | null>(null);
   const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const orientation = useMemo<'portrait' | 'landscape'>(() => {
-    return height >= width ? 'portrait' : 'landscape';
-  }, [width, height]);
-
   const isBookmarked = useMemo(
     () => bookmarks.some((bookmark: MovieProps) => bookmark.source === source),
-    [bookmarks]
+    [bookmarks, source]
   );
 
   const toggleBookmark = async () => {
-    const isBookmarkCkech = bookmarks.some((bookmark: MovieProps) => bookmark.source === source);
+    if (!movie) return;
 
-    const updatedBookmarks = isBookmarkCkech
+    const updatedBookmarks = isBookmarked
       ? bookmarks.filter((bookmark: MovieProps) => bookmark.source !== source)
       : [...bookmarks, { source: movie.source, poster: movie.poster, title: movie.title }];
 
@@ -61,7 +58,6 @@ export default function DetailsScreen() {
       let history: MovieProps[] = data ? JSON.parse(data) : [];
 
       history = history.filter(item => item.source !== movie.source);
-
       history.unshift({ source: movie.source, poster: movie.poster, title: movie.title });
 
       if (history.length > MAX_HISTORY_LENGTH) {
@@ -80,7 +76,6 @@ export default function DetailsScreen() {
 
       if (videos?.length === 0) {
         const episodes = await getMovieEpisodes(baseUrl, source);
-
         videos.push(...episodes);
       }
 
@@ -101,9 +96,7 @@ export default function DetailsScreen() {
         data: contentUri,
         type: 'application/vnd.apple.mpegurl',
         flags: 1,
-        extra: {
-          'android.intent.extra.INITIAL_INTENTS': []
-        }
+        extra: { 'android.intent.extra.INITIAL_INTENTS': [] }
       });
 
       ToastAndroid.show(`${playlistName} відкривається`, ToastAndroid.SHORT);
@@ -122,12 +115,12 @@ export default function DetailsScreen() {
         setLoading(true);
 
         if (source) {
-          const response = await getMovieDetails(baseUrl, source);
+          const [response, bookmarksData] = await Promise.all([
+            getMovieDetails(baseUrl, source),
+            AsyncStorage.getItem('bookmarks')
+          ]);
 
-          const bookmarks = await AsyncStorage.getItem('bookmarks');
-          if (bookmarks) {
-            setBookmarks([...JSON.parse(bookmarks)]);
-          }
+          if (bookmarksData) setBookmarks(JSON.parse(bookmarksData));
           setMovie(response);
         }
       } catch (error) {
@@ -139,10 +132,10 @@ export default function DetailsScreen() {
     };
 
     fetchMovie();
-  }, []);
+  }, [source]);
 
   return (
-    <View style={{ flex: 1 }} hasTVPreferredFocus>
+    <View style={styles.flex} hasTVPreferredFocus>
       {loading ? (
         <StyledLoader />
       ) : !movie ? (
@@ -150,10 +143,8 @@ export default function DetailsScreen() {
       ) : (
         <ScrollView
           contentContainerStyle={[
-            orientation === 'landscape' && styles.container,
-            orientation === 'landscape'
-              ? { flexDirection: 'row' }
-              : { flexDirection: 'column', alignItems: 'flex-start' }
+            styles.scrollContent,
+            orientation === 'landscape' ? styles.scrollLandscape : styles.scrollPortrait
           ]}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
@@ -162,8 +153,8 @@ export default function DetailsScreen() {
             <Image
               style={[
                 styles.headerImage,
-                orientation === 'landscape' && { height: '85%' },
-                orientation === 'portrait' && { width: '100%' }
+                orientation === 'landscape' && styles.headerImageLandscape,
+                orientation === 'portrait' && styles.headerImagePortrait
               ]}
               source={movie?.poster}
               placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
@@ -174,9 +165,9 @@ export default function DetailsScreen() {
             <Pressable
               focusable
               hasTVPreferredFocus
-              onPress={() => {
-                addToHistory(movie);
-                openPlaylist(movie?.episodes, movie.originalTitle || movie.title);
+              onPress={async () => {
+                await addToHistory(movie);
+                openPlaylist(movie?.episodes ?? [], movie.originalTitle || movie.title || '');
               }}
               style={({ focused, pressed }) => [
                 styles.playButton,
@@ -190,12 +181,14 @@ export default function DetailsScreen() {
           </View>
 
           <View style={styles.textContainer}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-              <View style={{ width: scaledPixels(40) }} />
+            <View style={styles.titleRow}>
+              <View style={styles.titleSpacer} />
 
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                {movie?.title?.length > 0 && <Text style={styles.headerTitle}>{movie.title}</Text>}
-                {movie?.originalTitle?.length > 0 && (
+              <View style={styles.titleCenter}>
+                {movie?.title && movie.title.length > 0 && (
+                  <Text style={styles.headerTitle}>{movie.title}</Text>
+                )}
+                {movie?.originalTitle && movie.originalTitle.length > 0 && (
                   <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
                 )}
               </View>
@@ -204,14 +197,7 @@ export default function DetailsScreen() {
                 focusable
                 onPress={toggleBookmark}
                 style={({ focused, pressed }) => [
-                  {
-                    aspectRatio: 1,
-                    width: scaledPixels(48),
-                    height: scaledPixels(48),
-                    borderRadius: '50%',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  },
+                  styles.bookmarkButton,
                   focused && { backgroundColor: AppTheme.colors.muted },
                   pressed && { opacity: 0.7 }
                 ]}
@@ -224,50 +210,43 @@ export default function DetailsScreen() {
               </Pressable>
             </View>
 
-            <View style={{ flex: 1 }}>
-              {movie?.imdb && movie?.imdb?.length > 0 && (
+            <View style={styles.flex}>
+              {movie?.imdb && movie.imdb.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
                 </Text>
               )}
-
-              {movie?.year && movie?.year?.length > 0 && (
+              {movie?.year && movie.year.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
                 </Text>
               )}
-
-              {movie?.age && movie?.age?.length > 0 && (
+              {movie?.age && movie.age.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Вік. рейтинг:</Text> {movie.age}
                 </Text>
               )}
-
-              {movie?.duration && movie?.duration?.length > 0 && (
+              {movie?.duration && movie.duration.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Тривалість:</Text> {movie.duration}
                 </Text>
               )}
-
-              {Array.isArray(movie?.genres) && movie?.genres?.length > 0 && (
+              {Array.isArray(movie?.genres) && movie.genres.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Жанр:</Text> {movie.genres.join(', ')}
                 </Text>
               )}
-
-              {Array.isArray(movie?.countries) && movie?.countries?.length > 0 && (
+              {Array.isArray(movie?.countries) && movie.countries.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Країна:</Text> {movie.countries.join(', ')}
                 </Text>
               )}
-
-              {Array.isArray(movie?.directors) && movie?.directors?.length > 0 && (
+              {Array.isArray(movie?.directors) && movie.directors.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Режисер:</Text> {movie.directors.join(', ')}
                 </Text>
               )}
-
-              {Array.isArray(movie?.actors) && movie?.actors?.length > 0 && (
+              {Array.isArray(movie?.actors) && movie.actors.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Актори:</Text> {movie.actors.join(', ')}
                 </Text>
@@ -275,7 +254,7 @@ export default function DetailsScreen() {
 
               <Separator />
 
-              {movie?.description && movie?.description?.length > 0 && (
+              {movie?.description && movie.description.length > 0 && (
                 <Text style={styles.headerDescription}>{movie.description}</Text>
               )}
             </View>
@@ -287,9 +266,19 @@ export default function DetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  flex: {
+    flex: 1
+  },
+  scrollContent: {
     gap: scaledPixels(20)
+  },
+  scrollLandscape: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  scrollPortrait: {
+    flexDirection: 'column',
+    alignItems: 'flex-start'
   },
   asideContainer: {
     justifyContent: 'space-around'
@@ -297,6 +286,26 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'column',
     flexShrink: 1
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%'
+  },
+  titleSpacer: {
+    width: scaledPixels(40)
+  },
+  titleCenter: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  bookmarkButton: {
+    aspectRatio: 1,
+    width: scaledPixels(48),
+    height: scaledPixels(48),
+    borderRadius: 9999,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   headerTitle: {
     color: AppTheme.colors.text,
@@ -328,22 +337,19 @@ const styles = StyleSheet.create({
     aspectRatio: 2 / 3,
     borderRadius: scaledPixels(8)
   },
-  headerButtonContainer: {
-    flexDirection: 'row',
-    marginVertical: scaledPixels(12)
+  headerImageLandscape: {
+    height: '85%' as any
+  },
+  headerImagePortrait: {
+    width: '100%' as any
   },
   playButton: {
-    height: '8%',
+    height: '8%' as any,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: AppTheme.colors.muted,
     borderRadius: scaledPixels(6)
-  },
-  playButtonContent: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   playButtonText: {
     color: AppTheme.colors.text,
