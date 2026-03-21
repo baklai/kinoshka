@@ -97,8 +97,8 @@ function findLabeledLinks(block: Element, label: string): string[] {
   return Array.from(block.querySelectorAll('.fi-item .fi-label h2'))
     .filter(el => el.textContent?.includes(label))
     .flatMap(el =>
-      Array.from(el.parentElement?.nextElementSibling?.querySelectorAll('a') ?? []).map(a =>
-        a.textContent?.trim() ?? ''
+      Array.from(el.parentElement?.nextElementSibling?.querySelectorAll('a') ?? []).map(
+        a => a.textContent?.trim() ?? ''
       )
     );
 }
@@ -122,10 +122,7 @@ async function parseEpisodesFromIframe(
   return [];
 }
 
-export async function getMovieDetails(
-  baseUrl: string,
-  source: string
-): Promise<MovieProps | null> {
+export async function getMovieDetails(baseUrl: string, source: string): Promise<MovieProps | null> {
   log('GET DETAILS', source);
 
   try {
@@ -149,14 +146,12 @@ export async function getMovieDetails(
     const likes = block.querySelector('[data-likes-id]')?.textContent?.trim() || null;
     const dislikes = block.querySelector('[data-dislikes-id]')?.textContent?.trim() || null;
     const year =
-      block.querySelector('.film-info .fi-item:nth-child(2) .fi-desc')?.textContent?.trim() ||
-      null;
+      block.querySelector('.film-info .fi-item:nth-child(2) .fi-desc')?.textContent?.trim() || null;
     const age =
-      block.querySelector('.film-info .fi-item:nth-child(3) .fi-desc')?.textContent?.trim() ||
-      null;
-    const countries = Array.from(
-      block.querySelectorAll('.fi-item:nth-child(4) .fi-desc a')
-    ).map(a => a.textContent?.trim() ?? '');
+      block.querySelector('.film-info .fi-item:nth-child(3) .fi-desc')?.textContent?.trim() || null;
+    const countries = Array.from(block.querySelectorAll('.fi-item:nth-child(4) .fi-desc a')).map(
+      a => a.textContent?.trim() ?? ''
+    );
     const genres = Array.from(block.querySelectorAll("[itemprop='genre'] a")).map(
       a => a.textContent?.trim() ?? ''
     );
@@ -211,27 +206,21 @@ async function resolveEpisodeSource(href: string): Promise<string> {
   }
 }
 
-export async function getMovieEpisodes(
-  _baseUrl: string,
-  source: string
-): Promise<EpisodeProps[]> {
+export async function getMovieEpisodes(_baseUrl: string, source: string): Promise<EpisodeProps[]> {
   log('GET EPISODES', source);
 
   const id = source?.match(/\/[^/]+\/(\d+)-/)?.[1];
   if (!id) return [];
 
   try {
-    const jsonData = await fetch(
-      `${EPISODES_API}?news_id=${id}&xfield=playlist`,
-      {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          Accept: 'application/json, text/javascript, */*; q=0.01',
-          Referer: source
-        }
+    const jsonData = await fetch(`${EPISODES_API}?news_id=${id}&xfield=playlist`, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Accept: 'application/json, text/javascript, */*; q=0.01',
+        Referer: source
       }
-    ).then(r => r.json());
+    }).then(r => r.json());
 
     const { document } = parseHTML(jsonData.response);
 

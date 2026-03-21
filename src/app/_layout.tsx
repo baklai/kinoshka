@@ -56,10 +56,7 @@ function RootLayout() {
 
   return (
     <SafeAreaView
-      style={[
-        styles.container,
-        orientation === 'landscape' && styles.containerLandscape
-      ]}
+      style={[styles.container, orientation === 'landscape' && styles.containerLandscape]}
       edges={orientation === 'portrait' ? ['top', 'bottom'] : []}
     >
       {loading ? (

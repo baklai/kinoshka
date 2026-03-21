@@ -14,14 +14,7 @@ import { Image } from 'expo-image';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  View
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 const Separator = () => <View style={styles.separator} />;
 
