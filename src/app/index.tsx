@@ -2,7 +2,12 @@ import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
-import { StyleSheet, TVFocusGuideView } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+
+// TVFocusGuideView існує тільки на нативних TV-платформах, на вебі — undefined
+const FocusContainer = Platform.isTV
+  ? require('react-native').TVFocusGuideView
+  : View;
 
 export default function IndexScreen() {
   const { source } = useLocalSearchParams<{ source: string }>();
@@ -23,13 +28,17 @@ export default function IndexScreen() {
         return [];
       }
     },
-    [fetchSource, baseUrl, getMovieCards] // fix: було [source, ...], має бути [fetchSource, ...]
+    [fetchSource, baseUrl, getMovieCards]
   );
 
+  const focusProps = Platform.isTV
+    ? { trapFocusLeft: true, trapFocusRight: true, trapFocusDown: true }
+    : {};
+
   return (
-    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
+    <FocusContainer style={styles.container} {...focusProps}>
       <MoviesFlatList onFetch={fetchData} key={fetchSource} />
-    </TVFocusGuideView>
+    </FocusContainer>
   );
 }
 

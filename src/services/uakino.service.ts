@@ -6,9 +6,20 @@
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { validUrl } from '@/utils';
 import { parseHTML } from 'linkedom';
+import { Platform } from 'react-native';
 
 const BASE_URL = 'https://uakino.best';
 const EPISODES_API = `${BASE_URL}/engine/ajax/playlists.php`;
+
+// На вебі браузер блокує прямі запити через CORS — використовуємо проксі
+const CORS_PROXY = 'https://corsproxy.io/?url=';
+
+function proxyUrl(url: string): string {
+  if (Platform.OS === 'web') {
+    return `${CORS_PROXY}${encodeURIComponent(url)}`;
+  }
+  return url;
+}
 
 function log(tag: string, message: string) {
   if (process.env.NODE_ENV === 'development') {
@@ -37,7 +48,7 @@ export async function getMovieCards(
   log('GET CARDS', url);
 
   try {
-    const html = await fetch(url).then(r => r.text());
+    const html = await fetch(proxyUrl(url)).then(r => r.text());
     const { document } = parseHTML(html);
     const items = document.querySelectorAll('div.movie-item.short-item');
 
@@ -68,7 +79,7 @@ export async function searchMovieCards(
   try {
     const params = new URLSearchParams({ do: 'search', subaction: 'search', story: search });
 
-    const html = await fetch(`${searchUrl}?${params.toString()}`, {
+    const html = await fetch(proxyUrl(`${searchUrl}?${params.toString()}`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).then(r => r.text());
@@ -108,7 +119,7 @@ async function parseEpisodesFromIframe(
   fallbackTitle: string | null
 ): Promise<EpisodeProps[]> {
   try {
-    const iframeHtml = await fetch(iframeSrc).then(r => r.text());
+    const iframeHtml = await fetch(proxyUrl(iframeSrc)).then(r => r.text());
     const fileMatch = iframeHtml.match(/file\s*:\s*['"]([^'"]+)['"]/);
     const source = fileMatch ? fileMatch[1] : null;
 
@@ -126,7 +137,7 @@ export async function getMovieDetails(baseUrl: string, source: string): Promise<
   log('GET DETAILS', source);
 
   try {
-    const html = await fetch(source).then(r => r.text());
+    const html = await fetch(proxyUrl(source)).then(r => r.text());
     const { document } = parseHTML(html);
 
     const block = document.querySelector('.film-info');
@@ -199,7 +210,7 @@ export async function getMovieDetails(baseUrl: string, source: string): Promise<
 
 async function resolveEpisodeSource(href: string): Promise<string> {
   try {
-    const text = await fetch(href).then(r => r.text());
+    const text = await fetch(proxyUrl(href)).then(r => r.text());
     return text.match(/file\s*:\s*['"]([^'"]+)['"]/)?.[1] || '';
   } catch {
     return '';
@@ -213,14 +224,17 @@ export async function getMovieEpisodes(_baseUrl: string, source: string): Promis
   if (!id) return [];
 
   try {
-    const jsonData = await fetch(`${EPISODES_API}?news_id=${id}&xfield=playlist`, {
-      method: 'GET',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        Accept: 'application/json, text/javascript, */*; q=0.01',
-        Referer: source
+    const jsonData = await fetch(
+      proxyUrl(`${EPISODES_API}?news_id=${id}&xfield=playlist`),
+      {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          Accept: 'application/json, text/javascript, */*; q=0.01',
+          Referer: source
+        }
       }
-    }).then(r => r.json());
+    ).then(r => r.json());
 
     const { document } = parseHTML(jsonData.response);
 
