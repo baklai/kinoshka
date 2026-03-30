@@ -1,9 +1,10 @@
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import { Animated, LayoutAnimation, Pressable, StyleSheet, Text, View } from 'react-native';
+
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
-import { Animated, LayoutAnimation, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface AccordionProps {
   sections: AccordionSection[];

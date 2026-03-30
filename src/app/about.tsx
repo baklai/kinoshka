@@ -1,9 +1,10 @@
-import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import * as Application from 'expo-application';
 import { Image } from 'expo-image';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
+import { AppTheme } from '@/constants/theme.constant';
+import { scaledPixels } from '@/hooks/useScaledPixels';
 
 export default function AboutScreen() {
   const currentVersion = useMemo(() => {

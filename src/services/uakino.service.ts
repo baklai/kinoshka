@@ -1,25 +1,20 @@
-/**
- * Сервіс для роботи з uakino.best:
- * парсинг карток, деталей фільму та епізодів серіалів.
- */
+import { parseHTML } from 'linkedom';
 
+import { EPISODES_API } from '@/constants/api.constant';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { validUrl } from '@/utils';
-import { parseHTML } from 'linkedom';
-import { Platform } from 'react-native';
 
-const BASE_URL = 'https://uakino.best';
-const EPISODES_API = `${BASE_URL}/engine/ajax/playlists.php`;
+const USER_AGENT =
+  'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36';
 
-// На вебі браузер блокує прямі запити через CORS — використовуємо проксі
-const CORS_PROXY = 'https://corsproxy.io/?url=';
+const DEFAULT_HEADERS: HeadersInit = {
+  'User-Agent': USER_AGENT,
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7'
+};
 
-function proxyUrl(url: string): string {
-  if (Platform.OS === 'web') {
-    return `${CORS_PROXY}${encodeURIComponent(url)}`;
-  }
-  return url;
-}
+const REQUEST_TIMEOUT_MS = 15_000;
+const MAX_RETRIES = 2;
 
 function log(tag: string, message: string) {
   if (process.env.NODE_ENV === 'development') {
@@ -27,7 +22,34 @@ function log(tag: string, message: string) {
   }
 }
 
-// ─── Картки фільмів ──────────────────────────────────────────────────────────
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  retries = MAX_RETRIES
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: { ...DEFAULT_HEADERS, ...(options.headers ?? {}) }
+    });
+
+    return response;
+  } catch (err: any) {
+    if (retries > 0 && err?.name !== 'AbortError') {
+      const delay = (MAX_RETRIES - retries + 1) * 1000;
+      log('RETRY', `${url} — залишилось спроб: ${retries}, затримка ${delay}ms`);
+      await new Promise(r => setTimeout(r, delay));
+      return fetchWithRetry(url, options, retries - 1);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function parseMovieCard(item: Element, baseUrl: string): MovieProps {
   const source = (item.querySelector('.movie-title') as HTMLAnchorElement)?.href || '';
@@ -39,28 +61,6 @@ function parseMovieCard(item: Element, baseUrl: string): MovieProps {
   return { source, title, poster: `${baseUrl}${poster}`, quality, likes };
 }
 
-export async function getMovieCards(
-  baseUrl: string,
-  source: string,
-  page?: number
-): Promise<MovieProps[]> {
-  const url = page ? `${source}/page/${page}/` : source;
-  log('GET CARDS', url);
-
-  try {
-    const html = await fetch(proxyUrl(url)).then(r => r.text());
-    const { document } = parseHTML(html);
-    const items = document.querySelectorAll('div.movie-item.short-item');
-
-    return Array.from(items).map(item => parseMovieCard(item, baseUrl));
-  } catch (err) {
-    console.error('Error fetching movie cards:', err);
-    return [];
-  }
-}
-
-// ─── Пошук ───────────────────────────────────────────────────────────────────
-
 function parseSearchCard(item: Element, baseUrl: string): MovieProps {
   const source = (item.querySelector('.movie-title') as HTMLAnchorElement)?.href || '';
   const title = item.querySelector('.movie-title')?.textContent?.trim() || '';
@@ -68,33 +68,6 @@ function parseSearchCard(item: Element, baseUrl: string): MovieProps {
 
   return { source, title, poster: `${baseUrl}${poster}` };
 }
-
-export async function searchMovieCards(
-  baseUrl: string,
-  searchUrl: string,
-  search: string
-): Promise<MovieProps[]> {
-  log('POST SEARCH', `${searchUrl} : ${search}`);
-
-  try {
-    const params = new URLSearchParams({ do: 'search', subaction: 'search', story: search });
-
-    const html = await fetch(proxyUrl(`${searchUrl}?${params.toString()}`), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    }).then(r => r.text());
-
-    const { document } = parseHTML(html);
-    const items = document.querySelectorAll('div.movie-item.short-item');
-
-    return Array.from(items).map(item => parseSearchCard(item, baseUrl));
-  } catch (err) {
-    console.error('Error searching movies:', err);
-    return [];
-  }
-}
-
-// ─── Деталі фільму ───────────────────────────────────────────────────────────
 
 function findLabeledField(block: Element, label: string): string | null {
   return (
@@ -119,7 +92,7 @@ async function parseEpisodesFromIframe(
   fallbackTitle: string | null
 ): Promise<EpisodeProps[]> {
   try {
-    const iframeHtml = await fetch(proxyUrl(iframeSrc)).then(r => r.text());
+    const iframeHtml = await fetchWithRetry(iframeSrc).then(r => r.text());
     const fileMatch = iframeHtml.match(/file\s*:\s*['"]([^'"]+)['"]/);
     const source = fileMatch ? fileMatch[1] : null;
 
@@ -133,11 +106,65 @@ async function parseEpisodesFromIframe(
   return [];
 }
 
+async function resolveEpisodeSource(href: string): Promise<string> {
+  try {
+    const text = await fetchWithRetry(href).then(r => r.text());
+    return text.match(/file\s*:\s*['"]([^'"]+)['"]/)?.[1] || '';
+  } catch {
+    return '';
+  }
+}
+
+export async function getMovieCards(
+  baseUrl: string,
+  source: string,
+  page?: number
+): Promise<MovieProps[]> {
+  const url = page && page > 1 ? `${source}/page/${page}/` : source;
+  log('GET CARDS', url);
+
+  try {
+    const html = await fetchWithRetry(url).then(r => r.text());
+    const { document } = parseHTML(html);
+    const items = document.querySelectorAll('div.movie-item.short-item');
+
+    return Array.from(items).map(item => parseMovieCard(item, baseUrl));
+  } catch (err) {
+    console.error('Error fetching movie cards:', err);
+    return [];
+  }
+}
+
+export async function searchMovieCards(
+  baseUrl: string,
+  searchUrl: string,
+  search: string
+): Promise<MovieProps[]> {
+  log('POST SEARCH', `${searchUrl} : ${search}`);
+
+  try {
+    const params = new URLSearchParams({ do: 'search', subaction: 'search', story: search });
+
+    const html = await fetchWithRetry(`${searchUrl}?${params.toString()}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).then(r => r.text());
+
+    const { document } = parseHTML(html);
+    const items = document.querySelectorAll('div.movie-item.short-item');
+
+    return Array.from(items).map(item => parseSearchCard(item, baseUrl));
+  } catch (err) {
+    console.error('Error searching movies:', err);
+    return [];
+  }
+}
+
 export async function getMovieDetails(baseUrl: string, source: string): Promise<MovieProps | null> {
   log('GET DETAILS', source);
 
   try {
-    const html = await fetch(proxyUrl(source)).then(r => r.text());
+    const html = await fetchWithRetry(source).then(r => r.text());
     const { document } = parseHTML(html);
 
     const block = document.querySelector('.film-info');
@@ -206,35 +233,25 @@ export async function getMovieDetails(baseUrl: string, source: string): Promise<
   }
 }
 
-// ─── Епізоди серіалу ─────────────────────────────────────────────────────────
-
-async function resolveEpisodeSource(href: string): Promise<string> {
-  try {
-    const text = await fetch(proxyUrl(href)).then(r => r.text());
-    return text.match(/file\s*:\s*['"]([^'"]+)['"]/)?.[1] || '';
-  } catch {
-    return '';
-  }
-}
-
 export async function getMovieEpisodes(_baseUrl: string, source: string): Promise<EpisodeProps[]> {
   log('GET EPISODES', source);
 
-  const id = source?.match(/\/[^/]+\/(\d+)-/)?.[1];
-  if (!id) return [];
+  const id = source?.match(/\/(\d+)-[^/]+(?:\/|$)/)?.[1];
+
+  if (!id) {
+    console.warn('[GET EPISODES] Could not extract movie ID from URL:', source);
+    return [];
+  }
 
   try {
-    const jsonData = await fetch(
-      proxyUrl(`${EPISODES_API}?news_id=${id}&xfield=playlist`),
-      {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          Accept: 'application/json, text/javascript, */*; q=0.01',
-          Referer: source
-        }
+    const jsonData = await fetchWithRetry(`${EPISODES_API}?news_id=${id}&xfield=playlist`, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Accept: 'application/json, text/javascript, */*; q=0.01',
+        Referer: source
       }
-    ).then(r => r.json());
+    }).then(r => r.json());
 
     const { document } = parseHTML(jsonData.response);
 

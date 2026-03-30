@@ -1,7 +1,8 @@
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, StyleSheet, View, ViewProps } from 'react-native';
+
+import { scaledPixels } from '@/hooks/useScaledPixels';
 
 const { width } = Dimensions.get('window');
 
@@ -27,7 +28,7 @@ export const SkeletonView = ({ style }: ViewProps) => {
     <View style={[styles.container, style && style]}>
       <Animated.View
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             transform: [{ translateX }]
           }
@@ -37,7 +38,7 @@ export const SkeletonView = ({ style }: ViewProps) => {
           colors={['transparent', '#27272750', 'transparent']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
       </Animated.View>
     </View>

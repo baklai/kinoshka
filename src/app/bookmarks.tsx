@@ -1,19 +1,26 @@
-import { MoviesFlatList } from '@/components/MoviesFlatList';
-import { MovieProps } from '@/types/movie.type';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSQLiteContext } from 'expo-sqlite';
 import React, { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { MoviesFlatList } from '@/components/MoviesFlatList';
+import { MovieProps } from '@/types/movie.type';
+
 export default function BookmarksScreen() {
-  const loadData = useCallback(async (_page: number): Promise<MovieProps[]> => {
-    try {
-      const data = await AsyncStorage.getItem('bookmarks');
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Bookmarks error:', error);
-      return [];
-    }
-  }, []);
+  const db = useSQLiteContext();
+
+  const loadData = useCallback(
+    async (_page: number): Promise<MovieProps[]> => {
+      try {
+        return await db.getAllAsync<MovieProps>(
+          'SELECT source, poster, title FROM bookmarks'
+        );
+      } catch (error) {
+        console.error('[BookmarksScreen] loadData error:', error);
+        return [];
+      }
+    },
+    [db]
+  );
 
   return (
     <View style={styles.container} hasTVPreferredFocus>

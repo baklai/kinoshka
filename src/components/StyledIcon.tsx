@@ -1,10 +1,11 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React from 'react';
+import { type ViewStyle, StyleSheet, View } from 'react-native';
+
 import { AppTheme } from '@/constants/theme.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { ColorType } from '@/types/colors.type';
 import { IconType } from '@/types/icons.type';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
-import { type ViewStyle, StyleSheet, View } from 'react-native';
 
 const ICON_SIZE = {
   small: 16,

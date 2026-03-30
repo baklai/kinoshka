@@ -1,9 +1,3 @@
-import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
-import { AppContext } from '@/context';
-import { useAutoUpdate } from '@/hooks/useAutoUpdate';
-import { scaledPixels } from '@/hooks/useScaledPixels';
-import { IconType } from '@/types/icons.type';
 import { router } from 'expo-router';
 import React, { useContext, useMemo, useRef } from 'react';
 import {
@@ -18,6 +12,13 @@ import {
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
+import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
+import { AppContext } from '@/context';
+import { useAutoUpdate } from '@/hooks/useAutoUpdate';
+import { scaledPixels } from '@/hooks/useScaledPixels';
+import { IconType } from '@/types/icons.type';
+
 export interface NavMenuItem {
   icon?: string;
   title?: string;
@@ -27,7 +28,6 @@ export interface NavMenuItem {
 
 const ITEM_HEIGHT = 60;
 
-// Винесено за межі MenuScreen, щоб React.memo справді зберігав референс
 const AnimatedItem = React.memo(
   ({
     item,

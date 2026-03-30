@@ -1,13 +1,11 @@
-import { MoviesFlatList } from '@/components/MoviesFlatList';
-import { useAppContext } from '@/hooks/useAppContext';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
-// TVFocusGuideView існує тільки на нативних TV-платформах, на вебі — undefined
-const FocusContainer = Platform.isTV
-  ? require('react-native').TVFocusGuideView
-  : View;
+import { MoviesFlatList } from '@/components/MoviesFlatList';
+import { useAppContext } from '@/hooks/useAppContext';
+
+const FocusContainer = Platform.isTV ? require('react-native').TVFocusGuideView : View;
 
 export default function IndexScreen() {
   const { source } = useLocalSearchParams<{ source: string }>();

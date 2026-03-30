@@ -1,3 +1,13 @@
+import { ThemeProvider } from '@react-navigation/native';
+import { Stack } from 'expo-router';
+import { SQLiteProvider, type SQLiteDatabase } from 'expo-sqlite';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { StackHeader } from '@/components/StackHeader';
 import { StackTabs } from '@/components/StackTabs';
 import { StyledLoader } from '@/components/StyledLoader';
@@ -7,26 +17,35 @@ import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
 import { useOrientation } from '@/hooks/useOrientation';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import { ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { MIGRATION_V1_BOOKMARKS, MIGRATION_V1_HISTORY } from '@/schemas/movie.schema';
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false
 });
 
+async function migrateDbIfNeeded(db: SQLiteDatabase) {
+  const DATABASE_VERSION = 2;
+
+  const result = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
+  const currentVersion = result?.user_version ?? 0;
+
+  if (currentVersion >= DATABASE_VERSION) return;
+
+  await db.execAsync(MIGRATION_V1_BOOKMARKS);
+  await db.execAsync(MIGRATION_V1_HISTORY);
+
+  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+}
+
 export default function RootLayoutProvider() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
       <SafeAreaProvider>
         <ThemeProvider value={AppTheme}>
-          <RootLayout />
+          <SQLiteProvider databaseName="kinodb.db" onInit={migrateDbIfNeeded}>
+            <RootLayout />
+          </SQLiteProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

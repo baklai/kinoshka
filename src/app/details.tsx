@@ -1,74 +1,51 @@
+import { File, Paths } from 'expo-file-system';
+import { Image } from 'expo-image';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
+
 import { NotFoundView } from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useBookmarks } from '@/hooks/useBookmarks';
+import { useHistory } from '@/hooks/useHistory';
 import { useOrientation } from '@/hooks/useOrientation';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { sleep } from '@/utils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
-import { Image } from 'expo-image';
-import * as IntentLauncher from 'expo-intent-launcher';
-import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 const Separator = () => <View style={styles.separator} />;
-
-const MAX_HISTORY_LENGTH = 24;
 
 export default function DetailsScreen() {
   const orientation = useOrientation();
   const { baseUrl, getMovieDetails, getMovieEpisodes } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
+  const { isBookmarked, toggleBookmark } = useBookmarks();
+  const { addToHistory } = useHistory();
 
   const [movie, setMovie] = useState<MovieProps | null>(null);
-  const [bookmarks, setBookmarks] = useState<MovieProps[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const isMountedRef = useRef(true);
 
-  const isBookmarked = useMemo(
-    () => bookmarks.some((bookmark: MovieProps) => bookmark.source === source),
-    [bookmarks, source]
-  );
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-  const toggleBookmark = async () => {
-    if (!movie) return;
-
-    const updatedBookmarks = isBookmarked
-      ? bookmarks.filter((bookmark: MovieProps) => bookmark.source !== source)
-      : [...bookmarks, { source: movie.source, poster: movie.poster, title: movie.title }];
-
-    setBookmarks(updatedBookmarks);
-    await AsyncStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
-  };
-
-  const addToHistory = async (movie: MovieProps) => {
-    try {
-      const data = await AsyncStorage.getItem('history');
-      let history: MovieProps[] = data ? JSON.parse(data) : [];
-
-      history = history.filter(item => item.source !== movie.source);
-      history.unshift({ source: movie.source, poster: movie.poster, title: movie.title });
-
-      if (history.length > MAX_HISTORY_LENGTH) {
-        history = history.slice(0, MAX_HISTORY_LENGTH);
-      }
-
-      await AsyncStorage.setItem('history', JSON.stringify(history));
-    } catch (error) {
-      console.error('Failed to add to history:', error);
-    }
-  };
+  const bookmarked = useMemo(() => isBookmarked(source ?? ''), [isBookmarked, source]);
 
   const openPlaylist = async (videos: EpisodeProps[], playlistName: string) => {
     try {
-      setLoading(true);
+      if (isMountedRef.current) setLoading(true);
 
-      if (videos?.length === 0) {
-        const episodes = await getMovieEpisodes(baseUrl, source);
+      if (videos.length === 0) {
+        const episodes = await getMovieEpisodes(baseUrl, source ?? '');
         videos.push(...episodes);
       }
 
@@ -77,13 +54,16 @@ export default function DetailsScreen() {
         m3uContent += `#EXTINF:-1,${video.title}\n${video.source}\n`;
       }
 
-      const cacheDir = FileSystem.cacheDirectory!;
-      const fileUri = `${cacheDir}${playlistName.replace(/\s+/g, '_')}.m3u`;
-      await FileSystem.writeAsStringAsync(fileUri, m3uContent, {
-        encoding: FileSystem.EncodingType.UTF8
-      });
+      const safeName = playlistName.replace(/\s+/g, '_');
+      const file = new File(Paths.cache, `${safeName}.m3u`);
 
-      const contentUri = await FileSystem.getContentUriAsync(fileUri);
+      if (file.exists) {
+        file.delete();
+      }
+
+      file.write(m3uContent);
+
+      const contentUri = file.contentUri;
 
       await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
         data: contentUri,
@@ -94,33 +74,31 @@ export default function DetailsScreen() {
 
       ToastAndroid.show(`${playlistName} відкривається`, ToastAndroid.SHORT);
     } catch (error) {
-      console.error('Error opening:', error);
+      console.error('Error opening playlist:', error);
       ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
     } finally {
       await sleep(5000);
-      setLoading(false);
+      if (isMountedRef.current) setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!source) return;
+
     const fetchMovie = async () => {
       try {
-        setLoading(true);
+        if (isMountedRef.current) setLoading(true);
 
-        if (source) {
-          const [response, bookmarksData] = await Promise.all([
-            getMovieDetails(baseUrl, source),
-            AsyncStorage.getItem('bookmarks')
-          ]);
+        const response = await getMovieDetails(baseUrl, source);
 
-          if (bookmarksData) setBookmarks(JSON.parse(bookmarksData));
-          setMovie(response);
-        }
+        if (!isMountedRef.current) return;
+        setMovie(response);
       } catch (error) {
+        if (!isMountedRef.current) return;
         ToastAndroid.show('Помилка завантаження фільму', ToastAndroid.SHORT);
         console.error('Movie loading error:', error);
       } finally {
-        setLoading(false);
+        if (isMountedRef.current) setLoading(false);
       }
     };
 
@@ -149,7 +127,7 @@ export default function DetailsScreen() {
                 orientation === 'landscape' && styles.headerImageLandscape,
                 orientation === 'portrait' && styles.headerImagePortrait
               ]}
-              source={movie?.poster}
+              source={movie.poster}
               placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
               contentFit="cover"
               transition={1000}
@@ -159,8 +137,14 @@ export default function DetailsScreen() {
               focusable
               hasTVPreferredFocus
               onPress={async () => {
-                await addToHistory(movie);
-                openPlaylist(movie?.episodes ?? [], movie.originalTitle || movie.title || '');
+                if (movie.title) {
+                  await addToHistory({
+                    source: movie.source,
+                    poster: movie.poster ?? null,
+                    title: movie.title
+                  });
+                }
+                openPlaylist(movie.episodes ?? [], movie.originalTitle || movie.title || '');
               }}
               style={({ focused, pressed }) => [
                 styles.playButton,
@@ -178,17 +162,25 @@ export default function DetailsScreen() {
               <View style={styles.titleSpacer} />
 
               <View style={styles.titleCenter}>
-                {movie?.title && movie.title.length > 0 && (
+                {movie.title && movie.title.length > 0 && (
                   <Text style={styles.headerTitle}>{movie.title}</Text>
                 )}
-                {movie?.originalTitle && movie.originalTitle.length > 0 && (
+                {movie.originalTitle && movie.originalTitle.length > 0 && (
                   <Text style={styles.headerOriginalText}>{movie.originalTitle}</Text>
                 )}
               </View>
 
               <Pressable
                 focusable
-                onPress={toggleBookmark}
+                onPress={() => {
+                  if (movie.title) {
+                    toggleBookmark({
+                      source: movie.source,
+                      poster: movie.poster ?? null,
+                      title: movie.title
+                    });
+                  }
+                }}
                 style={({ focused, pressed }) => [
                   styles.bookmarkButton,
                   focused && { backgroundColor: AppTheme.colors.muted },
@@ -198,48 +190,48 @@ export default function DetailsScreen() {
                 <StyledIcon
                   icon="bookmark"
                   size="large"
-                  color={isBookmarked ? AppTheme.colors.primary : AppTheme.colors.subtext}
+                  color={bookmarked ? AppTheme.colors.primary : AppTheme.colors.subtext}
                 />
               </Pressable>
             </View>
 
             <View style={styles.flex}>
-              {movie?.imdb && movie.imdb.length > 0 && (
+              {movie.imdb && movie.imdb.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
                 </Text>
               )}
-              {movie?.year && movie.year.length > 0 && (
+              {movie.year && movie.year.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
                 </Text>
               )}
-              {movie?.age && movie.age.length > 0 && (
+              {movie.age && movie.age.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Вік. рейтинг:</Text> {movie.age}
                 </Text>
               )}
-              {movie?.duration && movie.duration.length > 0 && (
+              {movie.duration && movie.duration.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Тривалість:</Text> {movie.duration}
                 </Text>
               )}
-              {Array.isArray(movie?.genres) && movie.genres.length > 0 && (
+              {Array.isArray(movie.genres) && movie.genres.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Жанр:</Text> {movie.genres.join(', ')}
                 </Text>
               )}
-              {Array.isArray(movie?.countries) && movie.countries.length > 0 && (
+              {Array.isArray(movie.countries) && movie.countries.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Країна:</Text> {movie.countries.join(', ')}
                 </Text>
               )}
-              {Array.isArray(movie?.directors) && movie.directors.length > 0 && (
+              {Array.isArray(movie.directors) && movie.directors.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Режисер:</Text> {movie.directors.join(', ')}
                 </Text>
               )}
-              {Array.isArray(movie?.actors) && movie.actors.length > 0 && (
+              {Array.isArray(movie.actors) && movie.actors.length > 0 && (
                 <Text style={styles.headerText}>
                   <Text style={styles.textBold}>Актори:</Text> {movie.actors.join(', ')}
                 </Text>
@@ -247,7 +239,7 @@ export default function DetailsScreen() {
 
               <Separator />
 
-              {movie?.description && movie.description.length > 0 && (
+              {movie.description && movie.description.length > 0 && (
                 <Text style={styles.headerDescription}>{movie.description}</Text>
               )}
             </View>

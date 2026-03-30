@@ -1,21 +1,30 @@
+import React, { useCallback, useRef, useState } from 'react';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { scaledPixels } from '@/hooks/useScaledPixels';
-import React, { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { MovieProps } from '@/types/movie.type';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState<string>('');
   const [isFocused, setIsFocused] = useState(true);
   const { baseUrl, searchUrl, searchMovieCards } = useAppContext();
 
+  const searchResultsRef = useRef<MovieProps[]>([]);
+
   const fetchData = useCallback(
-    async (page: number) => {
+    async (page: number): Promise<MovieProps[]> => {
       if (query.length < 3) return [];
+
+      if (page > 1) return [];
+
       try {
-        return await searchMovieCards(baseUrl, searchUrl, query);
+        const results = await searchMovieCards(baseUrl, searchUrl, query);
+        searchResultsRef.current = results;
+        return results;
       } catch (error) {
         console.error('Fetch error:', error);
         return [];
@@ -56,7 +65,6 @@ export default function SearchScreen() {
               style={({ focused, pressed }) => [
                 {
                   aspectRatio: 1,
-
                   width: scaledPixels(32),
                   height: scaledPixels(32),
                   borderRadius: '50%',
@@ -79,7 +87,7 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      <View style={styles.container}>
+      <View style={styles.listContainer}>
         <MoviesFlatList onFetch={fetchData} key={query} />
       </View>
     </View>
@@ -111,5 +119,8 @@ const styles = StyleSheet.create({
     marginHorizontal: scaledPixels(4),
     color: AppTheme.colors.text,
     fontSize: scaledPixels(18)
+  },
+  listContainer: {
+    flex: 1
   }
 });

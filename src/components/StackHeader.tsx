@@ -1,9 +1,10 @@
-import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, View, ViewProps } from 'react-native';
+
+import { StyledIcon } from '@/components/StyledIcon';
+import { AppTheme } from '@/constants/theme.constant';
+import { scaledPixels } from '@/hooks/useScaledPixels';
 
 interface HeaderContentProps extends ViewProps {}
 
