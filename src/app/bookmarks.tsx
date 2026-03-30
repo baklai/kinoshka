@@ -11,9 +11,7 @@ export default function BookmarksScreen() {
   const loadData = useCallback(
     async (_page: number): Promise<MovieProps[]> => {
       try {
-        return await db.getAllAsync<MovieProps>(
-          'SELECT source, poster, title FROM bookmarks'
-        );
+        return await db.getAllAsync<MovieProps>('SELECT source, poster, title FROM bookmarks');
       } catch (error) {
         console.error('[BookmarksScreen] loadData error:', error);
         return [];
