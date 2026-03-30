@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, LayoutChangeEvent, Platform, View } from 'react-native';
+import { FlatList, LayoutChangeEvent, Platform, View, ViewStyle } from 'react-native';
 
 import { MovieCard } from '@/components/MovieCard';
 import { NotFoundView } from '@/components/NotFoundView';
@@ -17,7 +17,6 @@ const POSTER_RATIO = 3 / 2;
 
 export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
   const [containerWidth, setContainerWidth] = useState(0);
-
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
@@ -47,6 +46,16 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
 
   const ITEM_HEIGHT = useMemo(() => ITEM_WIDTH * POSTER_RATIO, [ITEM_WIDTH]);
 
+  const itemStyles = useMemo<ViewStyle[]>(() => {
+    if (ITEM_WIDTH === 0) return [];
+    return Array.from({ length: NUM_COLUMNS }, (_, colIndex) => ({
+      width: ITEM_WIDTH,
+      height: ITEM_HEIGHT,
+      marginBottom: ITEM_SPACING,
+      marginRight: colIndex < NUM_COLUMNS - 1 ? ITEM_SPACING : 0
+    }));
+  }, [ITEM_WIDTH, ITEM_HEIGHT, NUM_COLUMNS]);
+
   const skeletonData = useMemo(
     () =>
       Array.from({ length: NUM_COLUMNS * 2 }).map(
@@ -58,24 +67,19 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
   const fetchData = useCallback(
     async (currentPage: number) => {
       if (loading || !hasMore || loadedPagesRef.current.has(currentPage)) return;
-
       try {
         setLoading(true);
         const response = await onFetch(currentPage);
-
         if (!isMountedRef.current) return;
-
         if (!response || response.length === 0) {
           setHasMore(false);
           return;
         }
-
         setData(prev => {
           const existingIds = new Set(prev.map(item => item.source));
           const filtered = response.filter(item => !existingIds.has(item.source));
           return [...prev, ...filtered];
         });
-
         loadedPagesRef.current.add(currentPage);
         setPage(prev => prev + 1);
       } catch (error) {
@@ -118,39 +122,19 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: MovieProps; index: number }) => {
-      const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
-      return (
-        <MovieCard
-          {...item}
-          style={{
-            width: ITEM_WIDTH,
-            height: ITEM_HEIGHT,
-            marginBottom: ITEM_SPACING,
-            marginRight: isLastInRow ? 0 : ITEM_SPACING
-          }}
-          onPress={handlePressSelectItem}
-        />
-      );
-    },
-    [ITEM_WIDTH, ITEM_HEIGHT, NUM_COLUMNS, handlePressSelectItem]
+    ({ item, index }: { item: MovieProps; index: number }) => (
+      <MovieCard
+        {...item}
+        style={itemStyles[index % NUM_COLUMNS]}
+        onPress={handlePressSelectItem}
+      />
+    ),
+    [itemStyles, NUM_COLUMNS, handlePressSelectItem]
   );
 
   const renderSkeleton = useCallback(
-    ({ index }: { index: number }) => {
-      const isLastInRow = (index + 1) % NUM_COLUMNS === 0;
-      return (
-        <SkeletonView
-          style={{
-            width: ITEM_WIDTH,
-            height: ITEM_HEIGHT,
-            marginBottom: ITEM_SPACING,
-            marginRight: isLastInRow ? 0 : ITEM_SPACING
-          }}
-        />
-      );
-    },
-    [ITEM_WIDTH, ITEM_HEIGHT, NUM_COLUMNS]
+    ({ index }: { index: number }) => <SkeletonView style={itemStyles[index % NUM_COLUMNS]} />,
+    [itemStyles, NUM_COLUMNS]
   );
 
   const getItemLayout = useCallback(
@@ -188,7 +172,7 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
           ]}
           initialNumToRender={NUM_COLUMNS * 2}
           maxToRenderPerBatch={NUM_COLUMNS * 2}
-          windowSize={8}
+          windowSize={5}
           removeClippedSubviews
         />
       )}

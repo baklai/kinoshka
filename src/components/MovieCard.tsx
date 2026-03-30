@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
@@ -15,61 +15,60 @@ interface MovieCardProps extends MovieProps {
 
 export const MovieCard = React.memo(
   ({ source, poster, title, imdb, likes, quality, style, onPress }: MovieCardProps) => {
+    const [focused, setFocused] = useState(false);
+
+    const handlePress = useCallback(() => onPress(source), [onPress, source]);
+    const handleFocus = useCallback(() => setFocused(true), []);
+    const handleBlur = useCallback(() => setFocused(false), []);
+
     return (
       <Pressable
         focusable
-        onPress={() => onPress(source)}
-        style={({ focused, pressed }) => [
-          style,
-          focused && { opacity: 0.5 },
-          pressed && { opacity: 0.7 }
-        ]}
+        onPress={handlePress}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        style={[style, focused && styles.focused]}
       >
-        {({ focused }) => (
-          <>
-            <View style={styles.container}>
-              {focused && <View style={styles.borderOverlay} />}
+        <View style={styles.container}>
+          {focused && <View style={styles.borderOverlay} />}
 
-              <Image
-                style={styles.image}
-                source={poster}
-                placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
-                contentFit="cover"
-                transition={300}
-              />
+          <Image
+            style={styles.image}
+            source={poster}
+            placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
+            contentFit="cover"
+            transition={300}
+          />
 
-              <View style={styles.overlayTop}>
-                {imdb || likes ? (
-                  <View style={styles.rating}>
-                    <Text style={styles.ratingText}>{imdb || likes}</Text>
-                  </View>
-                ) : (
-                  <View />
-                )}
-
-                {quality && (
-                  <View style={styles.quality}>
-                    <Text style={styles.qualityText}>{quality}</Text>
-                  </View>
-                )}
+          <View style={styles.overlayTop}>
+            {imdb || likes ? (
+              <View style={styles.rating}>
+                <Text style={styles.ratingText}>{imdb || likes}</Text>
               </View>
-            </View>
-
-            <View style={styles.overlayBottom}>
-              <Text style={styles.title} numberOfLines={2}>
-                {title}
-              </Text>
-            </View>
-
-            {focused && (
-              <StyledIcon
-                icon="play-circle"
-                size="xlarge"
-                color={AppTheme.colors.primary}
-                style={styles.playIcon}
-              />
+            ) : (
+              <View />
             )}
-          </>
+            {quality && (
+              <View style={styles.quality}>
+                <Text style={styles.qualityText}>{quality}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.overlayBottom}>
+          <Text style={styles.title} numberOfLines={2}>
+            {title}
+          </Text>
+        </View>
+
+        {focused && (
+          <StyledIcon
+            icon="play-circle"
+            size="xlarge"
+            color={AppTheme.colors.primary}
+            style={styles.playIcon}
+          />
         )}
       </Pressable>
     );
@@ -79,6 +78,9 @@ export const MovieCard = React.memo(
 MovieCard.displayName = 'MovieCard';
 
 const styles = StyleSheet.create({
+  focused: {
+    opacity: 0.5
+  },
   container: {
     width: '100%',
     height: '100%',
@@ -89,11 +91,6 @@ const styles = StyleSheet.create({
     borderRadius: scaledPixels(6),
     borderWidth: scaledPixels(3),
     borderColor: AppTheme.colors.primary,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     zIndex: 999,
     pointerEvents: 'none'
   },
