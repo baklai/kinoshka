@@ -37,8 +37,8 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "release": "node scripts/release.js",
     "prebuild": "cross-env EXPO_TV=1 expo prebuild --clean",
-    "build:debug": "cross-env EXPO_TV=1 cd android && gradlew assembleDebug",
-    "build:release": "cross-env EXPO_TV=1 cd android && gradlew assembleRelease"
+    "build:debug": "cd android && cross-env EXPO_TV=1 gradlew assembleDebug",
+    "build:release": "cd android && cross-env EXPO_TV=1 gradlew assembleRelease"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
