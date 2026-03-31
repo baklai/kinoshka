@@ -1,16 +1,18 @@
-import { Dimensions } from 'react-native';
+import { Dimensions, useWindowDimensions } from 'react-native';
 
-const designResolution = {
-  width: 1280,
-  height: 720
-};
+const DESIGN_DIAGONAL = Math.sqrt(1280 ** 2 + 720 ** 2);
+
+const { width: initialWidth, height: initialHeight } = Dimensions.get('screen');
 
 function createScaler(screenWidth: number, screenHeight: number) {
-  const DESIGN_RESOLUTION = Math.sqrt(designResolution.height ** 2 + designResolution.width ** 2);
-  const CURRENT_RESOLUTION = Math.sqrt(screenHeight ** 2 + screenWidth ** 2);
-  const PROPORTION = CURRENT_RESOLUTION / DESIGN_RESOLUTION;
-  return (size: number) => Math.round(PROPORTION * size);
+  const currentDiagonal = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
+  const proportion = currentDiagonal / DESIGN_DIAGONAL;
+  return (size: number) => Math.round(proportion * size);
 }
 
-const { width, height } = Dimensions.get('screen');
-export const scaledPixels = createScaler(width, height);
+export function useScaledPixels() {
+  const { width, height } = useWindowDimensions();
+  return { scaledPixels: createScaler(width, height) };
+}
+
+export const scaledPixels = createScaler(initialWidth, initialHeight);

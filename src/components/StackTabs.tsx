@@ -4,41 +4,22 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
 
-interface navTab {
+type RouteType = '/search' | '/history' | '/menu' | '/bookmarks' | '/options';
+
+interface NavTab {
   icon: IconType;
   title?: string;
-  route: string;
+  route: RouteType;
 }
 
-const NAV_TABS: navTab[] = [
-  {
-    route: 'search',
-    icon: 'magnify',
-    title: 'Пошук'
-  },
-  {
-    route: 'history',
-    icon: 'history',
-    title: 'Історія'
-  },
-  {
-    route: 'menu',
-    icon: 'menu',
-    title: 'Меню'
-  },
-  {
-    route: 'bookmarks',
-    icon: 'bookmark',
-    title: 'Закладки'
-  },
-  {
-    route: 'options',
-    icon: 'cog-outline',
-    title: 'Налаштування'
-  }
+const NAV_TABS: NavTab[] = [
+  { route: '/search', icon: 'magnify', title: 'Пошук' },
+  { route: '/history', icon: 'history', title: 'Історія' },
+  { route: '/menu', icon: 'menu', title: 'Меню' },
+  { route: '/bookmarks', icon: 'bookmark', title: 'Закладки' },
+  { route: '/options', icon: 'cog-outline', title: 'Налаштування' }
 ];
 
 export const StackTabs = () => {
@@ -54,6 +35,8 @@ export const StackTabs = () => {
   );
 };
 
+const { spacing, typography } = AppTheme;
+
 const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
@@ -63,11 +46,11 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    paddingVertical: scaledPixels(12),
+    paddingVertical: spacing(1.5),
     alignItems: 'center'
   },
   tabText: {
-    fontSize: scaledPixels(14),
+    fontSize: typography.sm,
     fontWeight: 'bold',
     color: AppTheme.colors.subtext,
     marginTop: 2

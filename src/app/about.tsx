@@ -4,12 +4,11 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 
 export default function AboutScreen() {
   const currentVersion = useMemo(() => {
     return Application.nativeApplicationVersion || '0.0.0';
-  }, [Application]);
+  }, []);
 
   return (
     <View style={styles.container} hasTVPreferredFocus>
@@ -23,7 +22,7 @@ export default function AboutScreen() {
         Додаток надає можливість швидко знаходити, на публічних ресурсах, популярні відеофільми,
         мультфільми, кіношоу, серіали та інший відеоконтент у хорошій якості. Все відео в додатку
         програвається з відкритих ресурсів. Автори додатку не несуть відповідальності за данні
-        ролики, ніяк не пов'язані з розміщенням та розповсюдженням відеоматеріалів.
+        ролики, ніяк не пов&apos;язані з розміщенням та розповсюдженням відеоматеріалів.
       </Text>
 
       <Text style={styles.text}>Поточна версія v{currentVersion}</Text>
@@ -31,18 +30,20 @@ export default function AboutScreen() {
   );
 }
 
+const { spacing, typography } = AppTheme;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: scaledPixels(6)
+    gap: spacing(0.75)
   },
   text: {
-    fontSize: scaledPixels(18),
+    fontSize: typography.lg,
     color: AppTheme.colors.subtext,
-    maxWidth: scaledPixels(560),
+    maxWidth: spacing(70),
     textAlign: 'center'
   }
 });

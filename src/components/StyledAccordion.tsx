@@ -3,7 +3,6 @@ import { Animated, LayoutAnimation, Pressable, StyleSheet, Text, View } from 're
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
 
 interface AccordionProps {
@@ -35,7 +34,7 @@ const AccordionItem = ({
       duration: 200,
       useNativeDriver: true
     }).start();
-  }, [isActive]);
+  }, [isActive, rotateAnim]);
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
@@ -52,7 +51,7 @@ const AccordionItem = ({
         {({ focused }) => (
           <>
             <StyledIcon
-              icon={icon ? icon : 'cog-outline'}
+              icon={icon ?? 'cog-outline'}
               size="xlarge"
               color={focused ? AppTheme.colors.primary : AppTheme.colors.text}
               style={styles.headerIcon}
@@ -109,13 +108,15 @@ export const StyledAccordion = ({ sections }: AccordionProps) => {
   );
 };
 
+const { spacing, typography, metrics } = AppTheme;
+
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: scaledPixels(12),
-    borderBottomWidth: scaledPixels(0.5),
+    paddingVertical: spacing(1.5),
+    borderBottomWidth: metrics.hairline,
     borderBottomColor: AppTheme.colors.border
   },
   headerBlock: {
@@ -124,19 +125,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   headerIcon: {
-    marginRight: scaledPixels(15)
+    marginRight: spacing(1.875)
   },
   headerText: {
     color: AppTheme.colors.text,
-    fontSize: scaledPixels(22),
+    fontSize: typography.xxl,
     fontWeight: 'bold'
   },
   headerSubText: {
     color: AppTheme.colors.subtext,
-    fontSize: scaledPixels(18),
-    marginTop: scaledPixels(2)
+    fontSize: typography.lg,
+    marginTop: spacing(0.25)
   },
   content: {
-    padding: scaledPixels(15)
+    padding: spacing(1.875)
   }
 });

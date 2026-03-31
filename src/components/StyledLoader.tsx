@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 
 const animation = [0.2, 0.3, 0.4, 0.1, 0.2, 0.3, 0, 0.1, 0.2];
 
@@ -14,34 +13,22 @@ export const StyledLoader = () => {
       const delay = animation[index] * 1000;
       Animated.loop(
         Animated.sequence([
-          Animated.timing(value, {
-            toValue: 1,
-            duration: 455,
-            delay: delay,
-            useNativeDriver: true
-          }),
-          Animated.timing(value, {
-            toValue: 0,
-            duration: 910,
-            useNativeDriver: true
-          })
+          Animated.timing(value, { toValue: 1, duration: 455, delay, useNativeDriver: true }),
+          Animated.timing(value, { toValue: 0, duration: 910, useNativeDriver: true })
         ])
       ).start();
     });
-  }, []);
+  }, [animatedValues]);
 
   return (
     <View style={styles.container}>
       <View style={styles.spinGrid}>
         {animatedValues.map((value, index) => {
-          const scale = value.interpolate({
-            inputRange: [0, 1],
-            outputRange: [1, 0]
-          });
+          const scale = value.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
           return (
             <Animated.View
               key={`cube-${index}`}
-              style={[styles.spinGridCube, { transform: [{ scale: scale }] }]}
+              style={[styles.spinGridCube, { transform: [{ scale }] }]}
             />
           );
         })}
@@ -50,6 +37,8 @@ export const StyledLoader = () => {
   );
 };
 
+const { spacing } = AppTheme;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -57,8 +46,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   spinGrid: {
-    width: scaledPixels(120),
-    height: scaledPixels(120),
+    width: spacing(15),
+    height: spacing(15),
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',

@@ -4,9 +4,8 @@ import { Pressable, StyleSheet, View, ViewProps } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 
-interface HeaderContentProps extends ViewProps {}
+type HeaderContentProps = ViewProps;
 
 export const StackHeader = (props: HeaderContentProps) => {
   const router = useRouter();
@@ -105,6 +104,8 @@ export const StackHeader = (props: HeaderContentProps) => {
   );
 };
 
+const { spacing, radius } = AppTheme;
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -113,15 +114,15 @@ const styles = StyleSheet.create({
     backgroundColor: AppTheme.colors.background
   },
   section: {
-    gap: scaledPixels(20),
+    gap: spacing(2.5),
     flexDirection: 'row',
     alignItems: 'center'
   },
   pressableIcon: {
     aspectRatio: 1,
-    width: scaledPixels(48),
-    height: scaledPixels(48),
-    borderRadius: 9999,
+    width: spacing(6),
+    height: spacing(6),
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center'
   }

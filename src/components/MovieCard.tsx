@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 
 interface MovieCardProps extends MovieProps {
@@ -77,6 +76,8 @@ export const MovieCard = React.memo(
 
 MovieCard.displayName = 'MovieCard';
 
+const { spacing, radius, typography, metrics } = AppTheme;
+
 const styles = StyleSheet.create({
   focused: {
     opacity: 0.5
@@ -84,19 +85,19 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    borderRadius: scaledPixels(6)
+    borderRadius: radius.sm
   },
   borderOverlay: {
     ...StyleSheet.absoluteFill,
-    borderRadius: scaledPixels(6),
-    borderWidth: scaledPixels(3),
+    borderRadius: radius.sm,
+    borderWidth: 3,
     borderColor: AppTheme.colors.primary,
     zIndex: 999,
     pointerEvents: 'none'
   },
   image: {
     ...StyleSheet.absoluteFill,
-    borderRadius: scaledPixels(6),
+    borderRadius: radius.sm,
     backgroundColor: AppTheme.colors.background
   },
   playIcon: {
@@ -109,9 +110,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     position: 'absolute',
-    top: scaledPixels(8),
-    left: scaledPixels(4),
-    right: scaledPixels(4),
+    top: spacing(1),
+    left: spacing(0.5),
+    right: spacing(0.5),
     zIndex: 10
   },
   overlayBottom: {
@@ -119,9 +120,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     backgroundColor: `${AppTheme.colors.surface}80`,
-    borderBottomLeftRadius: scaledPixels(3),
-    borderBottomRightRadius: scaledPixels(3),
-    paddingVertical: scaledPixels(4),
+    borderBottomLeftRadius: radius.xs,
+    borderBottomRightRadius: radius.xs,
+    paddingVertical: spacing(0.5),
     bottom: 0,
     left: 0,
     right: 0
@@ -131,35 +132,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#19875480',
-    paddingHorizontal: scaledPixels(4),
-    paddingVertical: scaledPixels(2),
-    borderRadius: scaledPixels(4),
-    marginBottom: scaledPixels(4),
-    gap: scaledPixels(2)
+    paddingHorizontal: spacing(0.5),
+    paddingVertical: spacing(0.25),
+    borderRadius: radius.xs,
+    marginBottom: spacing(0.5),
+    gap: spacing(0.25)
   },
   ratingText: {
     color: AppTheme.colors.text,
-    fontSize: scaledPixels(14),
-    paddingHorizontal: scaledPixels(3)
+    fontSize: typography.sm,
+    paddingHorizontal: spacing(0.375)
   },
   quality: {
     backgroundColor: '#00000070',
     alignSelf: 'flex-start',
-    paddingHorizontal: scaledPixels(6),
-    paddingVertical: scaledPixels(2),
-    borderRadius: scaledPixels(4),
-    marginBottom: scaledPixels(4)
+    paddingHorizontal: spacing(0.75),
+    paddingVertical: spacing(0.25),
+    borderRadius: radius.xs,
+    marginBottom: spacing(0.5)
   },
   qualityText: {
     color: AppTheme.colors.text,
-    fontSize: scaledPixels(14)
+    fontSize: typography.sm
   },
   title: {
     color: AppTheme.colors.text,
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: scaledPixels(18),
-    paddingHorizontal: scaledPixels(2),
+    fontSize: typography.lg,
+    paddingHorizontal: spacing(0.25),
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1
   }

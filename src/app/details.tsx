@@ -2,7 +2,7 @@ import { File, Paths } from 'expo-file-system';
 import { Image } from 'expo-image';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 
 import { NotFoundView } from '@/components/NotFoundView';
@@ -14,7 +14,6 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useHistory } from '@/hooks/useHistory';
 import { useOrientation } from '@/hooks/useOrientation';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { sleep } from '@/utils';
 
@@ -57,16 +56,12 @@ export default function DetailsScreen() {
       const safeName = playlistName.replace(/\s+/g, '_');
       const file = new File(Paths.cache, `${safeName}.m3u`);
 
-      if (file.exists) {
-        file.delete();
-      }
+      if (file.exists) file.delete();
 
       file.write(m3uContent);
 
-      const contentUri = file.contentUri;
-
       await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: contentUri,
+        data: file.contentUri,
         type: 'application/vnd.apple.mpegurl',
         flags: 1,
         extra: { 'android.intent.extra.INITIAL_INTENTS': [] }
@@ -82,28 +77,25 @@ export default function DetailsScreen() {
     }
   };
 
-  useEffect(() => {
+  const fetchMovie = useCallback(async () => {
     if (!source) return;
+    try {
+      if (isMountedRef.current) setLoading(true);
+      const response = await getMovieDetails(baseUrl, source);
+      if (!isMountedRef.current) return;
+      setMovie(response);
+    } catch (error) {
+      if (!isMountedRef.current) return;
+      ToastAndroid.show('Помилка завантаження фільму', ToastAndroid.SHORT);
+      console.error('Movie loading error:', error);
+    } finally {
+      if (isMountedRef.current) setLoading(false);
+    }
+  }, [source, baseUrl, getMovieDetails]);
 
-    const fetchMovie = async () => {
-      try {
-        if (isMountedRef.current) setLoading(true);
-
-        const response = await getMovieDetails(baseUrl, source);
-
-        if (!isMountedRef.current) return;
-        setMovie(response);
-      } catch (error) {
-        if (!isMountedRef.current) return;
-        ToastAndroid.show('Помилка завантаження фільму', ToastAndroid.SHORT);
-        console.error('Movie loading error:', error);
-      } finally {
-        if (isMountedRef.current) setLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchMovie();
-  }, [source]);
+  }, [fetchMovie]);
 
   return (
     <View style={styles.flex} hasTVPreferredFocus>
@@ -197,50 +189,50 @@ export default function DetailsScreen() {
 
             <View style={styles.flex}>
               {movie.imdb && movie.imdb.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>IMDB:</Text> {movie.imdb}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>IMDB:</Text> {movie.imdb}
                 </Text>
               )}
               {movie.year && movie.year.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Рік виходу:</Text> {movie.year}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Рік виходу:</Text> {movie.year}
                 </Text>
               )}
               {movie.age && movie.age.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Вік. рейтинг:</Text> {movie.age}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Вік. рейтинг:</Text> {movie.age}
                 </Text>
               )}
               {movie.duration && movie.duration.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Тривалість:</Text> {movie.duration}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Тривалість:</Text> {movie.duration}
                 </Text>
               )}
               {Array.isArray(movie.genres) && movie.genres.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Жанр:</Text> {movie.genres.join(', ')}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Жанр:</Text> {movie.genres.join(', ')}
                 </Text>
               )}
               {Array.isArray(movie.countries) && movie.countries.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Країна:</Text> {movie.countries.join(', ')}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Країна:</Text> {movie.countries.join(', ')}
                 </Text>
               )}
               {Array.isArray(movie.directors) && movie.directors.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Режисер:</Text> {movie.directors.join(', ')}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Режисер:</Text> {movie.directors.join(', ')}
                 </Text>
               )}
               {Array.isArray(movie.actors) && movie.actors.length > 0 && (
-                <Text style={styles.headerText}>
-                  <Text style={styles.textBold}>Актори:</Text> {movie.actors.join(', ')}
+                <Text style={styles.bodyText}>
+                  <Text style={styles.bodyTextBold}>Актори:</Text> {movie.actors.join(', ')}
                 </Text>
               )}
 
               <Separator />
 
               {movie.description && movie.description.length > 0 && (
-                <Text style={styles.headerDescription}>{movie.description}</Text>
+                <Text style={styles.description}>{movie.description}</Text>
               )}
             </View>
           </View>
@@ -250,12 +242,14 @@ export default function DetailsScreen() {
   );
 }
 
+const { spacing, radius, typography } = AppTheme;
+
 const styles = StyleSheet.create({
   flex: {
     flex: 1
   },
   scrollContent: {
-    gap: scaledPixels(20)
+    gap: spacing(2.5)
   },
   scrollLandscape: {
     flex: 1,
@@ -278,7 +272,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   titleSpacer: {
-    width: scaledPixels(40)
+    width: spacing(5)
   },
   titleCenter: {
     flex: 1,
@@ -286,41 +280,41 @@ const styles = StyleSheet.create({
   },
   bookmarkButton: {
     aspectRatio: 1,
-    width: scaledPixels(48),
-    height: scaledPixels(48),
-    borderRadius: 9999,
+    width: spacing(6),
+    height: spacing(6),
+    borderRadius: AppTheme.radius.full,
     alignItems: 'center',
     justifyContent: 'center'
   },
   headerTitle: {
     color: AppTheme.colors.text,
     textAlign: 'center',
-    fontSize: scaledPixels(28),
+    fontSize: typography.xxxl,
     fontWeight: 'bold'
   },
   headerOriginalText: {
     color: AppTheme.colors.subtext,
     textAlign: 'center',
-    fontSize: scaledPixels(18)
+    fontSize: typography.lg
   },
-  headerText: {
+  bodyText: {
     color: AppTheme.colors.text,
-    fontSize: scaledPixels(18)
+    fontSize: typography.lg
   },
-  textBold: {
+  bodyTextBold: {
     fontWeight: 'bold',
-    fontSize: scaledPixels(20)
+    fontSize: typography.xl
   },
-  headerDescription: {
+  description: {
     color: AppTheme.colors.subtext,
-    fontSize: scaledPixels(16),
+    fontSize: typography.md,
     fontWeight: '500',
     lineHeight: 22,
     flexWrap: 'wrap'
   },
   headerImage: {
     aspectRatio: 2 / 3,
-    borderRadius: scaledPixels(8)
+    borderRadius: radius.sm
   },
   headerImageLandscape: {
     height: '85%' as any
@@ -334,16 +328,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: AppTheme.colors.muted,
-    borderRadius: scaledPixels(6)
+    borderRadius: radius.sm
   },
   playButtonText: {
     color: AppTheme.colors.text,
     fontWeight: 'bold',
-    marginLeft: scaledPixels(6)
+    marginLeft: spacing(0.75)
   },
   separator: {
-    height: scaledPixels(1),
-    marginVertical: scaledPixels(8),
+    height: AppTheme.metrics.hairline,
+    marginVertical: spacing(1),
     backgroundColor: AppTheme.colors.border
   }
 });

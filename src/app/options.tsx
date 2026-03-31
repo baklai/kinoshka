@@ -3,7 +3,6 @@ import { StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
 
 import { AccordionSection, StyledAccordion } from '@/components/StyledAccordion';
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
 
 const ComingSoon = ({ label }: { label: string }) => (
@@ -47,18 +46,20 @@ export default function OptionsScreen() {
   );
 }
 
+const { spacing, typography } = AppTheme;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1
   },
   comingSoon: {
-    paddingVertical: scaledPixels(16),
-    paddingHorizontal: scaledPixels(8),
+    paddingVertical: spacing(2),
+    paddingHorizontal: spacing(1),
     alignItems: 'center'
   },
   comingSoonText: {
     color: AppTheme.colors.subtext,
-    fontSize: scaledPixels(16),
+    fontSize: typography.md,
     fontStyle: 'italic'
   }
 });

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useContext, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import {
   Alert,
   BackHandler,
@@ -16,7 +16,6 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { AppContext } from '@/context';
 import { useAutoUpdate } from '@/hooks/useAutoUpdate';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { IconType } from '@/types/icons.type';
 
 export interface NavMenuItem {
@@ -32,11 +31,13 @@ const AnimatedItem = React.memo(
   ({
     item,
     index,
-    scrollY
+    scrollY,
+    onFocused
   }: {
     item: NavMenuItem;
     index: number;
     scrollY: ReturnType<typeof useSharedValue<number>>;
+    onFocused: (index: number) => void;
   }) => {
     const animatedStyle = useAnimatedStyle(() => {
       const position = (index * ITEM_HEIGHT - scrollY.value) / ITEM_HEIGHT;
@@ -51,10 +52,11 @@ const AnimatedItem = React.memo(
           focusable
           hasTVPreferredFocus={index === 0}
           onPress={item?.onPress}
+          onFocus={() => onFocused(index)}
           style={({ focused }) => [
             styles.pressable,
             focused && { opacity: 0.85 },
-            item.separator && { height: scaledPixels(1), opacity: 0.3 }
+            item.separator && { height: AppTheme.metrics.hairline, opacity: 0.3 }
           ]}
         >
           {item.icon && <StyledIcon color={AppTheme.colors.text} icon={item.icon as IconType} />}
@@ -65,12 +67,25 @@ const AnimatedItem = React.memo(
   }
 );
 
+AnimatedItem.displayName = 'AnimatedItem';
+
 export default function MenuScreen() {
   const appContext = useContext(AppContext);
   const { startUpdateCheck } = useAutoUpdate();
   const { height } = useWindowDimensions();
   const scrollY = useSharedValue(0);
   const scrollRef = useRef<ScrollView>(null);
+
+  const paddingVertical = (height - ITEM_HEIGHT) / 2;
+
+  const handleItemFocused = useCallback(
+    (index: number) => {
+      const itemCenter = paddingVertical + index * ITEM_HEIGHT + ITEM_HEIGHT / 2;
+      const targetOffset = itemCenter - height / 2;
+      scrollRef.current?.scrollTo({ y: targetOffset, animated: true });
+    },
+    [height, paddingVertical]
+  );
 
   const navMenuList: NavMenuItem[] = useMemo(() => {
     return [
@@ -149,18 +164,26 @@ export default function MenuScreen() {
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        contentContainerStyle={{ paddingVertical: (height - ITEM_HEIGHT) / 2 }}
+        contentContainerStyle={{ paddingVertical }}
         onScroll={e => {
           scrollY.value = e.nativeEvent.contentOffset.y;
         }}
       >
         {navMenuList.map((item: NavMenuItem, index: number) => (
-          <AnimatedItem key={`nav-item-${index}`} item={item} index={index} scrollY={scrollY} />
+          <AnimatedItem
+            key={`nav-item-${index}`}
+            item={item}
+            index={index}
+            scrollY={scrollY}
+            onFocused={handleItemFocused}
+          />
         ))}
       </ScrollView>
     </TVFocusGuideView>
   );
 }
+
+const { spacing, radius, typography } = AppTheme;
 
 const styles = StyleSheet.create({
   container: {
@@ -175,9 +198,9 @@ const styles = StyleSheet.create({
   pressable: {
     width: 300,
     height: ITEM_HEIGHT - 10,
-    borderRadius: 12,
+    borderRadius: radius.lg,
     flexDirection: 'row',
-    gap: scaledPixels(6),
+    gap: spacing(0.75),
     backgroundColor: AppTheme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center'
@@ -185,7 +208,7 @@ const styles = StyleSheet.create({
   text: {
     color: AppTheme.colors.text,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: typography.xl,
     fontWeight: '500'
   }
 });

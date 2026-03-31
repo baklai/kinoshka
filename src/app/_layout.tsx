@@ -2,7 +2,7 @@ import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { SQLiteProvider, type SQLiteDatabase } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
@@ -16,7 +16,6 @@ import { AppContext, AppContextValue } from '@/context';
 import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
 import { useOrientation } from '@/hooks/useOrientation';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MIGRATION_V1_BOOKMARKS, MIGRATION_V1_HISTORY } from '@/schemas/movie.schema';
 
 configureReanimatedLogger({
@@ -58,20 +57,20 @@ function RootLayout() {
   const deviceKind = useDeviceSetup();
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        setLoading(true);
-        startUpdateCheck();
-      } catch (err) {
-        console.error('Application error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const init = useCallback(async () => {
+    try {
+      setLoading(true);
+      startUpdateCheck();
+    } catch (err) {
+      console.error('Application error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [startUpdateCheck]);
 
+  useEffect(() => {
     init();
-  }, []);
+  }, [init]);
 
   return (
     <SafeAreaView
@@ -123,16 +122,18 @@ function RootLayout() {
   );
 }
 
+const { spacing } = AppTheme;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: scaledPixels(20),
+    paddingHorizontal: spacing(2.5),
     backgroundColor: AppTheme.colors.background
   },
   containerLandscape: {
-    paddingHorizontal: scaledPixels(40)
+    paddingHorizontal: spacing(5)
   },
   header: {
-    marginVertical: scaledPixels(20)
+    marginVertical: spacing(2.5)
   }
 });

@@ -94,7 +94,7 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
 
   useEffect(() => {
     fetchData(1);
-  }, []);
+  }, [fetchData]);
 
   const handleEndReached = useCallback(() => {
     fetchData(page);

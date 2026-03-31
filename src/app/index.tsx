@@ -1,11 +1,11 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, TVFocusGuideView, View } from 'react-native';
 
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { useAppContext } from '@/hooks/useAppContext';
 
-const FocusContainer = Platform.isTV ? require('react-native').TVFocusGuideView : View;
+const FocusContainer = Platform.isTV ? TVFocusGuideView : View;
 
 export default function IndexScreen() {
   const { source } = useLocalSearchParams<{ source: string }>();

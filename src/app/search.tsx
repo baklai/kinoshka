@@ -5,7 +5,6 @@ import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { useAppContext } from '@/hooks/useAppContext';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { MovieProps } from '@/types/movie.type';
 
 export default function SearchScreen() {
@@ -18,9 +17,7 @@ export default function SearchScreen() {
   const fetchData = useCallback(
     async (page: number): Promise<MovieProps[]> => {
       if (query.length < 3) return [];
-
       if (page > 1) return [];
-
       try {
         const results = await searchMovieCards(baseUrl, searchUrl, query);
         searchResultsRef.current = results;
@@ -30,7 +27,7 @@ export default function SearchScreen() {
         return [];
       }
     },
-    [query, baseUrl, searchMovieCards]
+    [query, baseUrl, searchUrl, searchMovieCards]
   );
 
   return (
@@ -39,7 +36,7 @@ export default function SearchScreen() {
         <View
           style={[
             styles.searchSectionInput,
-            isFocused && { borderWidth: scaledPixels(3), borderColor: AppTheme.colors.primary }
+            isFocused && { borderWidth: 3, borderColor: AppTheme.colors.primary }
           ]}
         >
           <StyledIcon icon="magnify" size="normal" color={AppTheme.colors.subtext} />
@@ -63,14 +60,7 @@ export default function SearchScreen() {
             <Pressable
               onPress={() => setQuery('')}
               style={({ focused, pressed }) => [
-                {
-                  aspectRatio: 1,
-                  width: scaledPixels(32),
-                  height: scaledPixels(32),
-                  borderRadius: '50%',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                },
+                styles.clearButton,
                 focused && { backgroundColor: AppTheme.colors.muted },
                 pressed && { opacity: 0.7 }
               ]}
@@ -94,6 +84,8 @@ export default function SearchScreen() {
   );
 }
 
+const { spacing, radius, typography } = AppTheme;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1
@@ -102,23 +94,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: scaledPixels(12),
-    marginVertical: scaledPixels(10)
+    paddingBottom: spacing(1.5),
+    marginVertical: spacing(1.25)
   },
   searchSectionInput: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: scaledPixels(48),
-    marginLeft: scaledPixels(10),
-    paddingHorizontal: scaledPixels(20),
+    borderRadius: spacing(6),
+    marginLeft: spacing(1.25),
+    paddingHorizontal: spacing(2.5),
     backgroundColor: AppTheme.colors.card
   },
   searchSectionInputText: {
     flex: 1,
-    marginHorizontal: scaledPixels(4),
+    marginHorizontal: spacing(0.5),
     color: AppTheme.colors.text,
-    fontSize: scaledPixels(18)
+    fontSize: typography.lg
+  },
+  clearButton: {
+    aspectRatio: 1,
+    width: spacing(4),
+    height: spacing(4),
+    borderRadius: AppTheme.radius.full,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   listContainer: {
     flex: 1

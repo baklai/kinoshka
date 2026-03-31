@@ -1,20 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { type ViewStyle, StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 import { AppTheme } from '@/constants/theme.constant';
-import { scaledPixels } from '@/hooks/useScaledPixels';
 import { ColorType } from '@/types/colors.type';
 import { IconType } from '@/types/icons.type';
 
-const ICON_SIZE = {
-  small: 16,
-  normal: 24,
-  large: 32,
-  xlarge: 48
-} as const;
-
-type StyledIconSize = keyof typeof ICON_SIZE;
+type StyledIconSize = keyof typeof AppTheme.iconSize;
 
 type StyledIconProps = {
   icon?: IconType;
@@ -25,12 +17,11 @@ type StyledIconProps = {
 
 export const StyledIcon = ({
   icon,
-  size = 'normal' as StyledIconSize,
+  size = 'normal',
   color = AppTheme.colors.text,
   style
 }: StyledIconProps) => {
-  const resolvedSize =
-    typeof size === 'number' ? scaledPixels(size) : scaledPixels(ICON_SIZE[size]);
+  const resolvedSize = typeof size === 'number' ? size : AppTheme.iconSize[size];
 
   return (
     <View style={[styles.container, style]}>

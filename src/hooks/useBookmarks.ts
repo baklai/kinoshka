@@ -9,10 +9,6 @@ export function useBookmarks() {
   const db = useSQLiteContext();
   const [bookmarks, setBookmarks] = useState<BookmarkRow[]>([]);
 
-  useEffect(() => {
-    loadBookmarks();
-  }, []);
-
   const loadBookmarks = useCallback(async () => {
     try {
       const rows = await db.getAllAsync<BookmarkRow>('SELECT source, poster, title FROM bookmarks');
@@ -21,6 +17,10 @@ export function useBookmarks() {
       console.error('[useBookmarks] loadBookmarks error:', error);
     }
   }, [db]);
+
+  useEffect(() => {
+    loadBookmarks();
+  }, [loadBookmarks]);
 
   const isBookmarked = useCallback(
     (source: string) => bookmarks.some(b => b.source === source),
