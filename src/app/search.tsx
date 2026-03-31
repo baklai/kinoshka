@@ -84,7 +84,7 @@ export default function SearchScreen() {
   );
 }
 
-const { spacing, radius, typography } = AppTheme;
+const { spacing, typography } = AppTheme;
 
 const styles = StyleSheet.create({
   container: {

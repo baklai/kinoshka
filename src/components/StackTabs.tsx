@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -6,27 +6,26 @@ import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/theme.constant';
 import { IconType } from '@/types/icons.type';
 
-type RouteType = '/search' | '/history' | '/menu' | '/bookmarks' | '/options';
-
 interface NavTab {
+  key: string;
   icon: IconType;
   title?: string;
-  route: RouteType;
+  route: Href;
 }
 
 const NAV_TABS: NavTab[] = [
-  { route: '/search', icon: 'magnify', title: 'Пошук' },
-  { route: '/history', icon: 'history', title: 'Історія' },
-  { route: '/menu', icon: 'menu', title: 'Меню' },
-  { route: '/bookmarks', icon: 'bookmark', title: 'Закладки' },
-  { route: '/options', icon: 'cog-outline', title: 'Налаштування' }
+  { key: 'search', route: '/search', icon: 'magnify', title: 'Пошук' },
+  { key: 'history', route: '/history', icon: 'history', title: 'Історія' },
+  { key: 'menu', route: '/menu', icon: 'menu', title: 'Меню' },
+  { key: 'bookmarks', route: '/bookmarks', icon: 'bookmark', title: 'Закладки' },
+  { key: 'options', route: '/options', icon: 'cog-outline', title: 'Налаштування' }
 ];
 
 export const StackTabs = () => {
   return (
     <View style={styles.tabBar}>
-      {NAV_TABS.map(({ route, icon, title }) => (
-        <Pressable style={styles.tab} onPress={() => router.push(route)} key={route}>
+      {NAV_TABS.map(({ key, route, icon, title }) => (
+        <Pressable style={styles.tab} onPress={() => router.push(route)} key={key}>
           <StyledIcon size="large" color={AppTheme.colors.subtext} icon={icon} />
           {title && <Text style={styles.tabText}>{title}</Text>}
         </Pressable>
