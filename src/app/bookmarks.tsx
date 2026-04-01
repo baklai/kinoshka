@@ -1,23 +1,16 @@
-import { useSQLiteContext } from 'expo-sqlite';
 import React, { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { MoviesFlatList } from '@/components/MoviesFlatList';
+import { useBookmarks } from '@/hooks/useBookmarks';
 import { MovieProps } from '@/types/movie.type';
 
 export default function BookmarksScreen() {
-  const db = useSQLiteContext();
+  const { bookmarks } = useBookmarks();
 
   const loadData = useCallback(
-    async (_page: number): Promise<MovieProps[]> => {
-      try {
-        return await db.getAllAsync<MovieProps>('SELECT source, poster, title FROM bookmarks');
-      } catch (error) {
-        console.error('[BookmarksScreen] loadData error:', error);
-        return [];
-      }
-    },
-    [db]
+    async (_page: number): Promise<MovieProps[]> => bookmarks,
+    [bookmarks]
   );
 
   return (

@@ -46,6 +46,8 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
 
   const ITEM_HEIGHT = useMemo(() => ITEM_WIDTH * POSTER_RATIO, [ITEM_WIDTH]);
 
+  const ROW_HEIGHT = useMemo(() => ITEM_HEIGHT + ITEM_SPACING, [ITEM_HEIGHT]);
+
   const itemStyles = useMemo<ViewStyle[]>(() => {
     if (ITEM_WIDTH === 0) return [];
     return Array.from({ length: NUM_COLUMNS }, (_, colIndex) => ({
@@ -141,12 +143,12 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
     (_: ArrayLike<MovieProps> | null | undefined, index: number) => {
       const rowIndex = Math.floor(index / NUM_COLUMNS);
       return {
-        length: ITEM_HEIGHT + ITEM_SPACING,
-        offset: (ITEM_HEIGHT + ITEM_SPACING) * rowIndex,
+        length: ROW_HEIGHT,
+        offset: ROW_HEIGHT * rowIndex,
         index
       };
     },
-    [ITEM_HEIGHT, NUM_COLUMNS]
+    [ROW_HEIGHT, NUM_COLUMNS]
   );
 
   const isInitialLoading = loading && data.length === 0;
@@ -170,10 +172,11 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
             { flexGrow: 1 },
             !isInitialLoading && data.length === 0 && { height: '100%' }
           ]}
-          initialNumToRender={NUM_COLUMNS * 2}
-          maxToRenderPerBatch={NUM_COLUMNS * 2}
-          windowSize={5}
-          removeClippedSubviews
+          initialNumToRender={NUM_COLUMNS * 4}
+          maxToRenderPerBatch={NUM_COLUMNS * 3}
+          updateCellsBatchingPeriod={50}
+          windowSize={Platform.isTV ? 5 : 11}
+          removeClippedSubviews={Platform.isTV}
         />
       )}
     </View>

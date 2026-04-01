@@ -36,7 +36,9 @@ export const MovieCard = React.memo(
             source={poster}
             placeholder={{ blurhash: BLUR_HASH_MOVIE_CARD }}
             contentFit="cover"
-            transition={300}
+            transition={0}
+            cachePolicy="memory-disk"
+            recyclingKey={source}
           />
 
           <View style={styles.overlayTop}>
@@ -71,12 +73,17 @@ export const MovieCard = React.memo(
         )}
       </Pressable>
     );
-  }
+  },
+  (prev, next) =>
+    prev.source === next.source &&
+    prev.poster === next.poster &&
+    prev.title === next.title &&
+    prev.style === next.style
 );
 
 MovieCard.displayName = 'MovieCard';
 
-const { spacing, radius, typography, metrics } = AppTheme;
+const { spacing, radius, typography } = AppTheme;
 
 const styles = StyleSheet.create({
   focused: {

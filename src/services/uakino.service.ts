@@ -1,8 +1,10 @@
 import { parseHTML } from 'linkedom';
 
-import { EPISODES_API } from '@/constants/api.constant';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { validUrl } from '@/utils';
+
+const BASE_URL = 'https://uakino.best';
+const EPISODES_API = `${BASE_URL}/engine/ajax/playlists.php`;
 
 const USER_AGENT =
   'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36';
