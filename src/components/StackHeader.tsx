@@ -11,13 +11,15 @@ export const StackHeader = (props: HeaderContentProps) => {
   const router = useRouter();
 
   return (
-    <View style={[styles.container, props.style]} hasTVPreferredFocus={false}>
+    <View style={[styles.container, props.style]}>
       <View style={styles.section}>
         <Pressable
+          focusable
+          hasTVPreferredFocus
           onPress={() => router.push('/menu')}
           style={({ focused, pressed }) => [
             styles.pressableIcon,
-            focused && { backgroundColor: AppTheme.colors.primary },
+            focused && { backgroundColor: AppTheme.colors.muted },
             pressed && { opacity: 0.7 }
           ]}
         >
@@ -33,10 +35,11 @@ export const StackHeader = (props: HeaderContentProps) => {
 
       <View style={styles.section}>
         <Pressable
+          focusable
           onPress={() => router.push('/search')}
           style={({ focused, pressed }) => [
             styles.pressableIcon,
-            focused && { backgroundColor: AppTheme.colors.primary },
+            focused && { backgroundColor: AppTheme.colors.muted },
             pressed && { opacity: 0.7 }
           ]}
         >
@@ -50,10 +53,11 @@ export const StackHeader = (props: HeaderContentProps) => {
         </Pressable>
 
         <Pressable
+          focusable
           onPress={() => router.push('/history')}
           style={({ focused, pressed }) => [
             styles.pressableIcon,
-            focused && { backgroundColor: AppTheme.colors.primary },
+            focused && { backgroundColor: AppTheme.colors.muted },
             pressed && { opacity: 0.7 }
           ]}
         >
@@ -67,10 +71,11 @@ export const StackHeader = (props: HeaderContentProps) => {
         </Pressable>
 
         <Pressable
+          focusable
           onPress={() => router.push('/bookmarks')}
           style={({ focused, pressed }) => [
             styles.pressableIcon,
-            focused && { backgroundColor: AppTheme.colors.primary },
+            focused && { backgroundColor: AppTheme.colors.muted },
             pressed && { opacity: 0.7 }
           ]}
         >
@@ -84,10 +89,11 @@ export const StackHeader = (props: HeaderContentProps) => {
         </Pressable>
 
         <Pressable
+          focusable
           onPress={() => router.push('/options')}
           style={({ focused, pressed }) => [
             styles.pressableIcon,
-            focused && { backgroundColor: AppTheme.colors.primary },
+            focused && { backgroundColor: AppTheme.colors.muted },
             pressed && { opacity: 0.7 }
           ]}
         >

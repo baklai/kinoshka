@@ -15,11 +15,18 @@ type StorageContextType = {
   loadHistory: () => Promise<HistoryRow[]>;
   addToHistory: (movie: Pick<MovieProps, 'source' | 'poster' | 'title'>) => Promise<void>;
   clearHistory: () => Promise<void>;
+
+  recentSearches: string[];
+  addRecentSearch: (query: string) => Promise<void>;
+  removeRecentSearch: (query: string) => Promise<void>;
+  clearRecentSearches: () => Promise<void>;
 };
 
 const BOOKMARKS_KEY = 'bookmarks';
 const HISTORY_KEY = 'history';
+const RECENT_SEARCHES_KEY = 'recent_searches';
 const MAX_HISTORY = 24;
+const MAX_RECENT_SEARCHES = 8;
 
 const StorageContext = createContext<StorageContextType>({
   bookmarks: [],
@@ -28,16 +35,25 @@ const StorageContext = createContext<StorageContextType>({
   clearBookmarks: async () => {},
   loadHistory: async () => [],
   addToHistory: async () => {},
-  clearHistory: async () => {}
+  clearHistory: async () => {},
+  recentSearches: [],
+  addRecentSearch: async () => {},
+  removeRecentSearch: async () => {},
+  clearRecentSearches: async () => {}
 });
 
 export function StorageProvider({ children }: { children: React.ReactNode }) {
   const [bookmarks, setBookmarks] = useState<BookmarkRow[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
     AsyncStorage.getItem(BOOKMARKS_KEY)
       .then(raw => setBookmarks(raw ? JSON.parse(raw) : []))
       .catch(err => console.error('[StorageProvider] load bookmarks error:', err));
+
+    AsyncStorage.getItem(RECENT_SEARCHES_KEY)
+      .then(raw => setRecentSearches(raw ? JSON.parse(raw) : []))
+      .catch(err => console.error('[StorageProvider] load recent searches error:', err));
   }, []);
 
   const isBookmarked = useCallback(
@@ -55,7 +71,6 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
               ...bookmarks,
               { source: movie.source, poster: movie.poster ?? null, title: movie.title }
             ];
-
         setBookmarks(next);
         await AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(next));
       } catch (err) {
@@ -89,7 +104,6 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
       try {
         const raw = await AsyncStorage.getItem(HISTORY_KEY);
         const history: HistoryRow[] = raw ? JSON.parse(raw) : [];
-
         const next: HistoryRow[] = [
           {
             source: movie.source,
@@ -99,7 +113,6 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
           },
           ...history.filter(h => h.source !== movie.source)
         ].slice(0, MAX_HISTORY);
-
         await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next));
       } catch (err) {
         console.error('[StorageProvider] addToHistory error:', err);
@@ -116,6 +129,46 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const addRecentSearch = useCallback(
+    async (query: string) => {
+      const trimmed = query.trim();
+      if (!trimmed) return;
+      try {
+        const next = [trimmed, ...recentSearches.filter(s => s !== trimmed)].slice(
+          0,
+          MAX_RECENT_SEARCHES
+        );
+        setRecentSearches(next);
+        await AsyncStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next));
+      } catch (err) {
+        console.error('[StorageProvider] addRecentSearch error:', err);
+      }
+    },
+    [recentSearches]
+  );
+
+  const removeRecentSearch = useCallback(
+    async (query: string) => {
+      try {
+        const next = recentSearches.filter(s => s !== query);
+        setRecentSearches(next);
+        await AsyncStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next));
+      } catch (err) {
+        console.error('[StorageProvider] removeRecentSearch error:', err);
+      }
+    },
+    [recentSearches]
+  );
+
+  const clearRecentSearches = useCallback(async () => {
+    try {
+      setRecentSearches([]);
+      await AsyncStorage.removeItem(RECENT_SEARCHES_KEY);
+    } catch (err) {
+      console.error('[StorageProvider] clearRecentSearches error:', err);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       bookmarks,
@@ -124,7 +177,11 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
       clearBookmarks,
       loadHistory,
       addToHistory,
-      clearHistory
+      clearHistory,
+      recentSearches,
+      addRecentSearch,
+      removeRecentSearch,
+      clearRecentSearches
     }),
     [
       bookmarks,
@@ -133,7 +190,11 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
       clearBookmarks,
       loadHistory,
       addToHistory,
-      clearHistory
+      clearHistory,
+      recentSearches,
+      addRecentSearch,
+      removeRecentSearch,
+      clearRecentSearches
     ]
   );
 

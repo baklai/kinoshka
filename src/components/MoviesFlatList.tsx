@@ -22,8 +22,17 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
+  const loadingRef = useRef(false);
+  const hasMoreRef = useRef(true);
   const loadedPagesRef = useRef(new Set<number>());
   const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -68,13 +77,16 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
 
   const fetchData = useCallback(
     async (currentPage: number) => {
-      if (loading || !hasMore || loadedPagesRef.current.has(currentPage)) return;
+      if (loadingRef.current || !hasMoreRef.current || loadedPagesRef.current.has(currentPage))
+        return;
       try {
+        loadingRef.current = true;
         setLoading(true);
         const response = await onFetch(currentPage);
         if (!isMountedRef.current) return;
         if (!response || response.length === 0) {
           setHasMore(false);
+          hasMoreRef.current = false;
           return;
         }
         setData(prev => {
@@ -85,13 +97,19 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
         loadedPagesRef.current.add(currentPage);
         setPage(prev => prev + 1);
       } catch (error) {
-        if (isMountedRef.current) setHasMore(false);
+        if (isMountedRef.current) {
+          setHasMore(false);
+          hasMoreRef.current = false;
+        }
         console.error('Fetch error:', error);
       } finally {
-        if (isMountedRef.current) setLoading(false);
+        if (isMountedRef.current) {
+          loadingRef.current = false;
+          setLoading(false);
+        }
       }
     },
-    [onFetch, loading, hasMore]
+    [onFetch]
   );
 
   useEffect(() => {

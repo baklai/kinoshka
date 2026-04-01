@@ -33,6 +33,7 @@
   },
   "scripts": {
     "start": "expo start",
+    "start:android": "expo run:android",
     "lint": "expo lint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "release": "node scripts/release.js",

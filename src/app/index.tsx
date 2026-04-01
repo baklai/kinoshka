@@ -1,6 +1,6 @@
-import { useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
-import { Platform, StyleSheet, TVFocusGuideView, View } from 'react-native';
+import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { BackHandler, Platform, StyleSheet, TVFocusGuideView, View } from 'react-native';
 
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -10,11 +10,18 @@ const FocusContainer = Platform.isTV ? TVFocusGuideView : View;
 export default function IndexScreen() {
   const { source } = useLocalSearchParams<{ source: string }>();
   const { baseUrl, categories, getMovieCards } = useAppContext();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const fetchSource = useMemo(
-    () => source || categories[Math.floor(Math.random() * categories.length)].source,
-    [source, categories]
+  const fetchSourceRef = useRef<string>(
+    source || categories[Math.floor(Math.random() * categories.length)].source
   );
+
+  if (source && source !== fetchSourceRef.current) {
+    fetchSourceRef.current = source;
+  }
+
+  const fetchSource = fetchSourceRef.current;
 
   const fetchData = useCallback(
     async (page: number) => {
@@ -28,6 +35,21 @@ export default function IndexScreen() {
     },
     [fetchSource, baseUrl, getMovieCards]
   );
+
+  useEffect(() => {
+    if (!Platform.isTV) return;
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (pathname === '/menu') {
+        router.back();
+      } else {
+        router.push('/menu');
+      }
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [router, pathname]);
 
   const focusProps = Platform.isTV
     ? { trapFocusLeft: true, trapFocusRight: true, trapFocusDown: true }

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
@@ -12,7 +12,7 @@ import { StackHeader } from '@/components/StackHeader';
 import { StackTabs } from '@/components/StackTabs';
 import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/theme.constant';
-import { AppContext, DEFAULT_SERVICE_ID, ServiceConfig, SERVICES } from '@/context';
+import { AppContext, AppContextType, DEFAULT_SERVICE_ID, SERVICES } from '@/context';
 import { StorageProvider } from '@/context/storage';
 import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
@@ -44,39 +44,50 @@ function RootLayout() {
   const { startUpdateCheck } = useAutoUpdate();
   const deviceKind = useDeviceSetup();
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeService, setActiveService] = useState<ServiceConfig>(SERVICES[DEFAULT_SERVICE_ID]);
+
+  const [activeServiceId, setActiveServiceId] = useState<string>(DEFAULT_SERVICE_ID);
 
   const handleSetService = useCallback(async (id: string) => {
     if (SERVICES[id]) {
-      setActiveService(SERVICES[id]);
+      setActiveServiceId(id);
       await AsyncStorage.setItem(SERVICE_STORAGE_KEY, id);
     }
   }, []);
 
-  const contextValue = useMemo(
-    () => ({ ...activeService, setService: handleSetService }),
-    [activeService, handleSetService]
+  const contextValue = useMemo<AppContextType>(
+    () => ({ ...SERVICES[activeServiceId], setService: handleSetService }),
+    [activeServiceId, handleSetService]
   );
 
-  const init = useCallback(async () => {
-    try {
-      setLoading(true);
-      startUpdateCheck();
-
-      const savedId = await AsyncStorage.getItem(SERVICE_STORAGE_KEY);
-      if (savedId && SERVICES[savedId]) {
-        setActiveService(SERVICES[savedId]);
-      }
-    } catch (err) {
-      console.error('Application error:', err);
-    } finally {
-      setLoading(false);
-    }
+  const startUpdateCheckRef = useRef(startUpdateCheck);
+  useEffect(() => {
+    startUpdateCheckRef.current = startUpdateCheck;
   }, [startUpdateCheck]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        setLoading(true);
+        startUpdateCheckRef.current();
+
+        const savedId = await AsyncStorage.getItem(SERVICE_STORAGE_KEY);
+        if (!cancelled && savedId && SERVICES[savedId]) {
+          setActiveServiceId(savedId);
+        }
+      } catch (err) {
+        console.error('Application error:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
     init();
-  }, [init]);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <SafeAreaView
