@@ -40,10 +40,10 @@ export default function IndexScreen() {
     if (!Platform.isTV) return;
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (pathname === '/menu') {
-        router.back();
-      } else {
+      if (pathname === '/') {
         router.push('/menu');
+      } else {
+        router.back();
       }
       return true;
     });

@@ -15,7 +15,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-n
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/ui.constant';
 import { AppContext } from '@/context';
-import { useAutoUpdate } from '@/hooks/useAutoUpdate';
+import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { IconType } from '@/types/icons.type';
 
 export interface NavMenuItem {
@@ -26,6 +26,8 @@ export interface NavMenuItem {
 }
 
 const ITEM_HEIGHT = 60;
+
+const GITHUB_REALEASE = process.env.EXPO_PUBLIC_GITHUB_REALEASE || '';
 
 const AnimatedItem = React.memo(
   ({
@@ -71,7 +73,7 @@ AnimatedItem.displayName = 'AnimatedItem';
 
 export default function MenuScreen() {
   const appContext = useContext(AppContext);
-  const { startUpdateCheck } = useAutoUpdate();
+  const { checkForUpdate } = useAppUpdate(GITHUB_REALEASE);
   const { height } = useWindowDimensions();
   const scrollY = useSharedValue(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -124,7 +126,7 @@ export default function MenuScreen() {
         title: 'Перевірити оновлення',
         onPress: () => {
           router.back();
-          startUpdateCheck();
+          checkForUpdate();
         }
       },
       {
@@ -149,7 +151,7 @@ export default function MenuScreen() {
         }
       }
     ];
-  }, [appContext, startUpdateCheck]);
+  }, [appContext, checkForUpdate]);
 
   return (
     <TVFocusGuideView

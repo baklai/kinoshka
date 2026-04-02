@@ -14,7 +14,7 @@ import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/ui.constant';
 import { AppContext, AppContextType, DEFAULT_SERVICE_ID, SERVICES } from '@/context';
 import { StorageProvider } from '@/context/storage';
-import { checkForUpdate, useDownloadProgressListener } from '@/hooks/useAutoUpdate';
+import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
 import { useOrientation } from '@/hooks/useOrientation';
 
@@ -24,6 +24,8 @@ configureReanimatedLogger({
 });
 
 const SERVICE_STORAGE_KEY = 'selected_service_id';
+
+const GITHUB_REALEASE = process.env.EXPO_PUBLIC_GITHUB_REALEASE || '';
 
 export default function RootLayoutProvider() {
   return (
@@ -41,9 +43,9 @@ export default function RootLayoutProvider() {
 
 function RootLayout() {
   const orientation = useOrientation();
-  useDownloadProgressListener();
   const deviceKind = useDeviceSetup();
   const [loading, setLoading] = useState<boolean>(false);
+  const { checkForUpdate } = useAppUpdate(GITHUB_REALEASE);
 
   const [activeServiceId, setActiveServiceId] = useState<string>(DEFAULT_SERVICE_ID);
 
@@ -65,7 +67,6 @@ function RootLayout() {
     const init = async () => {
       try {
         setLoading(true);
-        checkForUpdate();
 
         const savedId = await AsyncStorage.getItem(SERVICE_STORAGE_KEY);
         if (!cancelled && savedId && SERVICES[savedId]) {
@@ -75,6 +76,7 @@ function RootLayout() {
         console.error('Application error:', err);
       } finally {
         if (!cancelled) setLoading(false);
+        checkForUpdate();
       }
     };
 
@@ -82,7 +84,7 @@ function RootLayout() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [checkForUpdate]);
 
   return (
     <SafeAreaView

@@ -2,7 +2,7 @@
   "expo": {
     "name": "KinoshkaTV",
     "slug": "KinoshkaTV",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
@@ -15,15 +15,10 @@
         "monochromeImage": "./assets/images/splash.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.KinoshkaTV"
+      "package": "com.anonymous.KinoshkaTV",
+      "permissions": ["REQUEST_INSTALL_PACKAGES"]
     },
     "plugins": [
-      [
-        "expo-screen-orientation",
-        {
-          "initialOrientation": "DEFAULT"
-        }
-      ],
       [
         "@react-native-tvos/config-tv",
         {
@@ -44,7 +39,6 @@
           }
         }
       ],
-      "expo-router",
       [
         "expo-splash-screen",
         {
@@ -54,6 +48,13 @@
             "imageWidth": 200
           },
           "resizeMode": "contain"
+        }
+      ],
+      "expo-router",
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
         }
       ],
       [
@@ -102,7 +103,8 @@
             "android": ["en", "ua", "ru"]
           }
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
