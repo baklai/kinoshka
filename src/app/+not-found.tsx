@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { scaledPixels } from '@/hooks/useScaledPixels';
 
 export default function NotFoundScreen() {

@@ -3,7 +3,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { IconType } from '@/types/icons.type';
 
 interface NavTab {

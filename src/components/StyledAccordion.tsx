@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { Animated, LayoutAnimation, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { IconType } from '@/types/icons.type';
 
 interface AccordionProps {

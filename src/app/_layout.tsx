@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
@@ -11,10 +11,10 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StackHeader } from '@/components/StackHeader';
 import { StackTabs } from '@/components/StackTabs';
 import { StyledLoader } from '@/components/StyledLoader';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { AppContext, AppContextType, DEFAULT_SERVICE_ID, SERVICES } from '@/context';
 import { StorageProvider } from '@/context/storage';
-import { useAutoUpdate } from '@/hooks/useAutoUpdate';
+import { checkForUpdate, useDownloadProgressListener } from '@/hooks/useAutoUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
 import { useOrientation } from '@/hooks/useOrientation';
 
@@ -41,7 +41,7 @@ export default function RootLayoutProvider() {
 
 function RootLayout() {
   const orientation = useOrientation();
-  const { startUpdateCheck } = useAutoUpdate();
+  useDownloadProgressListener();
   const deviceKind = useDeviceSetup();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -59,18 +59,13 @@ function RootLayout() {
     [activeServiceId, handleSetService]
   );
 
-  const startUpdateCheckRef = useRef(startUpdateCheck);
-  useEffect(() => {
-    startUpdateCheckRef.current = startUpdateCheck;
-  }, [startUpdateCheck]);
-
   useEffect(() => {
     let cancelled = false;
 
     const init = async () => {
       try {
         setLoading(true);
-        startUpdateCheckRef.current();
+        checkForUpdate();
 
         const savedId = await AsyncStorage.getItem(SERVICE_STORAGE_KEY);
         if (!cancelled && savedId && SERVICES[savedId]) {

@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 
 export default function AboutScreen() {
   const currentVersion = useMemo(() => {

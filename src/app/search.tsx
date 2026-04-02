@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { useStorage } from '@/context/storage';
 import { useAppContext } from '@/hooks/useAppContext';
 import { IconType } from '@/types/icons.type';

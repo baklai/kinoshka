@@ -3,7 +3,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View, ViewProps } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 
 type HeaderContentProps = ViewProps;
 

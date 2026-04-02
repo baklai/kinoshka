@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { ColorType } from '@/types/colors.type';
 import { IconType } from '@/types/icons.type';
 

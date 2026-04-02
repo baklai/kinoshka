@@ -3,7 +3,7 @@ import { Alert, Pressable, StyleSheet, Text, TVFocusGuideView, View } from 'reac
 
 import { AccordionSection, StyledAccordion } from '@/components/StyledAccordion';
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { AppContext, SERVICES } from '@/context';
 import { useStorage } from '@/context/storage';
 import { IconType } from '@/types/icons.type';

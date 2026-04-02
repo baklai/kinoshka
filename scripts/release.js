@@ -1,82 +1,79 @@
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const { execSync } = require('node:child_process');
 
-const appConfigJSON = fs.readFileSync(path.join(__dirname, '..', 'app.json'), 'utf-8');
-const appConfig = JSON.parse(appConfigJSON);
+function run(cmd, opts = {}) {
+  return execSync(cmd, { stdio: 'inherit', ...opts });
+}
 
+function runSilent(cmd) {
+  return execSync(cmd, { stdio: 'ignore' });
+}
+
+function isValidVersion(v) {
+  return /^\d+\.\d+\.\d+$/.test(v);
+}
+
+const appConfigPath = path.join(__dirname, '..', 'app.json');
+const readmePath = path.join(__dirname, 'README.md');
+const apkDir = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'release');
+
+const appConfig = JSON.parse(fs.readFileSync(appConfigPath, 'utf-8'));
 const appName = appConfig?.expo?.name || 'KinoshkaTV';
-const version = process?.argv?.[2]
-  ? `v${process.argv[2]}`
-  : appConfig?.expo?.version
-    ? `v${appConfig.expo.version}`
-    : null;
 
-if (!version) {
-  console.error('❌ Specify the version: npm run release XX.XX.XX or write it in app.json');
+const rawVersion = process.argv[2] || appConfig?.expo?.version;
+
+if (!rawVersion || !isValidVersion(rawVersion)) {
+  console.error('❌ Specify a valid version (X.X.X): npm run release X.X.X or set it in app.json');
   process.exit(1);
 }
 
-const originalApkPath = path.join(
-  __dirname,
-  '..',
-  'android',
-  'app',
-  'build',
-  'outputs',
-  'apk',
-  'release',
-  'app-release.apk'
-);
+const version = `v${rawVersion}`;
+
+try {
+  runSilent('gh --version');
+} catch {
+  console.error('❌ GitHub CLI (gh) is not installed or not in PATH');
+  process.exit(1);
+}
+
+const originalApkPath = path.join(apkDir, 'app-release.apk');
 
 if (!fs.existsSync(originalApkPath)) {
-  console.error(`❌ APK not found in path: ${originalApkPath}`);
+  console.error(`❌ APK not found: ${originalApkPath}`);
+  process.exit(1);
+}
+
+if (!fs.existsSync(readmePath)) {
+  console.error('❌ scripts/README.md not found');
   process.exit(1);
 }
 
 const customApkName = `${appName.toLowerCase()}-${version}.apk`;
-const customApkPath = path.join(
-  __dirname,
-  '..',
-  'android',
-  'app',
-  'build',
-  'outputs',
-  'apk',
-  'release',
-  customApkName
-);
+const customApkPath = path.join(apkDir, customApkName);
 
 fs.copyFileSync(originalApkPath, customApkPath);
+console.log(`📦 APK copied as ${customApkName}`);
 
 try {
-  fs.readFileSync(path.join(__dirname, 'README.md'), 'utf-8');
-} catch (err) {
-  console.warn('⚠️ README.md not found!');
-  process.exit(1);
-}
+  runSilent(`gh release view ${version}`);
 
-try {
-  execSync(`gh release view ${version}`, { stdio: 'ignore' });
-
-  console.log(`ℹ️ Release ${version} already exists, uploading new APK...`);
-  execSync(`gh release upload ${version} ${customApkPath} --clobber`, { stdio: 'inherit' });
-
+  console.log(`ℹ️  Release ${version} already exists, uploading new APK...`);
+  run(`gh release upload ${version} "${customApkPath}" --clobber`);
   console.log(`✅ APK for ${appName} ${version} has been updated!`);
 } catch {
-  console.log(`ℹ️ Release ${version} not found, creating a new one...`);
+  console.log(`ℹ️  Release ${version} not found, creating a new one...`);
 
   try {
-    execSync(`git rev-parse ${version}`, { stdio: 'ignore' });
-    console.log(`ℹ️ Git tag ${version} already exists, skipping tag creation.`);
+    runSilent(`git rev-parse ${version}`);
+    console.log(`ℹ️  Git tag ${version} already exists, skipping tag creation.`);
   } catch {
-    execSync(`git tag -a ${version} -m "Release ${version}"`, { stdio: 'inherit' });
-    execSync(`git push origin ${version}`, { stdio: 'inherit' });
+    run(`git tag -a ${version} -m "Release ${version}"`);
+    run(`git push origin ${version}`);
   }
 
-  execSync(
-    `gh release create ${version} ${customApkPath} --title "${appName} ${version}" --notes-file "${path.join(__dirname, 'README.md')}"`,
-    { stdio: 'inherit' }
+  run(
+    `gh release create ${version} "${customApkPath}" --title "${appName} ${version}" --notes-file "${readmePath}"`
   );
 
   console.log(`✅ New release ${appName} ${version} created and APK uploaded!`);

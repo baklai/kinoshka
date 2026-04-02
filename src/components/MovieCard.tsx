@@ -3,8 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
-import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
+import { AppTheme, BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { MovieProps } from '@/types/movie.type';
 
 interface MovieCardProps extends MovieProps {

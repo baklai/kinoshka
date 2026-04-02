@@ -13,7 +13,7 @@ import {
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { StyledIcon } from '@/components/StyledIcon';
-import { AppTheme } from '@/constants/theme.constant';
+import { AppTheme } from '@/constants/ui.constant';
 import { AppContext } from '@/context';
 import { useAutoUpdate } from '@/hooks/useAutoUpdate';
 import { IconType } from '@/types/icons.type';

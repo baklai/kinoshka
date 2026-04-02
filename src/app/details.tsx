@@ -8,8 +8,7 @@ import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'rea
 import { NotFoundView } from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { StyledLoader } from '@/components/StyledLoader';
-import { AppTheme } from '@/constants/theme.constant';
-import { BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
+import { AppTheme, BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useHistory } from '@/hooks/useHistory';
