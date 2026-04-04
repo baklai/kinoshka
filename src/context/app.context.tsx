@@ -8,6 +8,7 @@ import { MovieProps } from '@/types/movie.type';
 
 type AppContextType = {
   release: string;
+  ready: boolean;
   service: string;
   player: string;
   category: string;
@@ -48,6 +49,7 @@ const MAX_SEARCH = 8;
 
 export const AppContext = createContext<AppContextType>({
   release: '',
+  ready: false,
   category: DEFAULT_CATEGORY,
   service: DEFAULT_SERVICE,
   player: DEFAULT_PLAYER,
@@ -177,6 +179,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider
       value={{
         release: RELEASE,
+        ready,
         service,
         player,
         category,

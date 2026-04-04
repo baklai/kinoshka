@@ -9,6 +9,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { StackHeader } from '@/components/StackHeader';
 import { StackTabs } from '@/components/StackTabs';
+import { StyledLoader } from '@/components/StyledLoader';
 import { AppTheme } from '@/constants/ui.constant';
 import { AppProvider } from '@/context/app.context';
 import { useAppContext } from '@/hooks/useAppContext';
@@ -35,13 +36,17 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
-  const { checkForUpdate } = useAppContext();
+  const { checkForUpdate, ready } = useAppContext();
   const orientation = useOrientation();
   const deviceKind = useDeviceSetup();
 
   useEffect(() => {
     checkForUpdate();
   }, [checkForUpdate]);
+
+  if (!ready) {
+    return <StyledLoader />;
+  }
 
   return (
     <SafeAreaView
