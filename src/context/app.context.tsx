@@ -10,6 +10,9 @@ import { ServiceType } from '@/types/service.type';
 type AppContextType = {
   release: string;
   service: ServiceType | null;
+  player: PlayerType | null;
+  setService: (key: string) => void;
+  setPlayer: (key: string) => void;
   bookmarks: Pick<MovieProps, 'source' | 'poster' | 'title'>[];
   history: Pick<MovieProps, 'source' | 'poster' | 'title'>[];
   search: string[];
@@ -21,11 +24,12 @@ type AppContextType = {
   clearBookmarks: () => void;
   clearHistory: () => void;
   clearSearch: () => void;
+  bookmarksLength: () => number;
 };
 
 const RELEASE = process.env.EXPO_PUBLIC_GITHUB_RELEASE || '';
 
-const SERVICES: Record<string, ServiceType> = {
+export const SERVICES: Record<string, ServiceType> = {
   uakino
 };
 
@@ -40,22 +44,26 @@ const MAX_SEARCH = 8;
 export const AppContext = createContext<AppContextType>({
   release: '',
   service: null,
+  player: null,
+  setService: () => {},
+  setPlayer: () => {},
   bookmarks: [],
   history: [],
   search: [],
   isBookmarked: () => false,
-  toggleBookmark: async () => {},
-  addHistory: async () => {},
-  addSearch: async () => {},
-  removeSearch: async () => {},
-  clearBookmarks: async () => [],
-  clearHistory: async () => [],
-  clearSearch: async () => []
+  toggleBookmark: () => {},
+  addHistory: () => {},
+  addSearch: () => {},
+  removeSearch: () => {},
+  clearBookmarks: () => {},
+  clearHistory: () => {},
+  clearSearch: () => {},
+  bookmarksLength: () => 0
 });
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [service, setService] = useState<ServiceType | null>(null);
-  const [player, setPlayer] = useState<PlayerType | null>(null);
+  const [service, setServiceState] = useState<ServiceType | null>(null);
+  const [player, setPlayerState] = useState<PlayerType | null>(null);
   const [bookmarks, setBookmarks] = useState<Pick<MovieProps, 'source' | 'poster' | 'title'>[]>([]);
   const [history, setHistory] = useState<Pick<MovieProps, 'source' | 'poster' | 'title'>[]>([]);
   const [search, setSearch] = useState<string[]>([]);
@@ -70,8 +78,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.getItem(HISTORY_KEY),
       AsyncStorage.getItem(SEARCH_KEY)
     ]).then(([v, p, b, h, s]) => {
-      setService(v ? SERVICES[v] : null);
-      setPlayer(p ? PLAYERS[p] : null);
+      setServiceState(v ? SERVICES[v] : null);
+      setPlayerState(p ? PLAYERS[p] : null);
       setBookmarks(b ? JSON.parse(b) : []);
       setHistory(h ? JSON.parse(h) : []);
       setSearch(s ? JSON.parse(s) : []);
@@ -81,12 +89,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(SERVICE_KEY, service?.key).catch(console.error);
+    if (service?.key) {
+      AsyncStorage.setItem(SERVICE_KEY, service.key).catch(console.error);
+    }
   }, [service, ready]);
 
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(BOOKMARK_KEY, player?.key).catch(console.error);
+    if (player?.key) {
+      AsyncStorage.setItem(PLAYER_KEY, player.key).catch(console.error);
+    }
   }, [player, ready]);
 
   useEffect(() => {
@@ -104,6 +116,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(SEARCH_KEY, JSON.stringify(search)).catch(console.error);
   }, [search, ready]);
 
+  const setService = useCallback((key: string) => {
+    setServiceState(SERVICES[key] ?? null);
+  }, []);
+
+  const setPlayer = useCallback((key: string) => {
+    setPlayerState(PLAYERS[key] ?? null);
+  }, []);
+
   const isBookmarked = useCallback(
     (source: string) => bookmarks.some(b => b.source === source),
     [bookmarks]
@@ -120,7 +140,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addHistory = useCallback((movie: Pick<MovieProps, 'source' | 'poster' | 'title'>) => {
     setHistory(prev =>
       [
-        { ...movie, poster: movie.poster ?? null, viewed_at: Date.now() },
+        { ...movie, poster: movie.poster ?? null },
         ...prev.filter(h => h.source !== movie.source)
       ].slice(0, MAX_HISTORY)
     );
@@ -139,7 +159,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSearch(next);
         await AsyncStorage.setItem(SEARCH_KEY, JSON.stringify(next));
       } catch (err) {
-        console.error('[AppProvider] removeRecentSearch error:', err);
+        console.error('[AppProvider] removeSearch error:', err);
       }
     },
     [search]
@@ -148,12 +168,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const clearBookmarks = useCallback(() => setBookmarks([]), []);
   const clearHistory = useCallback(() => setHistory([]), []);
   const clearSearch = useCallback(() => setSearch([]), []);
+  const bookmarksLength = useCallback(() => bookmarks.length, [bookmarks]);
 
   return (
     <AppContext.Provider
       value={{
         release: RELEASE,
         service,
+        player,
+        setService,
+        setPlayer,
         bookmarks,
         history,
         search,
@@ -164,7 +188,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         removeSearch,
         clearBookmarks,
         clearHistory,
-        clearSearch
+        clearSearch,
+        bookmarksLength
       }}
     >
       {children}

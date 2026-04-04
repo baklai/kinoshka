@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Alert, Pressable, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { PLAYERS } from '@/constants/players.constant';
 import { AppTheme } from '@/constants/ui.constant';
-import { AppContext, SERVICES, useApplication } from '@/context/app.context';
+import { SERVICES } from '@/context/app.context';
+import { useAppContext } from '@/hooks/useAppContext';
 import { IconType } from '@/types/icons.type';
 
 export default function OptionsScreen() {
-  const { id: activeId, setService } = useContext(AppContext);
-  const { bookmarksLength, clearBookmarks, clearHistory } = useApplication();
+  const { service, player, setService, setPlayer, bookmarksLength, clearBookmarks, clearHistory } =
+    useAppContext();
 
   const handleClearBookmarks = () =>
     Alert.alert(
@@ -20,7 +21,7 @@ export default function OptionsScreen() {
         {
           text: 'Очистити',
           style: 'destructive',
-          onPress: async () => await clearBookmarks()
+          onPress: () => clearBookmarks()
         }
       ]
     );
@@ -34,7 +35,7 @@ export default function OptionsScreen() {
         {
           text: 'Очистити',
           style: 'destructive',
-          onPress: async () => await clearHistory()
+          onPress: () => clearHistory()
         }
       ]
     );
@@ -43,13 +44,13 @@ export default function OptionsScreen() {
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
       <View>
         <Text style={styles.sectionLabel}>Джерело відео</Text>
-        {Object.values(SERVICES).map(service => {
-          const isSelected = service.id === activeId;
+        {Object.values(SERVICES).map(s => {
+          const isSelected = s.key === service?.key;
           return (
             <Pressable
-              key={service.id}
+              key={s.key}
               focusable
-              onPress={() => setService(service.id)}
+              onPress={() => setService(s.key)}
               style={({ focused }) => [styles.row, focused && styles.rowFocused]}
             >
               <StyledIcon
@@ -57,7 +58,7 @@ export default function OptionsScreen() {
                 size="large"
                 style={styles.rowIcon}
               />
-              <Text style={styles.rowText}>{service.name}</Text>
+              <Text style={styles.rowText}>{s.name}</Text>
             </Pressable>
           );
         })}
@@ -65,13 +66,13 @@ export default function OptionsScreen() {
 
       <View>
         <Text style={styles.sectionLabel}>Відтворення відео</Text>
-        {Object.values(PLAYERS).map(player => {
-          const isSelected = player.id === activeId;
+        {Object.values(PLAYERS).map(p => {
+          const isSelected = p.key === player?.key;
           return (
             <Pressable
-              key={player.id}
+              key={p.key}
               focusable
-              onPress={() => setService(player.id)}
+              onPress={() => setPlayer(p.key)}
               style={({ focused }) => [styles.row, focused && styles.rowFocused]}
             >
               <StyledIcon
@@ -79,7 +80,7 @@ export default function OptionsScreen() {
                 size="large"
                 style={styles.rowIcon}
               />
-              <Text style={styles.rowText}>{player.name}</Text>
+              <Text style={styles.rowText}>{p.name}</Text>
             </Pressable>
           );
         })}

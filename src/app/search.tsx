@@ -4,7 +4,6 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/ui.constant';
-import { useApplication } from '@/context/app.context';
 import { useAppContext } from '@/hooks/useAppContext';
 import { IconType } from '@/types/icons.type';
 import { MovieProps } from '@/types/movie.type';
@@ -128,8 +127,15 @@ export default function SearchScreen() {
   const [isFocused, setIsFocused] = useState(true);
   const [resultsCount, setResultsCount] = useState<number | null>(null);
 
-  const { baseUrl, searchUrl, searchMovieCards } = useAppContext();
-  const { recentSearches, addRecentSearch, removeRecentSearch } = useApplication();
+  const {
+    service,
+    search: recentSearches,
+    addSearch: addRecentSearch,
+    removeSearch: removeRecentSearch
+  } = useAppContext();
+  const baseUrl = service?.baseUrl ?? '';
+  const searchUrl = service?.searchUrl ?? '';
+  const searchMovieCards = service?.searchMovieCards;
 
   const inputRef = useRef<TextInput>(null);
 
@@ -153,7 +159,7 @@ export default function SearchScreen() {
       if (query.length < MIN_QUERY_LENGTH) return [];
       if (page > 1) return [];
       try {
-        const results = await searchMovieCards(baseUrl, searchUrl, query);
+        const results = (await searchMovieCards?.(baseUrl, searchUrl, query)) ?? [];
         handleResults(results);
         return results;
       } catch (error) {
