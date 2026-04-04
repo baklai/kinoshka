@@ -35,7 +35,7 @@
     "start": "expo start",
     "start:android": "expo run:android",
     "lint": "expo lint",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "format": "prettier --write \"**/*.{js,ts,tsx}\"",
     "release": "node scripts/release.js",
     "prebuild": "cross-env EXPO_TV=1 expo prebuild --clean",
     "build:debug": "cd android && cross-env EXPO_TV=1 gradlew assembleDebug",

@@ -4,6 +4,13 @@ The app allows users to quickly find popular movies, cartoons, shows, TV series,
 
 <img src="preview.png" alt="KinoshkaTV"/>
 
+## Project variables `.env`
+
+| Key                       | Comment                               |
+| ------------------------- | ------------------------------------- |
+| `EXPO_PUBLIC_APP_VERSION` | Application version in release        |
+| `EXPO_PUBLIC_APP_RELEASE` | Link to the release catalog on GitHub |
+
 ## Get started
 
 1. Install dependencies

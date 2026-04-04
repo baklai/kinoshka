@@ -35,7 +35,7 @@ type AppContextType = {
   checkForUpdate: () => void;
 };
 
-const RELEASE = process.env.EXPO_PUBLIC_GITHUB_RELEASE || '';
+const RELEASE = process.env.EXPO_PUBLIC_APP_RELEASE || '';
 
 const PLAYER_KEY = 'player';
 const CATEGORY_KEY = 'category';
