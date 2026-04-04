@@ -1,6 +1,13 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { execSync } = require('node:child_process');
+import { execSync } from 'node:child_process';
+import { copyFileSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+
+const config = require('../app.config.js');
 
 function run(cmd, opts = {}) {
   return execSync(cmd, { stdio: 'inherit', ...opts });
@@ -14,17 +21,18 @@ function isValidVersion(v) {
   return /^\d+\.\d+\.\d+$/.test(v);
 }
 
-const appConfigPath = path.join(__dirname, '..', 'app.json');
-const readmePath = path.join(__dirname, 'README.md');
-const apkDir = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'release');
+const appName = config?.expo?.name || 'KinoshkaTV';
+const appVersion = config?.expo?.version;
 
-const appConfig = JSON.parse(fs.readFileSync(appConfigPath, 'utf-8'));
-const appName = appConfig?.expo?.name || 'KinoshkaTV';
+const readmePath = join(__dirname, 'README.md');
+const apkDir = join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'release');
 
-const rawVersion = process.argv[2] || appConfig?.expo?.version;
+const rawVersion = process.argv[2] || appVersion;
 
 if (!rawVersion || !isValidVersion(rawVersion)) {
-  console.error('❌ Specify a valid version (X.X.X): npm run release X.X.X or set it in app.json');
+  console.error(
+    '❌ Specify a valid version (X.X.X): npm run release X.X.X or set EXPO_PUBLIC_APP_VERSION in .env'
+  );
   process.exit(1);
 }
 
@@ -37,22 +45,22 @@ try {
   process.exit(1);
 }
 
-const originalApkPath = path.join(apkDir, 'app-release.apk');
+const originalApkPath = join(apkDir, 'app-release.apk');
 
-if (!fs.existsSync(originalApkPath)) {
+if (!existsSync(originalApkPath)) {
   console.error(`❌ APK not found: ${originalApkPath}`);
   process.exit(1);
 }
 
-if (!fs.existsSync(readmePath)) {
+if (!existsSync(readmePath)) {
   console.error('❌ scripts/README.md not found');
   process.exit(1);
 }
 
 const customApkName = `${appName.toLowerCase()}-${version}.apk`;
-const customApkPath = path.join(apkDir, customApkName);
+const customApkPath = join(apkDir, customApkName);
 
-fs.copyFileSync(originalApkPath, customApkPath);
+copyFileSync(originalApkPath, customApkPath);
 console.log(`📦 APK copied as ${customApkName}`);
 
 try {
