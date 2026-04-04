@@ -3,11 +3,21 @@ import { Image } from 'expo-image';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
+import {
+  AppState,
+  AppStateStatus,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  View
+} from 'react-native';
 
 import { NotFoundView } from '@/components/NotFoundView';
 import { StyledIcon } from '@/components/StyledIcon';
 import { StyledLoader } from '@/components/StyledLoader';
+import { PLAYERS } from '@/constants/players.constant';
 import { AppTheme, BLUR_HASH_MOVIE_CARD } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useBookmarks } from '@/hooks/useBookmarks';
@@ -15,13 +25,12 @@ import { useHistory } from '@/hooks/useHistory';
 import { useOrientation } from '@/hooks/useOrientation';
 import { SERVICES } from '@/services';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
-import { sleep } from '@/utils';
 
 const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
   const orientation = useOrientation();
-  const { service } = useAppContext();
+  const { service, player } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { addToHistory } = useHistory();
@@ -35,6 +44,16 @@ export default function DetailsScreen() {
     return () => {
       isMountedRef.current = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const handleAppState = (next: AppStateStatus) => {
+      if (next === 'active' && isMountedRef.current) {
+        setLoading(false);
+      }
+    };
+    const sub = AppState.addEventListener('change', handleAppState);
+    return () => sub.remove();
   }, []);
 
   const bookmarked = useMemo(() => isBookmarked(source ?? ''), [isBookmarked, source]);
@@ -63,19 +82,32 @@ export default function DetailsScreen() {
 
       file.write(m3uContent);
 
-      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+      const intentParams = {
         data: file.contentUri,
         type: 'application/vnd.apple.mpegurl',
-        flags: 1,
-        extra: { 'android.intent.extra.INITIAL_INTENTS': [] }
-      });
+        flags: 1
+      };
+
+      if (PLAYERS[player] && PLAYERS[player]?.packageName !== 'default') {
+        try {
+          await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+            ...intentParams,
+            packageName: PLAYERS[player].packageName
+          });
+        } catch {
+          console.warn(
+            `[openPlaylist] ${PLAYERS[player].name} недоступний, відкриваємо системний вибір`
+          );
+          await IntentLauncher.startActivityAsync('android.intent.action.VIEW', intentParams);
+        }
+      } else {
+        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', intentParams);
+      }
 
       ToastAndroid.show(`${playlistName} відкривається`, ToastAndroid.SHORT);
     } catch (error) {
       console.error('Error opening playlist:', error);
       ToastAndroid.show(`Не вдалося відкрити ${playlistName}`, ToastAndroid.SHORT);
-    } finally {
-      await sleep(5000);
       if (isMountedRef.current) setLoading(false);
     }
   };
@@ -139,7 +171,7 @@ export default function DetailsScreen() {
                     title: movie.title
                   });
                 }
-                openPlaylist(movie.episodes ?? [], movie.originalTitle || movie.title || '');
+                openPlaylist(movie.episodes ?? [], movie.title || movie.originalTitle || 'Відео');
               }}
               style={({ focused, pressed }) => [
                 styles.playButton,
