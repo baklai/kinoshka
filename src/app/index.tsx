@@ -9,12 +9,12 @@ const FocusContainer = Platform.isTV ? TVFocusGuideView : View;
 
 export default function IndexScreen() {
   const { source } = useLocalSearchParams<{ source: string }>();
-  const { baseUrl, categories, getMovieCards } = useAppContext();
+  const { service } = useAppContext();
   const router = useRouter();
   const pathname = usePathname();
 
   const fetchSourceRef = useRef<string>(
-    source || categories[Math.floor(Math.random() * categories.length)].source
+    source || service?.categories[Math.floor(Math.random() * service?.categories.length)].source
   );
 
   if (source && source !== fetchSourceRef.current) {
@@ -27,13 +27,13 @@ export default function IndexScreen() {
     async (page: number) => {
       if (!fetchSource) return [];
       try {
-        return await getMovieCards(baseUrl, fetchSource, page);
+        return await service?.getMovieCards(service?.baseUrl, fetchSource, page);
       } catch (error) {
         console.error('Помилка завантаження фільмів:', error);
         return [];
       }
     },
-    [fetchSource, baseUrl, getMovieCards]
+    [fetchSource, service]
   );
 
   useEffect(() => {

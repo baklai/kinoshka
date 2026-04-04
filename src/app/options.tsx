@@ -1,166 +1,117 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Alert, Pressable, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
 
-import { AccordionSection, StyledAccordion } from '@/components/StyledAccordion';
 import { StyledIcon } from '@/components/StyledIcon';
+import { PLAYERS } from '@/constants/players.constant';
 import { AppTheme } from '@/constants/ui.constant';
-import { AppContext, SERVICES } from '@/context';
-import { useStorage } from '@/context/storage';
+import { AppContext, SERVICES, useApplication } from '@/context/app.context';
 import { IconType } from '@/types/icons.type';
 
-const ServiceSelector = () => {
-  const { id: activeId, setService } = useContext(AppContext);
-
-  return (
-    <View>
-      <Text style={styles.sectionLabel}>Джерело відео</Text>
-      {Object.values(SERVICES).map(service => {
-        const isSelected = service.id === activeId;
-        return (
-          <Pressable
-            key={service.id}
-            focusable
-            onPress={() => setService(service.id)}
-            style={({ focused }) => [styles.row, focused && styles.rowFocused]}
-          >
-            <StyledIcon
-              icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
-              size="large"
-              color={isSelected ? AppTheme.colors.primary : AppTheme.colors.subtext}
-              style={styles.rowIcon}
-            />
-            <Text style={[styles.rowText, isSelected && styles.rowTextActive]}>{service.name}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-};
-
-type ClearButtonProps = {
-  icon: IconType;
-  label: string;
-  description: string;
-  confirmTitle: string;
-  confirmMessage: string;
-  onConfirm: () => Promise<void>;
-};
-
-const ClearButton = ({
-  icon,
-  label,
-  description,
-  confirmTitle,
-  confirmMessage,
-  onConfirm
-}: ClearButtonProps) => {
-  const [done, setDone] = useState(false);
-
-  const handlePress = useCallback(() => {
-    Alert.alert(confirmTitle, confirmMessage, [
-      { text: 'Скасувати', style: 'cancel' },
-      {
-        text: 'Очистити',
-        style: 'destructive',
-        onPress: async () => {
-          await onConfirm();
-          setDone(true);
-          setTimeout(() => setDone(false), 3000);
-        }
-      }
-    ]);
-  }, [confirmTitle, confirmMessage, onConfirm]);
-
-  return (
-    <Pressable
-      focusable
-      onPress={handlePress}
-      style={({ focused }) => [styles.row, focused && styles.rowFocused]}
-    >
-      <StyledIcon
-        icon={done ? ('check-circle-outline' as IconType) : icon}
-        size="large"
-        color={done ? AppTheme.colors.primary : AppTheme.colors.subtext}
-        style={styles.rowIcon}
-      />
-      <View style={styles.rowBody}>
-        <Text style={styles.rowText}>{label}</Text>
-        <Text style={styles.rowSubText}>{description}</Text>
-      </View>
-      <StyledIcon
-        icon={'delete-outline' as IconType}
-        size="normal"
-        color={AppTheme.colors.subtext}
-      />
-    </Pressable>
-  );
-};
-
-const StorageManager = () => {
-  const { bookmarks, clearBookmarks, clearHistory } = useStorage();
-
-  return (
-    <View>
-      <Text style={styles.sectionLabel}>Очистити дані</Text>
-
-      <ClearButton
-        icon={'bookmark-multiple-outline' as IconType}
-        label="Закладки"
-        description={`${bookmarks.length} збережених фільмів`}
-        confirmTitle="Очистити закладки?"
-        confirmMessage="Всі збережені закладки буде видалено. Цю дію неможливо скасувати."
-        onConfirm={clearBookmarks}
-      />
-
-      <ClearButton
-        icon={'history' as IconType}
-        label="Історія перегляду"
-        description="Записи про переглянуті фільми"
-        confirmTitle="Очистити історію?"
-        confirmMessage="Всю історію перегляду буде видалено. Цю дію неможливо скасувати."
-        onConfirm={clearHistory}
-      />
-    </View>
-  );
-};
-
-const ComingSoon = ({ label }: { label: string }) => (
-  <View style={styles.comingSoon}>
-    <Text style={styles.comingSoonText}>{label}</Text>
-  </View>
-);
-
-const sections: AccordionSection[] = [
-  {
-    icon: 'video' as IconType,
-    title: 'Відео',
-    subtitle: 'Налаштування плеєра та джерел відео',
-    content: <ComingSoon label="Налаштування відео — незабаром" />
-  },
-  {
-    icon: 'movie-roll' as IconType,
-    title: 'Каталог',
-    subtitle: 'Налаштування каталогу фільмів/серіалів',
-    content: <ServiceSelector />
-  },
-  {
-    icon: 'theme-light-dark' as IconType,
-    title: 'Вигляд та поведінка',
-    subtitle: 'Тема, сортування',
-    content: <ComingSoon label="Налаштування вигляду — незабаром" />
-  },
-  {
-    icon: 'content-save' as IconType,
-    title: 'Збережені дані',
-    subtitle: 'Керування збереженими даними (історія, закладки)',
-    content: <StorageManager />
-  }
-];
-
 export default function OptionsScreen() {
+  const { id: activeId, setService } = useContext(AppContext);
+  const { bookmarksLength, clearBookmarks, clearHistory } = useApplication();
+
+  const handleClearBookmarks = () =>
+    Alert.alert(
+      'Очистити закладки?',
+      'Всі збережені закладки буде видалено. Цю дію неможливо скасувати.',
+      [
+        { text: 'Скасувати', style: 'cancel' },
+        {
+          text: 'Очистити',
+          style: 'destructive',
+          onPress: async () => await clearBookmarks()
+        }
+      ]
+    );
+
+  const handleClearHistory = () =>
+    Alert.alert(
+      'Очистити історію?',
+      'Всю історію перегляду буде видалено. Цю дію неможливо скасувати.',
+      [
+        { text: 'Скасувати', style: 'cancel' },
+        {
+          text: 'Очистити',
+          style: 'destructive',
+          onPress: async () => await clearHistory()
+        }
+      ]
+    );
+
   return (
     <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
-      <StyledAccordion sections={sections} />
+      <View>
+        <Text style={styles.sectionLabel}>Джерело відео</Text>
+        {Object.values(SERVICES).map(service => {
+          const isSelected = service.id === activeId;
+          return (
+            <Pressable
+              key={service.id}
+              focusable
+              onPress={() => setService(service.id)}
+              style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+            >
+              <StyledIcon
+                icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
+                size="large"
+                style={styles.rowIcon}
+              />
+              <Text style={styles.rowText}>{service.name}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View>
+        <Text style={styles.sectionLabel}>Відтворення відео</Text>
+        {Object.values(PLAYERS).map(player => {
+          const isSelected = player.id === activeId;
+          return (
+            <Pressable
+              key={player.id}
+              focusable
+              onPress={() => setService(player.id)}
+              style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+            >
+              <StyledIcon
+                icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
+                size="large"
+                style={styles.rowIcon}
+              />
+              <Text style={styles.rowText}>{player.name}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View>
+        <Text style={styles.sectionLabel}>Збережені дані</Text>
+
+        <Pressable
+          focusable
+          onPress={handleClearBookmarks}
+          style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+        >
+          <StyledIcon icon="bookmark-multiple-outline" size="large" style={styles.rowIcon} />
+          <View style={styles.rowBody}>
+            <Text style={styles.rowText}>Закладки</Text>
+            <Text style={styles.rowSubText}>{`${bookmarksLength()} збережених фільмів`}</Text>
+          </View>
+        </Pressable>
+
+        <Pressable
+          focusable
+          onPress={handleClearHistory}
+          style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+        >
+          <StyledIcon icon="history" size="large" style={styles.rowIcon} />
+          <View style={styles.rowBody}>
+            <Text style={styles.rowText}>Історія перегляду</Text>
+            <Text style={styles.rowSubText}>Записи про переглянуті фільми</Text>
+          </View>
+        </Pressable>
+      </View>
     </TVFocusGuideView>
   );
 }
@@ -169,7 +120,9 @@ const { spacing, typography } = AppTheme;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    paddingHorizontal: spacing(1),
+    gap: spacing(2)
   },
   sectionLabel: {
     color: AppTheme.colors.subtext,
@@ -182,11 +135,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: spacing(1.25),
-    paddingHorizontal: spacing(0.5),
-    borderRadius: 8
+    paddingHorizontal: spacing(1.25),
+    borderRadius: 4
   },
   rowFocused: {
-    opacity: 0.8
+    opacity: 0.8,
+    backgroundColor: AppTheme.colors.muted
   },
   rowIcon: {
     marginRight: spacing(1.25)
@@ -199,23 +153,9 @@ const styles = StyleSheet.create({
     color: AppTheme.colors.text,
     fontSize: typography.xl
   },
-  rowTextActive: {
-    color: AppTheme.colors.primary,
-    fontWeight: 'bold'
-  },
   rowSubText: {
     color: AppTheme.colors.subtext,
     fontSize: typography.md,
     marginTop: spacing(0.25)
-  },
-  comingSoon: {
-    paddingVertical: spacing(2),
-    paddingHorizontal: spacing(1),
-    alignItems: 'center'
-  },
-  comingSoonText: {
-    color: AppTheme.colors.subtext,
-    fontSize: typography.md,
-    fontStyle: 'italic'
   }
 });

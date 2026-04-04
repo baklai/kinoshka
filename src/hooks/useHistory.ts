@@ -1,6 +1,6 @@
-import { useStorage } from '@/context/storage';
+import { useApplication } from '@/context/app.context';
 
 export function useHistory() {
-  const { loadHistory, addToHistory } = useStorage();
+  const { loadHistory, addToHistory } = useApplication();
   return { loadHistory, addToHistory };
 }

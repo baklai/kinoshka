@@ -14,7 +14,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-n
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/ui.constant';
-import { AppContext } from '@/context';
+import { AppContext } from '@/context/app.context';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { IconType } from '@/types/icons.type';
 

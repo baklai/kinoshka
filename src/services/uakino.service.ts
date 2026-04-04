@@ -1,6 +1,7 @@
 import { parseHTML } from 'linkedom';
 
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
+import { ServiceType } from '@/types/service.type';
 import { validUrl } from '@/utils';
 
 const BASE_URL = 'https://uakino.best';
@@ -117,7 +118,7 @@ async function resolveEpisodeSource(href: string): Promise<string> {
   }
 }
 
-export async function getMovieCards(
+async function getMovieCards(
   baseUrl: string,
   source: string,
   page?: number
@@ -137,7 +138,7 @@ export async function getMovieCards(
   }
 }
 
-export async function searchMovieCards(
+async function searchMovieCards(
   baseUrl: string,
   searchUrl: string,
   search: string
@@ -162,7 +163,7 @@ export async function searchMovieCards(
   }
 }
 
-export async function getMovieDetails(baseUrl: string, source: string): Promise<MovieProps | null> {
+async function getMovieDetails(baseUrl: string, source: string): Promise<MovieProps | null> {
   log('GET DETAILS', source);
 
   try {
@@ -235,7 +236,7 @@ export async function getMovieDetails(baseUrl: string, source: string): Promise<
   }
 }
 
-export async function getMovieEpisodes(_baseUrl: string, source: string): Promise<EpisodeProps[]> {
+async function getMovieEpisodes(_baseUrl: string, source: string): Promise<EpisodeProps[]> {
   log('GET EPISODES', source);
 
   const id = source?.match(/\/(\d+)-[^/]+(?:\/|$)/)?.[1];
@@ -283,3 +284,25 @@ export async function getMovieEpisodes(_baseUrl: string, source: string): Promis
     return [];
   }
 }
+
+export const uakino: ServiceType = {
+  key: 'uakino',
+  name: 'uakino.best',
+  baseUrl: BASE_URL,
+  searchUrl: BASE_URL,
+  categories: [
+    { title: 'Фільми - останні додані', source: `${BASE_URL}/filmy` },
+    { title: 'Фільми - дивляться зараз', source: `${BASE_URL}/filmy/online` },
+    { title: 'Найкращі фільми українською', source: `${BASE_URL}/filmy/best` },
+    { title: 'Серіали - останні додані', source: `${BASE_URL}/seriesss` },
+    { title: 'Серіали - дивляться зараз', source: `${BASE_URL}/seriesss/online` },
+    { title: 'Найкращі серіали українською', source: `${BASE_URL}/seriesss/best` },
+    { title: 'Мультфільми - останні додані', source: `${BASE_URL}/cartoon` },
+    { title: 'Мультфільми - дивляться зараз', source: `${BASE_URL}/cartoon/online` },
+    { title: 'Найкращі мультфільми українською', source: `${BASE_URL}/cartoon/best` }
+  ],
+  getMovieCards,
+  searchMovieCards,
+  getMovieDetails,
+  getMovieEpisodes
+};
