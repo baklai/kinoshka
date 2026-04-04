@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useContext, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   Alert,
   BackHandler,
@@ -14,8 +14,8 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue } from 'react-n
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/ui.constant';
-import { AppContext } from '@/context/app.context';
-import { useAppUpdate } from '@/hooks/useAppUpdate';
+import { useAppContext } from '@/hooks/useAppContext';
+import { SERVICES } from '@/services';
 import { IconType } from '@/types/icons.type';
 
 export interface NavMenuItem {
@@ -26,8 +26,6 @@ export interface NavMenuItem {
 }
 
 const ITEM_HEIGHT = 60;
-
-const GITHUB_REALEASE = process.env.EXPO_PUBLIC_GITHUB_REALEASE || '';
 
 const AnimatedItem = React.memo(
   ({
@@ -72,8 +70,7 @@ const AnimatedItem = React.memo(
 AnimatedItem.displayName = 'AnimatedItem';
 
 export default function MenuScreen() {
-  const appContext = useContext(AppContext);
-  const { checkForUpdate } = useAppUpdate(GITHUB_REALEASE);
+  const { service, setCategory, checkForUpdate } = useAppContext();
   const { height } = useWindowDimensions();
   const scrollY = useSharedValue(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -91,16 +88,19 @@ export default function MenuScreen() {
 
   const navMenuList: NavMenuItem[] = useMemo(() => {
     return [
-      ...appContext.categories.map(item => ({
+      ...(SERVICES[service]?.categories?.map(item => ({
         title: item.title,
         onPress: () => {
+          setCategory(item.key);
           router.replace({
             pathname: '/',
             params: { title: item.title, source: item.source }
           });
         }
-      })),
+      })) ?? []),
+
       { separator: true },
+
       {
         icon: 'magnify',
         title: 'Пошук',
@@ -151,7 +151,7 @@ export default function MenuScreen() {
         }
       }
     ];
-  }, [appContext, checkForUpdate]);
+  }, [service]);
 
   return (
     <TVFocusGuideView

@@ -1,6 +1,7 @@
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 
 export type CategoryType = {
+  key: string;
   title: string;
   source: string;
 };

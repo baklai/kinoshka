@@ -115,13 +115,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing(0.25),
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(54, 124, 52, 0.6)',
     paddingHorizontal: spacing(0.625),
     paddingVertical: spacing(0.25),
     borderRadius: radius.xs
   },
   ratingText: {
-    color: '#FFD166',
+    color: AppTheme.colors.text,
     fontSize: typography.sm,
     fontWeight: '700'
   },

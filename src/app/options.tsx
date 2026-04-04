@@ -1,16 +1,32 @@
 import React from 'react';
-import { Alert, Pressable, StyleSheet, Text, TVFocusGuideView, View } from 'react-native';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TVFocusGuideView,
+  View
+} from 'react-native';
 
 import { StyledIcon } from '@/components/StyledIcon';
 import { PLAYERS } from '@/constants/players.constant';
 import { AppTheme } from '@/constants/ui.constant';
-import { SERVICES } from '@/context/app.context';
 import { useAppContext } from '@/hooks/useAppContext';
+import { SERVICES } from '@/services';
 import { IconType } from '@/types/icons.type';
 
 export default function OptionsScreen() {
-  const { service, player, setService, setPlayer, bookmarksLength, clearBookmarks, clearHistory } =
-    useAppContext();
+  const {
+    player,
+    service,
+    bookmarks,
+    setService,
+    setPlayer,
+    clearBookmarks,
+    clearHistory,
+    clearSearch
+  } = useAppContext();
 
   const handleClearBookmarks = () =>
     Alert.alert(
@@ -40,79 +56,107 @@ export default function OptionsScreen() {
       ]
     );
 
+  const handleClearSearch = () =>
+    Alert.alert(
+      'Очистити пошук?',
+      'Всю історію пошуку буде видалено. Цю дію неможливо скасувати.',
+      [
+        { text: 'Скасувати', style: 'cancel' },
+        {
+          text: 'Очистити',
+          style: 'destructive',
+          onPress: () => clearSearch()
+        }
+      ]
+    );
+
   return (
-    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight trapFocusDown>
-      <View>
-        <Text style={styles.sectionLabel}>Джерело відео</Text>
-        {Object.values(SERVICES).map(s => {
-          const isSelected = s.key === service?.key;
-          return (
-            <Pressable
-              key={s.key}
-              focusable
-              onPress={() => setService(s.key)}
-              style={({ focused }) => [styles.row, focused && styles.rowFocused]}
-            >
-              <StyledIcon
-                icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
-                size="large"
-                style={styles.rowIcon}
-              />
-              <Text style={styles.rowText}>{s.name}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
+    <TVFocusGuideView style={styles.container} trapFocusLeft trapFocusRight>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <View>
+          <Text style={styles.sectionLabel}>Збережені дані</Text>
 
-      <View>
-        <Text style={styles.sectionLabel}>Відтворення відео</Text>
-        {Object.values(PLAYERS).map(p => {
-          const isSelected = p.key === player?.key;
-          return (
-            <Pressable
-              key={p.key}
-              focusable
-              onPress={() => setPlayer(p.key)}
-              style={({ focused }) => [styles.row, focused && styles.rowFocused]}
-            >
-              <StyledIcon
-                icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
-                size="large"
-                style={styles.rowIcon}
-              />
-              <Text style={styles.rowText}>{p.name}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
+          <Pressable
+            focusable
+            onPress={handleClearBookmarks}
+            style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+          >
+            <StyledIcon icon="bookmark-multiple-outline" size="large" style={styles.rowIcon} />
+            <View style={styles.rowBody}>
+              <Text style={styles.rowText}>Закладки</Text>
+              <Text style={styles.rowSubText}>{`${bookmarks.length} збережених фільмів`}</Text>
+            </View>
+          </Pressable>
 
-      <View>
-        <Text style={styles.sectionLabel}>Збережені дані</Text>
+          <Pressable
+            focusable
+            onPress={handleClearHistory}
+            style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+          >
+            <StyledIcon icon="history" size="large" style={styles.rowIcon} />
+            <View style={styles.rowBody}>
+              <Text style={styles.rowText}>Історія перегляду</Text>
+              <Text style={styles.rowSubText}>Записи про переглянуті фільми</Text>
+            </View>
+          </Pressable>
 
-        <Pressable
-          focusable
-          onPress={handleClearBookmarks}
-          style={({ focused }) => [styles.row, focused && styles.rowFocused]}
-        >
-          <StyledIcon icon="bookmark-multiple-outline" size="large" style={styles.rowIcon} />
-          <View style={styles.rowBody}>
-            <Text style={styles.rowText}>Закладки</Text>
-            <Text style={styles.rowSubText}>{`${bookmarksLength()} збережених фільмів`}</Text>
-          </View>
-        </Pressable>
+          <Pressable
+            focusable
+            onPress={handleClearSearch}
+            style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+          >
+            <StyledIcon icon="magnify" size="large" style={styles.rowIcon} />
+            <View style={styles.rowBody}>
+              <Text style={styles.rowText}>Історія пошуку</Text>
+              <Text style={styles.rowSubText}>Записи про пошукові запити</Text>
+            </View>
+          </Pressable>
+        </View>
 
-        <Pressable
-          focusable
-          onPress={handleClearHistory}
-          style={({ focused }) => [styles.row, focused && styles.rowFocused]}
-        >
-          <StyledIcon icon="history" size="large" style={styles.rowIcon} />
-          <View style={styles.rowBody}>
-            <Text style={styles.rowText}>Історія перегляду</Text>
-            <Text style={styles.rowSubText}>Записи про переглянуті фільми</Text>
-          </View>
-        </Pressable>
-      </View>
+        <View>
+          <Text style={styles.sectionLabel}>Джерело відео</Text>
+          {Object.values(SERVICES).map(s => {
+            const isSelected = s.key === service;
+            return (
+              <Pressable
+                key={s.key}
+                focusable
+                onPress={() => setService(s.key)}
+                style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+              >
+                <StyledIcon
+                  icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
+                  size="large"
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowText}>{s.name}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        <View>
+          <Text style={styles.sectionLabel}>Відтворення відео</Text>
+          {Object.values(PLAYERS).map(p => {
+            const isSelected = p.key === player;
+            return (
+              <Pressable
+                key={p.key}
+                focusable
+                onPress={() => setPlayer(p.key)}
+                style={({ focused }) => [styles.row, focused && styles.rowFocused]}
+              >
+                <StyledIcon
+                  icon={(isSelected ? 'radiobox-marked' : 'radiobox-blank') as IconType}
+                  size="large"
+                  style={styles.rowIcon}
+                />
+                <Text style={styles.rowText}>{p.name}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
     </TVFocusGuideView>
   );
 }
@@ -122,7 +166,9 @@ const { spacing, typography } = AppTheme;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing(1),
+    padding: spacing(1)
+  },
+  scrollContent: {
     gap: spacing(2)
   },
   sectionLabel: {

@@ -47,7 +47,7 @@ export function useAppUpdate(checkUrl: string) {
   };
 
   const checkForUpdate = useCallback(async () => {
-    //  if (__DEV__) return;
+    if (__DEV__) return;
     if (Platform.OS !== 'android') return;
 
     try {

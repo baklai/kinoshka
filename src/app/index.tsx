@@ -1,33 +1,40 @@
 import { useLocalSearchParams, usePathname, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { BackHandler, Platform, StyleSheet, TVFocusGuideView, View } from 'react-native';
 
 import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { useAppContext } from '@/hooks/useAppContext';
+import { SERVICES } from '@/services';
 
 const FocusContainer = Platform.isTV ? TVFocusGuideView : View;
 
 export default function IndexScreen() {
+  const { service, category } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
-  const { service } = useAppContext();
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
 
-  const fetchSourceRef = useRef<string>(
-    source || service?.categories[Math.floor(Math.random() * service?.categories.length)].source
-  );
+  const fetchSourceRef = useMemo(() => {
+    return (
+      source ||
+      SERVICES[service]?.categories?.find(item => item.key === category)?.source ||
+      SERVICES[service]?.categories[
+        Math.floor(Math.random() * SERVICES[service]?.categories.length)
+      ].source
+    );
+  }, [source, service, category]);
 
-  if (source && source !== fetchSourceRef.current) {
-    fetchSourceRef.current = source;
-  }
-
-  const fetchSource = fetchSourceRef.current;
+  const fetchSource = source && source !== fetchSourceRef ? source : fetchSourceRef;
 
   const fetchData = useCallback(
     async (page: number) => {
       if (!fetchSource) return [];
       try {
-        return await service?.getMovieCards(service?.baseUrl, fetchSource, page);
+        return await SERVICES[service]?.getMovieCards(
+          SERVICES[service]?.baseUrl,
+          fetchSource,
+          page
+        );
       } catch (error) {
         console.error('Помилка завантаження фільмів:', error);
         return [];

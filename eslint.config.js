@@ -21,5 +21,10 @@ module.exports = defineConfig([
         console: 'readonly'
       }
     }
+  },
+  {
+    rules: {
+      'react-hooks/exhaustive-deps': 'off'
+    }
   }
 ]);

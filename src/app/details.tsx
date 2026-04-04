@@ -13,6 +13,7 @@ import { useAppContext } from '@/hooks/useAppContext';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useHistory } from '@/hooks/useHistory';
 import { useOrientation } from '@/hooks/useOrientation';
+import { SERVICES } from '@/services';
 import { EpisodeProps, MovieProps } from '@/types/movie.type';
 import { sleep } from '@/utils';
 
@@ -20,7 +21,7 @@ const Separator = () => <View style={styles.separator} />;
 
 export default function DetailsScreen() {
   const orientation = useOrientation();
-  const { baseUrl, getMovieDetails, getMovieEpisodes } = useAppContext();
+  const { service } = useAppContext();
   const { source } = useLocalSearchParams<{ source: string }>();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { addToHistory } = useHistory();
@@ -43,7 +44,10 @@ export default function DetailsScreen() {
       if (isMountedRef.current) setLoading(true);
 
       if (videos.length === 0) {
-        const episodes = await getMovieEpisodes(baseUrl, source ?? '');
+        const episodes = await SERVICES[service]?.getMovieEpisodes(
+          SERVICES[service]?.baseUrl,
+          source ?? ''
+        );
         videos.push(...episodes);
       }
 
@@ -80,7 +84,7 @@ export default function DetailsScreen() {
     if (!source) return;
     try {
       if (isMountedRef.current) setLoading(true);
-      const response = await getMovieDetails(baseUrl, source);
+      const response = await SERVICES[service]?.getMovieDetails(SERVICES[service]?.baseUrl, source);
       if (!isMountedRef.current) return;
       setMovie(response);
     } catch (error) {
@@ -90,7 +94,7 @@ export default function DetailsScreen() {
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
-  }, [source, baseUrl, getMovieDetails]);
+  }, [source, service]);
 
   useEffect(() => {
     fetchMovie();

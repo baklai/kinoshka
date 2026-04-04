@@ -12,7 +12,6 @@ import { StackTabs } from '@/components/StackTabs';
 import { AppTheme } from '@/constants/ui.constant';
 import { AppProvider } from '@/context/app.context';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useDeviceSetup } from '@/hooks/useDeviceSetup';
 import { useOrientation } from '@/hooks/useOrientation';
 
@@ -36,14 +35,13 @@ export default function RootLayoutProvider() {
 }
 
 function RootLayout() {
-  const { release } = useAppContext();
+  const { checkForUpdate } = useAppContext();
   const orientation = useOrientation();
   const deviceKind = useDeviceSetup();
-  const { checkForUpdate } = useAppUpdate(release);
 
   useEffect(() => {
     checkForUpdate();
-  }, []);
+  }, [checkForUpdate]);
 
   return (
     <SafeAreaView

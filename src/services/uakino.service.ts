@@ -291,15 +291,31 @@ export const uakino: ServiceType = {
   baseUrl: BASE_URL,
   searchUrl: BASE_URL,
   categories: [
-    { title: 'Фільми - останні додані', source: `${BASE_URL}/filmy` },
-    { title: 'Фільми - дивляться зараз', source: `${BASE_URL}/filmy/online` },
-    { title: 'Найкращі фільми українською', source: `${BASE_URL}/filmy/best` },
-    { title: 'Серіали - останні додані', source: `${BASE_URL}/seriesss` },
-    { title: 'Серіали - дивляться зараз', source: `${BASE_URL}/seriesss/online` },
-    { title: 'Найкращі серіали українською', source: `${BASE_URL}/seriesss/best` },
-    { title: 'Мультфільми - останні додані', source: `${BASE_URL}/cartoon` },
-    { title: 'Мультфільми - дивляться зараз', source: `${BASE_URL}/cartoon/online` },
-    { title: 'Найкращі мультфільми українською', source: `${BASE_URL}/cartoon/best` }
+    { key: 'filmy', title: 'Фільми - останні додані', source: `${BASE_URL}/filmy` },
+    { key: 'filmy-online', title: 'Фільми - дивляться зараз', source: `${BASE_URL}/filmy/online` },
+    { key: 'filmy-best', title: 'Найкращі фільми українською', source: `${BASE_URL}/filmy/best` },
+    { key: 'seriesss', title: 'Серіали - останні додані', source: `${BASE_URL}/seriesss` },
+    {
+      key: 'seriesss-online',
+      title: 'Серіали - дивляться зараз',
+      source: `${BASE_URL}/seriesss/online`
+    },
+    {
+      key: 'seriesss-best',
+      title: 'Найкращі серіали українською',
+      source: `${BASE_URL}/seriesss/best`
+    },
+    { key: 'cartoon', title: 'Мультфільми - останні додані', source: `${BASE_URL}/cartoon` },
+    {
+      key: 'cartoon-online',
+      title: 'Мультфільми - дивляться зараз',
+      source: `${BASE_URL}/cartoon/online`
+    },
+    {
+      key: 'cartoon-best',
+      title: 'Найкращі мультфільми українською',
+      source: `${BASE_URL}/cartoon/best`
+    }
   ],
   getMovieCards,
   searchMovieCards,

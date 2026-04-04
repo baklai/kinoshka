@@ -5,6 +5,7 @@ import { MoviesFlatList } from '@/components/MoviesFlatList';
 import { StyledIcon } from '@/components/StyledIcon';
 import { AppTheme } from '@/constants/ui.constant';
 import { useAppContext } from '@/hooks/useAppContext';
+import { SERVICES } from '@/services';
 import { IconType } from '@/types/icons.type';
 import { MovieProps } from '@/types/movie.type';
 
@@ -133,9 +134,9 @@ export default function SearchScreen() {
     addSearch: addRecentSearch,
     removeSearch: removeRecentSearch
   } = useAppContext();
-  const baseUrl = service?.baseUrl ?? '';
-  const searchUrl = service?.searchUrl ?? '';
-  const searchMovieCards = service?.searchMovieCards;
+  const baseUrl = SERVICES[service]?.baseUrl ?? '';
+  const searchUrl = SERVICES[service]?.searchUrl ?? '';
+  const searchMovieCards = SERVICES[service]?.searchMovieCards;
 
   const inputRef = useRef<TextInput>(null);
 
