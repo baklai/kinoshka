@@ -11,6 +11,12 @@ import { MovieProps } from '@/types/movie.type';
 
 const MIN_QUERY_LENGTH = 3;
 
+type RecentSearchesProps = {
+  searches: string[];
+  onSelect: (query: string) => void;
+  onRemove: (query: string) => void;
+};
+
 const MinCharsHint = ({ current }: { current: number }) => {
   const remaining = MIN_QUERY_LENGTH - current;
   const progress = (current / MIN_QUERY_LENGTH) * 100;
@@ -32,12 +38,6 @@ const MinCharsHint = ({ current }: { current: number }) => {
       </View>
     </View>
   );
-};
-
-type RecentSearchesProps = {
-  searches: string[];
-  onSelect: (query: string) => void;
-  onRemove: (query: string) => void;
 };
 
 const RecentSearches = ({ searches, onSelect, onRemove }: RecentSearchesProps) => {
@@ -92,24 +92,19 @@ export default function SearchScreen() {
   const [isFocused, setIsFocused] = useState(true);
   const [resultsCount, setResultsCount] = useState<number | null>(null);
 
-  const {
-    service,
-    search: recentSearches,
-    addSearch: addRecentSearch,
-    removeSearch: removeRecentSearch
-  } = useAppContext();
-  const searchMovieCards = SERVICES[service]?.searchMovieCards;
+  const { service, search, addSearch, removeSearch } = useAppContext();
 
   const inputRef = useRef<TextInput>(null);
 
-  const handleResults = useCallback(
-    (results: MovieProps[]) => {
-      setResultsCount(results.length);
-      if (results.length > 0) {
-        addRecentSearch(query);
-      }
+  const handleResults = useCallback((results: MovieProps[]) => {
+    setResultsCount(results.length);
+  }, []);
+
+  const handleCardPress = useCallback(
+    (title: string) => {
+      addSearch(title);
     },
-    [query, addRecentSearch]
+    [addSearch]
   );
 
   const handleChipSelect = useCallback((q: string) => {
@@ -122,7 +117,7 @@ export default function SearchScreen() {
       if (query.length < MIN_QUERY_LENGTH) return [];
       if (page > 1) return [];
       try {
-        const results = (await searchMovieCards?.(query)) ?? [];
+        const results = (await SERVICES[service]?.searchMovieCards?.(query)) ?? [];
         handleResults(results);
         return results;
       } catch (error) {
@@ -130,7 +125,7 @@ export default function SearchScreen() {
         return [];
       }
     },
-    [query, searchMovieCards, handleResults]
+    [query, handleResults]
   );
 
   useEffect(() => {
@@ -192,18 +187,14 @@ export default function SearchScreen() {
         >
           {showMinHint && <MinCharsHint current={query.length} />}
 
-          <RecentSearches
-            searches={recentSearches}
-            onSelect={handleChipSelect}
-            onRemove={removeRecentSearch}
-          />
+          <RecentSearches searches={search} onSelect={handleChipSelect} onRemove={removeSearch} />
         </ScrollView>
       )}
 
       {showResults && (
         <View style={styles.resultsContainer}>
           {resultsCount !== null && <ResultsCount count={resultsCount} />}
-          <MoviesFlatList onFetch={fetchData} key={query} />
+          <MoviesFlatList onFetch={fetchData} onCardPress={handleCardPress} key={query} />
         </View>
       )}
     </View>

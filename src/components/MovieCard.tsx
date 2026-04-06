@@ -8,14 +8,14 @@ import { MovieProps } from '@/types/movie.type';
 
 interface MovieCardProps extends MovieProps {
   style?: ViewStyle;
-  onPress: (source: string) => void;
+  onPress: (source: string, title: string) => void;
 }
 
 export const MovieCard = React.memo(
   ({ source, poster, title, imdb, likes, quality, style, onPress }: MovieCardProps) => {
     const [focused, setFocused] = useState(false);
 
-    const handlePress = useCallback(() => onPress(source), [onPress, source]);
+    const handlePress = useCallback(() => onPress(source, title ?? ''), [onPress, source, title]);
     const handleFocus = useCallback(() => setFocused(true), []);
     const handleBlur = useCallback(() => setFocused(false), []);
 

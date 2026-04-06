@@ -10,12 +10,13 @@ import { MovieProps } from '@/types/movie.type';
 
 interface MoviesFlatListProps {
   onFetch: (page: number) => Promise<MovieProps[]>;
+  onCardPress?: (title: string) => void;
 }
 
 const ITEM_SPACING = 14;
 const POSTER_RATIO = 3 / 2;
 
-export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
+export const MoviesFlatList = React.memo(({ onFetch, onCardPress }: MoviesFlatListProps) => {
   const [containerWidth, setContainerWidth] = useState(0);
   const [data, setData] = useState<MovieProps[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -120,9 +121,13 @@ export const MoviesFlatList = React.memo(({ onFetch }: MoviesFlatListProps) => {
     fetchData(page);
   }, [fetchData, page]);
 
-  const handlePressSelectItem = useCallback((source: string) => {
-    router.push({ pathname: '/details', params: { source } });
-  }, []);
+  const handlePressSelectItem = useCallback(
+    (source: string, title: string) => {
+      onCardPress?.(title);
+      router.push({ pathname: '/details', params: { source } });
+    },
+    [onCardPress]
+  );
 
   const renderEmpty = useCallback(() => {
     if (loading) return null;
