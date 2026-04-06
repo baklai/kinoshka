@@ -34,42 +34,6 @@ const MinCharsHint = ({ current }: { current: number }) => {
   );
 };
 
-const CATEGORY_CHIPS = [
-  { label: 'Фільми', query: 'фільм' },
-  { label: 'Серіали', query: 'серіал' },
-  { label: 'Мультфільми', query: 'мультфільм' },
-  { label: 'Аніме', query: 'аніме' },
-  { label: 'Документальні', query: 'документальний' }
-];
-
-type CategoryChipsProps = {
-  onSelect: (query: string) => void;
-};
-
-const CategoryChips = ({ onSelect }: CategoryChipsProps) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionLabel}>Популярні категорії</Text>
-    <View style={styles.chipsRow}>
-      {CATEGORY_CHIPS.map(chip => (
-        <Pressable
-          key={chip.query}
-          focusable
-          onPress={() => onSelect(chip.query)}
-          style={({ focused, pressed }) => [
-            styles.chip,
-            focused && styles.chipFocused,
-            pressed && { opacity: 0.7 }
-          ]}
-        >
-          {({ focused }) => (
-            <Text style={[styles.chipText, focused && styles.chipTextFocused]}>{chip.label}</Text>
-          )}
-        </Pressable>
-      ))}
-    </View>
-  </View>
-);
-
 type RecentSearchesProps = {
   searches: string[];
   onSelect: (query: string) => void;
@@ -134,8 +98,6 @@ export default function SearchScreen() {
     addSearch: addRecentSearch,
     removeSearch: removeRecentSearch
   } = useAppContext();
-  const baseUrl = SERVICES[service]?.baseUrl ?? '';
-  const searchUrl = SERVICES[service]?.searchUrl ?? '';
   const searchMovieCards = SERVICES[service]?.searchMovieCards;
 
   const inputRef = useRef<TextInput>(null);
@@ -160,7 +122,7 @@ export default function SearchScreen() {
       if (query.length < MIN_QUERY_LENGTH) return [];
       if (page > 1) return [];
       try {
-        const results = (await searchMovieCards?.(baseUrl, searchUrl, query)) ?? [];
+        const results = (await searchMovieCards?.(query)) ?? [];
         handleResults(results);
         return results;
       } catch (error) {
@@ -168,7 +130,7 @@ export default function SearchScreen() {
         return [];
       }
     },
-    [query, baseUrl, searchUrl, searchMovieCards, handleResults]
+    [query, searchMovieCards, handleResults]
   );
 
   useEffect(() => {
@@ -230,8 +192,6 @@ export default function SearchScreen() {
         >
           {showMinHint && <MinCharsHint current={query.length} />}
 
-          {showSuggestions && <CategoryChips onSelect={handleChipSelect} />}
-
           <RecentSearches
             searches={recentSearches}
             onSelect={handleChipSelect}
@@ -273,7 +233,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent'
   },
   searchBarFocused: {
-    borderColor: AppTheme.colors.primary
+    borderColor: AppTheme.colors.subtext
   },
   searchInput: {
     flex: 1,
@@ -291,6 +251,7 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     flex: 1,
+    paddingHorizontal: spacing(1.25),
     paddingTop: spacing(0.5)
   },
   section: {

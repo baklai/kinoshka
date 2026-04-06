@@ -63,10 +63,7 @@ export default function DetailsScreen() {
       if (isMountedRef.current) setLoading(true);
 
       if (videos.length === 0) {
-        const episodes = await SERVICES[service]?.getMovieEpisodes(
-          SERVICES[service]?.baseUrl,
-          source ?? ''
-        );
+        const episodes = await SERVICES[service]?.getMovieEpisodes(source ?? '');
         videos.push(...episodes);
       }
 
@@ -116,7 +113,7 @@ export default function DetailsScreen() {
     if (!source) return;
     try {
       if (isMountedRef.current) setLoading(true);
-      const response = await SERVICES[service]?.getMovieDetails(SERVICES[service]?.baseUrl, source);
+      const response = await SERVICES[service]?.getMovieDetails(source);
       if (!isMountedRef.current) return;
       setMovie(response);
     } catch (error) {

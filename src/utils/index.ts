@@ -6,3 +6,9 @@ export const validUrl = (url: string | null | undefined, baseUrl: string): strin
   if (!url || !url.length) return null;
   return new URL(url, baseUrl).toString();
 };
+
+export const devlog = (tag: string, message: string) => {
+  if (__DEV__) {
+    console.info(`${new Date().toISOString()} [${tag}] ${message}`);
+  }
+};

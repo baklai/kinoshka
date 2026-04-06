@@ -30,11 +30,7 @@ export default function IndexScreen() {
     async (page: number) => {
       if (!fetchSource) return [];
       try {
-        return await SERVICES[service]?.getMovieCards(
-          SERVICES[service]?.baseUrl,
-          fetchSource,
-          page
-        );
+        return await SERVICES[service]?.getMovieCards(fetchSource, page);
       } catch (error) {
         console.error('Помилка завантаження фільмів:', error);
         return [];
