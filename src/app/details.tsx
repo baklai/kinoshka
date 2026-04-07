@@ -162,7 +162,7 @@ export default function DetailsScreen() {
             <Pressable
               focusable
               hasTVPreferredFocus
-              onPress={() => {
+              onPress={async () => {
                 if (movie.title) {
                   addToHistory({
                     source: movie.source,
@@ -170,7 +170,10 @@ export default function DetailsScreen() {
                     title: movie.title
                   });
                 }
-                openPlaylist(movie.episodes ?? [], movie.title || movie.originalTitle || 'Відео');
+                await openPlaylist(
+                  movie.episodes ?? [],
+                  movie.title || movie.originalTitle || 'Відео'
+                );
               }}
               style={({ focused, pressed }) => [
                 styles.playButton,
