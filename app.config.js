@@ -104,7 +104,8 @@ module.exports = {
           }
         }
       ],
-      'expo-sharing'
+      'expo-sharing',
+      'expo-file-system'
     ],
     experiments: {
       typedRoutes: true,
