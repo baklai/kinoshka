@@ -105,7 +105,62 @@ module.exports = {
         }
       ],
       'expo-sharing',
-      'expo-file-system'
+      'expo-file-system',
+      function withM3uIntentSupport(config) {
+        const { withAndroidManifest } = require('@expo/config-plugins');
+        return withAndroidManifest(config, async config => {
+          const manifest = config.modResults;
+          const app = manifest.manifest;
+
+          if (!app.queries) app.queries = [];
+          const existingMimeTypes = app.queries
+            .flatMap(q => q.intent || [])
+            .flatMap(i => i.data || [])
+            .map(d => d.$?.['android:mimeType']);
+
+          const mimeTypesToAdd = ['application/vnd.apple.mpegurl', 'audio/x-mpegurl', 'video/*'];
+          for (const mimeType of mimeTypesToAdd) {
+            if (!existingMimeTypes.includes(mimeType)) {
+              app.queries.push({
+                intent: [
+                  {
+                    action: [{ $: { 'android:name': 'android.intent.action.VIEW' } }],
+                    data: [{ $: { 'android:mimeType': mimeType } }]
+                  }
+                ]
+              });
+            }
+          }
+          if (!app.application) app.application = [{}];
+          const application = app.application[0];
+          if (!application.provider) application.provider = [];
+
+          const providerName = 'expo.modules.filesystem.FileSystemFileProvider';
+          const alreadyAdded = application.provider.some(
+            p => p.$?.['android:name'] === providerName
+          );
+          if (!alreadyAdded) {
+            application.provider.push({
+              $: {
+                'android:name': providerName,
+                'android:authorities': '${applicationId}.FileSystemFileProvider',
+                'android:exported': 'false',
+                'android:grantUriPermissions': 'true'
+              },
+              'meta-data': [
+                {
+                  $: {
+                    'android:name': 'android.support.FILE_PROVIDER_PATHS',
+                    'android:resource': '@xml/file_system_provider_paths'
+                  }
+                }
+              ]
+            });
+          }
+
+          return config;
+        });
+      }
     ],
     experiments: {
       typedRoutes: true,

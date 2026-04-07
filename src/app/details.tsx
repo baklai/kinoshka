@@ -79,10 +79,8 @@ export default function DetailsScreen() {
       file.create();
       file.write(m3uContent);
 
-      const contentUri = file.contentUri;
-
       const intentParams = {
-        data: contentUri,
+        data: file.contentUri,
         type: 'application/vnd.apple.mpegurl',
         flags: 1
       };
