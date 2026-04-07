@@ -76,11 +76,13 @@ export default function DetailsScreen() {
       const file = new File(Paths.cache, `${safeName}.m3u`);
 
       if (file.exists) file.delete();
-
+      file.create();
       file.write(m3uContent);
 
+      const contentUri = file.contentUri;
+
       const intentParams = {
-        data: file.contentUri,
+        data: contentUri,
         type: 'application/vnd.apple.mpegurl',
         flags: 1
       };
@@ -160,9 +162,9 @@ export default function DetailsScreen() {
             <Pressable
               focusable
               hasTVPreferredFocus
-              onPress={async () => {
+              onPress={() => {
                 if (movie.title) {
-                  await addToHistory({
+                  addToHistory({
                     source: movie.source,
                     poster: movie.poster ?? null,
                     title: movie.title
